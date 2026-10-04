@@ -6,7 +6,7 @@ on:
     tags: [ "v*" ]
 
 permissions:
-  contents: write      # 允许回写构建日志，便于远程排错
+  contents: write
 
 jobs:
   build-apk:
@@ -54,58 +54,101 @@ jobs:
             --android-legacy-packaging \
             -o build > build.log 2>&1
           echo "EXIT=$?" >> "$GITHUB_OUTPUT"
-          echo "----- 日志尾部 -----"
-          tail -60 build.log
+          tail -40 build.log || true
 
-      - name: 回写构建日志到仓库
+      - name: 收集 APK（Flutter 3.44 输出路径与 flet 默认不一致，手动兜底）
+        id: collect
+        run: |
+          mkdir -p dist
+          echo "=== 全盘查找 apk ==="
+          find "$GITHUB_WORKSPACE" -name "*.apk" -type f 2>/dev/null | head -20 || true
+          # flet 期望的旧路径
+          for d in \
+            build/flutter/build/app/outputs/flutter-apk \
+            build/flutter/build/app/outputs/apk/release \
+            build/flutter/build/app/outputs/apk \
+            build/app/outputs/apk/release \
+            build/app/outputs/flutter-apk \
+            dist ; do
+            if [ -d "$d" ]; then
+              echo "发现目录: $d"
+              find "$d" -name "*.apk" -exec cp -v {} dist/ \; 2>/dev/null || true
+            fi
+          done
+          # 兜底：直接搜
+          if [ -z "$(ls -A dist 2>/dev/null)" ]; then
+            find "$GITHUB_WORKSPACE" -name "*.apk" -type f -exec cp -v {} dist/ \; 2>/dev/null || true
+          fi
+          ls -lh dist/ || true
+          echo "COUNT=$(ls dist/*.apk 2>/dev/null | wc -l)" >> "$GITHUB_OUTPUT"
+
+      - name: 回写构建日志
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 - <<'PY'
           import base64, json, os, urllib.request
-          tok = os.environ["GH_TOKEN"]
-          repo = os.environ["GITHUB_REPOSITORY"]
+          tok=os.environ["GH_TOKEN"]; repo=os.environ["GITHUB_REPOSITORY"]
+          try: raw=open("build.log","rb").read()
+          except OSError: raw=b"no log"
+          if len(raw)>600_000: raw=raw[:200_000]+b"\n...truncated...\n"+raw[-400_000:]
+          body={"message":"build log","content":base64.b64encode(raw).decode()}
           try:
-              raw = open("build.log", "rb").read()
-          except OSError:
-              raw = b"no build.log"
-          if len(raw) > 600_000:
-              raw = raw[:200_000] + b"\n...[truncated]...\n" + raw[-400_000:]
-          body = {"message": "build log", "content": base64.b64encode(raw).decode()}
-          # 已存在则带 sha 覆盖
-          try:
-              r = urllib.request.Request(
-                  f"https://api.github.com/repos/{repo}/contents/build-log.txt",
-                  headers={"Authorization": f"token {tok}", "User-Agent": "gh"})
-              d = json.loads(urllib.request.urlopen(r, timeout=60).read())
-              body["sha"] = d["sha"]
-          except Exception:
-              pass
-          req = urllib.request.Request(
-              f"https://api.github.com/repos/{repo}/contents/build-log.txt",
-              data=json.dumps(body).encode(), method="PUT",
-              headers={"Authorization": f"token {tok}",
-                       "Accept": "application/vnd.github+json",
-                       "Content-Type": "application/json",
-                       "User-Agent": "gh"})
-          try:
-              print("回写:", urllib.request.urlopen(req, timeout=120).status)
-          except Exception as e:
-              print("回写失败:", e)
+              r=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/build-log.txt",
+                  headers={"Authorization":f"token {tok}","User-Agent":"gh"})
+              body["sha"]=json.loads(urllib.request.urlopen(r,timeout=60).read())["sha"]
+          except Exception: pass
+          req=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/build-log.txt",
+              data=json.dumps(body).encode(),method="PUT",
+              headers={"Authorization":f"token {tok}","Accept":"application/vnd.github+json",
+                       "Content-Type":"application/json","User-Agent":"gh"})
+          try: print("回写:",urllib.request.urlopen(req,timeout=120).status)
+          except Exception as e: print("回写失败:",e)
           PY
 
-      - name: 上传 APK 产物
-        if: steps.build.outputs.EXIT == '0'
+      - name: 上传 APK
+        if: steps.collect.outputs.COUNT != '0'
         uses: actions/upload-artifact@v4
         with:
           name: 光影相册-APK
-          path: build/apk/*.apk
+          path: dist/*.apk
           retention-days: 30
           if-no-files-found: error
 
-      - name: 失败则中断
-        if: steps.build.outputs.EXIT != '0'
+      # APK 产物下载需要登录 GitHub，这里额外把 apk 直接提交回仓库，方便直接取用
+      - name: 提交 APK 到仓库 apk 分支文件
+        if: steps.collect.outputs.COUNT != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "::error::APK 构建失败"
+          python3 - <<'PY'
+          import base64, glob, json, os, urllib.request
+          tok=os.environ["GH_TOKEN"]; repo=os.environ["GITHUB_REPOSITORY"]
+          apks=sorted(glob.glob("dist/*.apk"))
+          for path in apks:
+              raw=open(path,"rb").read()
+              name=os.path.basename(path)
+              target=f"apk/{name}"
+              print(f"上传 {name} ({len(raw)//1024} KB) -> {target}")
+              body={"message":f"chore: {name}","content":base64.b64encode(raw).decode()}
+              try:
+                  r=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/{target}",
+                      headers={"Authorization":f"token {tok}","User-Agent":"gh"})
+                  body["sha"]=json.loads(urllib.request.urlopen(r,timeout=60).read())["sha"]
+              except Exception: pass
+              req=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/{target}",
+                  data=json.dumps(body).encode(),method="PUT",
+                  headers={"Authorization":f"token {tok}","Accept":"application/vnd.github+json",
+                           "Content-Type":"application/json","User-Agent":"gh"})
+              try:
+                  print("  结果:",urllib.request.urlopen(req,timeout=300).status)
+              except Exception as e:
+                  print("  失败:",e)
+          PY
+
+      - name: 失败则中断
+        if: steps.collect.outputs.COUNT == '0'
+        run: |
+          echo "::error::未收集到 APK"
           exit 1
