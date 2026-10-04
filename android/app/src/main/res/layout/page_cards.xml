@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="8dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/progress" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="0 / 0" android:textSize="14sp"
+            android:textColor="@color/text" android:textStyle="bold"/>
+        <Button android:id="@+id/btnMode" style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content" android:layout_height="32dp" android:text="移动" android:textSize="11sp"/>
+    </LinearLayout>
+
+    <FrameLayout android:id="@+id/stage" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1">
+        <ImageView android:id="@+id/card2" android:layout_width="200dp" android:layout_height="256dp"
+            android:layout_gravity="center" android:scaleType="centerCrop" android:alpha="0.5"/>
+        <ImageView android:id="@+id/card1" android:layout_width="212dp" android:layout_height="270dp"
+            android:layout_gravity="center" android:scaleType="centerCrop" android:alpha="0.75"/>
+        <ImageView android:id="@+id/card0" android:layout_width="224dp" android:layout_height="284dp"
+            android:layout_gravity="center" android:scaleType="centerCrop"
+            android:background="@color/glass"/>
+    </FrameLayout>
+
+    <TextView android:id="@+id/cardTip" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="上滑回收 · 下滑收藏 · 长按选择相册" android:textSize="11sp"
+        android:textColor="@color/dim" android:gravity="center" android:padding="4dp"/>
+
+    <TextView android:id="@+id/cardName" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center" android:textSize="13sp" android:textColor="@color/text"
+        android:singleLine="true" android:ellipsize="middle"/>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center">
+        <Button android:id="@+id/btnPrev" style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content" android:layout_height="34dp" android:text="上一张" android:textSize="11sp"/>
+        <Button android:id="@+id/btnSkip" style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content" android:layout_height="34dp" android:text="跳过" android:textSize="11sp"/>
+        <Button android:id="@+id/btnTrash" style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content" android:layout_height="34dp" android:text="清理" android:textSize="11sp"
+            android:textColor="@color/danger"/>
+    </LinearLayout>
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="归类到相册（点击即归档）" android:textSize="10sp" android:textColor="@color/dim"
+        android:gravity="center" android:paddingTop="6dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/cardAlbums"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:overScrollMode="never"/>
+</LinearLayout>
