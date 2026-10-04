@@ -16,6 +16,16 @@ android {
         resourceConfigurations += ["zh"]
     }
 
+    signingConfigs {
+        create("release") {
+            val ks = System.getenv("PB_KEYSTORE") ?: "photobox.jks"
+            storeFile = file(ks)
+            storePassword = System.getenv("PB_STORE_PASS") ?: "photobox"
+            keyAlias = System.getenv("PB_ALIAS") ?: "photobox"
+            keyPassword = System.getenv("PB_KEY_PASS") ?: "photobox"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -24,8 +34,10 @@ android {
 
     buildTypes {
         release {
-            // 使用 CI 自动生成的 debug 密钥签名，产出的 APK 可直接安装
-            signingConfig signingConfigs.debug
+            // 有密钥库就签名，保证产出的 APK 可直接安装
+            if (file(System.getenv("PB_KEYSTORE") ?: "photobox.jks").exists()) {
+                signingConfig signingConfigs.getByName("release")
+            }
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
