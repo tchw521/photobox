@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>光影相册 PhotoBox · 交互原型</title>
+<style>
+:root{
+  --bg1:#180A2B; --bg2:#2A1150; --bg3:#160A26;
+  --glass:rgba(255,255,255,.07); --glass2:rgba(255,255,255,.12);
+  --stroke:rgba(255,255,255,.10);
+  --accent:#A855F7; --accent2:#7C3AED;
+  --text:#F2EEFF; --dim:#A79EC8; --danger:#F87171;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:var(--text);overflow:hidden}
+#app{height:100%;display:flex;flex-direction:column;background:linear-gradient(135deg,var(--bg1),var(--bg2) 55%,var(--bg3))}
+header{display:flex;align-items:center;gap:10px;padding:14px 16px 10px}
+header h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.5px}
+.status{font-size:11px;color:var(--dim);margin-top:2px}
+.hbtn{width:34px;height:34px;border-radius:12px;background:var(--glass);border:1px solid var(--stroke);display:grid;place-items:center;cursor:pointer;font-size:15px}
+main{flex:1;display:flex;min-height:0}
+aside{width:20%;flex:0 0 20%;min-width:92px;max-width:240px;background:rgba(255,255,255,.045);border-radius:0 18px 18px 0;padding:10px 8px;overflow:auto;transition:none}
+aside.hidden{display:none}
+.aside-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;padding:4px 8px 10px}
+.item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:14px;cursor:pointer;font-size:13px;color:var(--dim);margin-bottom:2px}
+.item:hover{background:rgba(255,255,255,.06)}
+.item.on{background:var(--accent2);color:#fff;font-weight:600}
+.item .c{margin-left:auto;font-size:11px;opacity:.75}
+.sec{font-size:11px;color:#6B5C8C;padding:10px 12px 4px}
+.vline{width:1px;background:var(--stroke)}
+section.content{flex:1;display:flex;flex-direction:column;padding:10px 14px 8px;min-width:0;gap:8px}
+.row{display:flex;align-items:center;gap:8px}
+.search{flex:1;height:40px;border-radius:14px;background:var(--glass);border:1px solid var(--stroke);display:flex;align-items:center;padding:0 12px;gap:8px}
+.search input{flex:1;background:none;border:0;outline:0;color:var(--text);font-size:13px}
+.chips{display:flex;gap:8px;overflow:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:6px 11px;border-radius:12px;background:var(--glass);border:1px solid var(--stroke);font-size:12px;color:var(--dim);white-space:nowrap;cursor:pointer}
+.chip.on{background:var(--accent);color:#fff;border-color:transparent}
+.grid{flex:1;overflow:auto;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));align-content:start;padding-bottom:80px}
+.card{position:relative;aspect-ratio:1;border-radius:16px;overflow:hidden;border:3px solid transparent;cursor:pointer}
+.card.on{border-color:var(--accent)}
+.card .ph{width:100%;height:100%}
+.card .bar{position:absolute;left:0;right:0;bottom:0;padding:6px 8px;background:rgba(0,0,0,.6);font-size:10px;display:flex;gap:4px;align-items:center}
+.card .tick{position:absolute;right:6px;top:6px;display:none}
+.card.on .tick{display:block}
+.list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:80px}
+.lrow{display:flex;align-items:center;gap:10px;padding:8px 6px 8px 8px;background:var(--glass);border:1px solid var(--stroke);border-radius:14px;cursor:pointer}
+.lrow.on{background:var(--accent2)}
+.thumb{width:56px;height:56px;border-radius:12px;flex:0 0 56px}
+.lmeta{flex:1;min-width:0}
+.lmeta b{display:block;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lmeta span{font-size:11px;color:var(--dim)}
+nav{display:flex;background:#1A0F31;border-top:1px solid var(--stroke);padding:6px 0 10px}
+nav div{flex:1;text-align:center;font-size:11px;color:var(--dim);cursor:pointer;padding:4px 0}
+nav div.on{color:var(--accent)}
+nav .ic{display:block;font-size:19px;margin-bottom:2px}
+.fab{position:fixed;right:18px;bottom:78px;width:52px;height:52px;border-radius:18px;background:var(--accent);display:grid;place-items:center;font-size:26px;color:#fff;box-shadow:0 8px 20px rgba(168,85,247,.45);cursor:pointer;z-index:5}
+.selbar{position:fixed;left:14px;right:14px;bottom:74px;background:#2C1A4D;border:1px solid var(--stroke);border-radius:16px;padding:10px 12px;display:none;align-items:center;gap:10px;z-index:6;font-size:13px}
+.selbar.on{display:flex}
+.tbtn{font-size:12px;color:var(--dim);cursor:pointer;padding:4px 8px;border-radius:10px}
+.tbtn.p{color:var(--danger)}
+.tbtn.a{color:var(--accent)}
+.mask{position:fixed;inset:0;background:rgba(10,4,20,.72);display:none;align-items:center;justify-content:center;z-index:20;padding:22px}
+.mask.on{display:flex}
+.dlg{width:100%;max-width:380px;background:#241040;border:1px solid var(--stroke);border-radius:20px;overflow:hidden}
+.dlg h3{margin:0;padding:14px 16px 6px;font-size:15px}
+.dlg p{margin:0 16px 12px;font-size:13px;color:var(--dim);line-height:1.5}
+.dlg .acts{display:flex;justify-content:flex-end;gap:6px;padding:6px 10px 12px}
+.preview-img{height:300px;background:#1A0B2E;display:grid;place-items:center}
+.preview-img img{width:100%;height:100%;object-fit:contain}
+.pane{flex:1;overflow:auto;display:none;flex-direction:column;gap:10px;padding-bottom:80px}
+.pane.on{display:flex}
+.tile{flex:1;background:var(--glass);border:1px solid var(--stroke);border-radius:16px;padding:12px}
+.tile b{display:block;font-size:19px;font-weight:700}
+.tile span{font-size:11px;color:var(--dim)}
+.card-blk{background:var(--glass);border:1px solid var(--stroke);border-radius:18px;padding:14px;font-size:13px}
+.card-blk h4{margin:0 0 8px;font-size:15px}
+.pathrow{display:flex;align-items:center;gap:8px;padding:7px 8px;background:var(--glass);border-radius:12px;margin-bottom:6px;font-size:12px}
+.pathrow span{flex:1;overflow:hidden;text-overflow:ellipsis}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.empty{flex:1;display:grid;place-items:center;text-align:center;color:var(--dim)}
+.empty .ic{font-size:54px;color:#4B3B6B}
+.menu-btn{display:none;align-items:center;gap:6px;padding:6px 11px;border-radius:12px;
+  background:var(--glass);border:1px solid var(--stroke);cursor:pointer;font-size:12px;color:var(--text)}
+.menu-btn:active{background:var(--glass2)}
+.timeline{flex:1;overflow:auto;flex-direction:column;gap:10px;display:none;padding-bottom:80px}
+.tl-day{background:var(--glass);border:1px solid var(--stroke);border-radius:16px;padding:10px 12px}
+.tl-day .row{margin-bottom:8px}
+.tl-bar{width:4px;height:16px;background:var(--accent);border-radius:2px}
+.tl-cells{display:flex;flex-wrap:wrap;gap:8px}
+.tl-cell{width:76px;height:76px;border-radius:12px;cursor:pointer}
+.card-stage{flex:0 0 auto;height:340px;display:grid;place-items:center;position:relative}
+.cwrap{position:relative;width:230px;height:294px}
+.cstack{position:absolute;inset:0;transform-origin:center;transition:.22s;box-shadow:0 12px 28px rgba(0,0,0,.45)}
+.cstack:hover{border-color:rgba(168,85,247,.6)}
+.item.bubble{display:flex;align-items:center;gap:4px;padding:7px 6px;justify-content:space-between}
+.bname{flex:1;min-width:0;max-width:34px;overflow:hidden;white-space:nowrap;
+  background:rgba(255,255,255,.10);border:1px solid var(--stroke);border-radius:10px;
+  padding:3px 5px;font-size:12px;text-align:center}
+.bname.roll span{display:inline-block;animation:marquee 5s linear infinite}
+.bname.roll{text-align:left}
+@keyframes marquee{
+  0%{transform:translateX(0)}
+  15%{transform:translateX(0)}
+  55%{transform:translateX(calc(-100% + 30px))}
+  75%{transform:translateX(calc(-100% + 30px))}
+  100%{transform:translateX(0)}
+}
+.selbar2{position:fixed;left:14px;right:14px;bottom:128px;display:none;
+  align-items:center;gap:8px;z-index:6;overflow-x:auto}
+.selbar2.on{display:flex}
+.sop{padding:8px 12px;border-radius:12px;background:var(--glass);border:1px solid var(--stroke);
+  font-size:12px;white-space:nowrap;cursor:pointer}
+.sop.p{color:var(--danger)}
+.ctip{font-size:12px;color:#6B5C8C;text-align:center;height:16px}
+.slist{max-height:300px;overflow:auto;margin:0 6px 6px}
+.srow{display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:13px;cursor:pointer;border-radius:12px}
+.srow:hover{background:rgba(255,255,255,.07)}
+.cinfo{text-align:center}
+.cinfo b{display:block;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cinfo span{font-size:11px;color:var(--dim)}
+.craft-wrap{display:flex;gap:12px;flex-wrap:wrap}
+.craft-preview{flex:0 0 380px;background:var(--glass);border:1px solid var(--stroke);border-radius:20px;padding:14px}
+.craft-shot{position:relative;height:330px;border-radius:16px;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.craft-shot.breakout{align-items:center}
+.wm-bar{width:88%;margin-bottom:14px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(8px)}
+.wm-bar b{display:block;font-size:15px}
+.wm-bar span{font-size:11px;opacity:.85}
+.wm-bar.outline{background:linear-gradient(90deg,var(--c1),var(--c2));border:0}
+.wm-bar.breakout{background:#fff;color:#3c2a5c;border:0}
+.craft-shot.outline{box-shadow:inset 0 0 0 4px var(--c2)}
+.polka{position:absolute;inset:0;font-size:15px;opacity:.35;line-height:34px;padding:6px;color:#fff;word-break:break-all}
+.craft-panel{flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px}
+.sw{width:26px;height:26px;border-radius:8px;border:2px solid transparent;cursor:pointer}
+.sw.on{border-color:#fff}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:#2C1A4D;border:1px solid var(--stroke);padding:10px 16px;border-radius:14px;font-size:12px;opacity:0;transition:.25s;z-index:30;pointer-events:none}
+.toast.on{opacity:1}
+/* 主流安卓机型适配 */
+@media(max-width:380px){
+  aside{flex:0 0 20%;min-width:66px;max-width:84px;padding:6px 4px}
+  .item{font-size:10px;padding:6px 5px;gap:4px}
+  .aside-title{font-size:10px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(78px,1fr)) !important;gap:6px !important}
+  .card-stage{height:260px}
+  .cwrap{width:150px;height:196px}
+  header h1{font-size:15px}
+  .chip{font-size:10px;padding:6px 9px}
+}
+@media(min-width:381px) and (max-width:430px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+  .card-stage{height:310px}
+  .cwrap{width:180px;height:232px}
+}
+@media(min-width:600px) and (max-width:840px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+}
+/* 底部安全区：避开手势条 */
+@supports(padding-bottom:env(safe-area-inset-bottom)){
+  nav{padding-bottom:calc(6px + env(safe-area-inset-bottom))}
+  .fab{bottom:calc(78px + env(safe-area-inset-bottom))}
+  .selbar{bottom:calc(74px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(96px + env(safe-area-inset-bottom))}
+}
+
+@supports(padding-top:env(safe-area-inset-top)){
+  header{padding-top:calc(12px + env(safe-area-inset-top))}
+}
+
+@media(max-width:720px){
+  aside{flex:0 0 20%;min-width:72px;max-width:160px;padding:8px 5px}
+  .item{font-size:11px;padding:7px 6px;gap:6px}
+  .item .c{font-size:10px}
+  .aside-title{font-size:11px;padding:3px 6px 8px}
+  section.content{padding:8px 8px 8px}
+  main .vline{display:none}
+  .menu-btn{display:flex !important}
+  .card-stage{height:300px}
+  .cwrap{width:190px;height:244px}
+  .craft-preview{flex:1 1 100%}
+  .fab{right:14px;bottom:74px}
+  header{padding:12px 12px 8px}
+  header h1{font-size:16px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+}
+.card-stage{flex:0 0 auto;height:340px;display:grid;place-items:center;position:relative}
+.cwrap{position:relative;width:230px;height:294px}
+.cstack{position:absolute;inset:0;transform-origin:center;transition:.22s;box-shadow:0 12px 28px rgba(0,0,0,.45)}
+.cstack:hover{border-color:rgba(168,85,247,.6)}
+.item.bubble{display:flex;align-items:center;gap:4px;padding:7px 6px;justify-content:space-between}
+.bname{flex:1;min-width:0;max-width:34px;overflow:hidden;white-space:nowrap;
+  background:rgba(255,255,255,.10);border:1px solid var(--stroke);border-radius:10px;
+  padding:3px 5px;font-size:12px;text-align:center}
+.bname.roll span{display:inline-block;animation:marquee 5s linear infinite}
+.bname.roll{text-align:left}
+@keyframes marquee{
+  0%{transform:translateX(0)}
+  15%{transform:translateX(0)}
+  55%{transform:translateX(calc(-100% + 30px))}
+  75%{transform:translateX(calc(-100% + 30px))}
+  100%{transform:translateX(0)}
+}
+.selbar2{position:fixed;left:14px;right:14px;bottom:128px;display:none;
+  align-items:center;gap:8px;z-index:6;overflow-x:auto}
+.selbar2.on{display:flex}
+.sop{padding:8px 12px;border-radius:12px;background:var(--glass);border:1px solid var(--stroke);
+  font-size:12px;white-space:nowrap;cursor:pointer}
+.sop.p{color:var(--danger)}
+.ctip{font-size:12px;color:#6B5C8C;text-align:center;height:16px}
+.slist{max-height:300px;overflow:auto;margin:0 6px 6px}
+.srow{display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:13px;cursor:pointer;border-radius:12px}
+.srow:hover{background:rgba(255,255,255,.07)}
+.cinfo{text-align:center}
+.cinfo b{display:block;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cinfo span{font-size:11px;color:var(--dim)}
+.craft-wrap{display:flex;gap:12px;flex-wrap:wrap}
+.craft-preview{flex:0 0 380px;background:var(--glass);border:1px solid var(--stroke);border-radius:20px;padding:14px}
+.craft-shot{position:relative;height:330px;border-radius:16px;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.craft-shot.breakout{align-items:center}
+.wm-bar{width:88%;margin-bottom:14px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(8px)}
+.wm-bar b{display:block;font-size:15px}
+.wm-bar span{font-size:11px;opacity:.85}
+.wm-bar.outline{background:linear-gradient(90deg,var(--c1),var(--c2));border:0}
+.wm-bar.breakout{background:#fff;color:#3c2a5c;border:0}
+.craft-shot.outline{box-shadow:inset 0 0 0 4px var(--c2)}
+.polka{position:absolute;inset:0;font-size:15px;opacity:.35;line-height:34px;padding:6px;color:#fff;word-break:break-all}
+.craft-panel{flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px}
+.sw{width:26px;height:26px;border-radius:8px;border:2px solid transparent;cursor:pointer}
+.sw.on{border-color:#fff}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:#2C1A4D;border:1px solid var(--stroke);padding:10px 16px;border-radius:14px;font-size:12px;opacity:0;transition:.25s;z-index:30;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="menu-btn" id="menu"><span>☰</span><b>相册分类</b></div>
+    <div style="flex:1">
+      <h1 id="h1">光影相册</h1>
+      <div class="status" id="status">共 36 张照片 · 18.4 MB</div>
+    </div>
+    <div class="hbtn" id="rescan">⟳</div>
+    <div class="hbtn" id="about">ⓘ</div>
+  </header>
+  <main>
+    <aside id="aside">
+      <div class="aside-title">🖼 图集</div>
+      <div id="side"></div>
+    </aside>
+    <div class="vline"></div>
+    <section class="content">
+      <div class="row" id="toolbar">
+        <div class="search">🔍<input id="q" placeholder="搜索照片名称 / 图集"></div>
+        <div class="hbtn" id="v-toggle" title="切换宫格/列表">▦</div>
+        <div class="hbtn" id="v-timeline">📅</div>
+        <div class="hbtn" id="v-craft" style="color:var(--accent)">✦</div>
+        <div class="hbtn" id="sort">⇅</div>
+      </div>
+      <div class="chips" id="months"></div>
+      <div class="row" style="font-size:14px;font-weight:600">
+        <div id="title" style="flex:1">全部照片</div>
+        <div style="font-size:11px;color:var(--dim)" id="count"></div>
+        <div class="tbtn a" id="clean">🧹 按月份专清</div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="list" id="list" style="display:none"></div>
+
+      <div class="pane" id="pane-trash"></div>
+      <div class="pane" id="pane-set"></div>
+      <div class="timeline" id="timeline" style="display:none"></div>
+      <div class="pane" id="pane-block"></div>
+      <div class="pane" id="pane-card"></div>
+      <div class="pane" id="pane-craft"></div>
+    </section>
+  </main>
+  <nav id="nav">
+    <div class="on" data-t="0"><span class="ic">🖼</span>图库</div>
+    <div data-t="1"><span class="ic">🃏</span>卡片</div>
+    <div data-t="2"><span class="ic">⚙</span>设置</div>
+  </nav>
+  <div class="fab" id="fab">+</div>
+  <div class="selbar" id="selbar">
+    <span id="seltxt">已选 0 项</span>
+    <div style="flex:1"></div>
+    <div class="tbtn" id="selall">全选</div>
+    <div class="tbtn" id="selexit">取消</div>
+  </div>
+  <div class="selbar2" id="selbar2">
+    <div class="sop" id="op-fav">⭐ 收藏</div>
+    <div class="sop" id="op-move">📁 移动</div>
+    <div class="sop" id="op-rename">✏️ 重命名</div>
+    <div class="sop p" id="op-del">🗑 删除</div>
+  </div>
+</div>
+
+<div class="mask" id="mask"><div class="dlg" id="dlg"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const ICON={folder:'📁',star:'⭐',block:'🚫'};
+let ALBUMS=['Camera','Screenshots','旅行','微信图片'];
+let BLOCKED=new Set();
+let photos=[],trash=[],fav=new Set();
+let state={album:'ALL',month:null,q:'',view:'grid',sort:'date_desc',tab:0,sel:new Set(),selMode:false,blocked:false,tSort:'time_desc',tSel:new Set(),tAlbum:'ALL'};
+
+function grad(i){const h=[(i*47)%360,(i*73+120)%360];return `linear-gradient(135deg,hsl(${h[0]} 55% 32%),hsl(${h[1]} 60% 22%))`;}
+function seed(){
+  photos=[];let id=0;
+  ALBUMS.forEach((a,ai)=>{
+    const n=[12,8,10,6][ai];
+    for(let k=0;k<n;k++){
+      const m=[0,1,2][k%3];
+      const d=new Date(2026,9-m,((k*3)%27)+1,10+k%12);
+      photos.push({id:id++,name:`IMG_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${1000+id}.jpg`,
+        album:a,size:[820,1450,2300,640,3100,980][k%6]*1024,month:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,date:d,g:k});
+    }
+  });
+}
+seed();
+
+function visible(){
+  let ps=photos.filter(p=>!BLOCKED.has(p.album));
+  if(state.album==='FAV')ps=ps.filter(p=>fav.has(p.id));
+  else if(state.album!=='ALL')ps=ps.filter(p=>p.album===state.album);
+  if(state.month)ps=ps.filter(p=>p.month===state.month);
+  if(state.q)ps=ps.filter(p=>p.name.toLowerCase().includes(state.q)||p.album.toLowerCase().includes(state.q));
+  const s=state.sort;
+  ps.sort((a,b)=>s==='date_asc'?a.date-b.date:s==='name_asc'?a.name.localeCompare(b.name):s==='size_desc'?b.size-a.size:b.date-a.date);
+  return ps;
+}
+function fs(n){return n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';}
+function fmt(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:00`;}
+function albums(){const m={};photos.filter(p=>!BLOCKED.has(p.album)).forEach(p=>m[p.album]=(m[p.album]||0)+1);return Object.entries(m).sort((a,b)=>b[1]-a[1]);}
+function months(){const m={};photos.filter(p=>!BLOCKED.has(p.album)).forEach(p=>m[p.month]=(m[p.month]||0)+1);return Object.entries(m).sort().reverse();}
+
+function renderSide(){
+  const a=albums();let h='';
+  // 无图标；名字用气泡包裹，视口只容两字，超长自动滚动
+  const it=(ic,t,c,on,fn)=>{
+    const long=t.length>2;
+    return `<div class="item bubble ${on?'on':''}" data-f="${fn}" title="${t}">
+      <div class="bname ${long?'roll':''}"><span>${t}</span></div>
+      <div class="c">${c}</div></div>`;};
+  h+=it('🎞','全部照片',photos.filter(p=>!BLOCKED.has(p.album)).length,state.album==='ALL'&&!state.blocked,'ALL');
+  h+=it('⭐','收藏',fav.size,state.album==='FAV','FAV');
+  h+='<div class="sec">图集</div>';
+  a.forEach(([n,c])=>h+=it(ICON.folder,n,c,state.album===n,n));
+  h+='<div class="sec">其他</div>';
+  h+=it(ICON.block,'已屏蔽图集',BLOCKED.size,state.blocked,'BLOCK');
+  h+=it('🗑','回收站',trash.length,state.tab===3,'TRASH');
+  h+=it('✦','创作 / 水印',0,state.tab===4,'CRAFT');
+  document.getElementById('side').innerHTML=h;
+  document.querySelectorAll('#side .item').forEach(el=>el.onclick=()=>{
+    const f=el.dataset.f;
+    if(f==='CRAFT'){state.blocked=false;openCraft();return;}
+    if(f==='TRASH'){state.blocked=false;state.tab=3;render();return;}
+    if(f==='BLOCK'){state.blocked=true;}
+    else{state.blocked=false;state.album=f;state.month=null;state.selMode=false;state.sel.clear();}
+    state.tab=0;render();
+  });
+}
+function render(){
+  renderSide();
+  const lib=state.tab===0&&!state.blocked, cd=state.tab===1, tr=state.tab===3, set=state.tab===2, craft=state.tab===4;
+  document.getElementById('toolbar').style.display=(lib)?'flex':'none';
+  document.getElementById('months').style.display=lib?'flex':'none';
+  document.getElementById('grid').style.display=(lib&&state.view==='grid')?'grid':'none';
+  document.getElementById('list').style.display=(lib&&state.view==='list')?'flex':'none';
+  document.getElementById('pane-trash').className='pane'+(tr?' on':'');
+  document.getElementById('pane-set').className='pane'+(set?' on':'');
+  document.getElementById('pane-block').className='pane'+(state.blocked&&state.tab===0?' on':'');
+  document.getElementById('pane-craft').className='pane'+(craft?' on':'');
+  document.getElementById('pane-card').className='pane'+(cd?' on':'');
+  const noSide=(state.tab===1||state.tab===2);
+  document.getElementById('aside').style.display=noSide?'none':'';
+  document.getElementById('menu').style.display=noSide?'none':'';
+  document.getElementById('timeline').style.display=(lib&&state.view==='timeline')?'flex':'none';
+  const selOn=state.selMode&&state.sel.size;
+  document.getElementById('selbar').className='selbar'+(selOn?' on':'');
+  document.getElementById('selbar2').className='selbar2'+(selOn?' on':'');
+  document.getElementById('op-rename').style.display=(state.sel.size===1)?'':'none';
+  document.getElementById('fab').style.display=(state.tab===2)?'none':'grid';
+  document.querySelectorAll('#nav div').forEach((d,i)=>d.className=(state.tab<3&&i===state.tab)?'on':'');
+  const HM={0:'图库',1:'卡片 · 分类归档',2:'设置',3:'回收站',4:'创作 / 水印'};
+  document.getElementById('h1').textContent=HM[state.tab]||'光影相册';
+  if(lib)renderLib(); if(tr)renderTrash(); if(set)renderSet(); if(cd)renderCard(); if(craft)renderCraft(); if(state.blocked&&state.tab===0)renderBlock();
+  document.getElementById('fab').style.display=(state.tab===2||state.tab===4)?'none':'grid';
+  const tot=photos.filter(p=>!BLOCKED.has(p.album)).reduce((s,p)=>s+p.size,0);
+  document.getElementById('status').textContent=`共 ${photos.filter(p=>!BLOCKED.has(p.album)).length} 张照片 · ${fs(tot)}`;
+}
+function renderLib(){
+  const ps=visible();
+  const m=months();
+  document.getElementById('months').innerHTML=
+    `<div class="chip ${!state.month?'on':''}" data-m="">全部</div>`+
+    m.map(([k,c])=>`<div class="chip ${state.month===k?'on':''}" data-m="${k}">${k} (${c})</div>`).join('');
+  document.querySelectorAll('#months .chip').forEach(c=>c.onclick=()=>{state.month=c.dataset.m||null;render();});
+  document.getElementById('title').textContent=state.album==='ALL'?'全部照片'+(state.month?' · '+state.month:''):state.album==='FAV'?'收藏':state.album;
+  document.getElementById('count').textContent=`${ps.length} 张 · ${fs(ps.reduce((s,p)=>s+p.size,0))}`;
+  if(!ps.length){document.getElementById('grid').innerHTML=`<div class="empty" style="grid-column:1/-1"><div><div class="ic">🖼</div>还没有照片</div></div>`;document.getElementById('list').innerHTML='';return;}
+  document.getElementById('grid').innerHTML=ps.map(p=>`<div class="card ${state.sel.has(p.id)?'on':''}" data-id="${p.id}">
+     <div class="ph" style="background:${grad(p.g)}"></div>
+     <div class="bar"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">${p.name}</span>${fav.has(p.id)?'⭐':''}</div>
+     <div class="tick">✅</div></div>`).join('');
+  document.getElementById('list').innerHTML=ps.map(p=>`<div class="lrow ${state.sel.has(p.id)?'on':''}" data-id="${p.id}">
+     <div class="thumb" style="background:${grad(p.g)}"></div>
+     <div class="lmeta"><b>${p.name}</b><span>${p.album} · ${fmt(p.date)} · ${fs(p.size)}</span></div>
+     <div style="font-size:16px;color:var(--dim)">⋮</div></div>`).join('');
+  document.querySelectorAll('.card,.lrow').forEach(el=>{
+    const id=+el.dataset.id;
+    el.onclick=()=>{state.selMode?toggle(id):preview(id);};
+    el.onpointerup=()=>clearTimeout(t);
+    let t=null;
+    el.onpointerdown=()=>{t=setTimeout(()=>{if(!state.selMode)toast('已进入多选，可继续点选更多');state.selMode=true;state.sel.add(id);render();},450);};
+    el.onpointerup=()=>clearTimeout(t);
+    el.onpointerleave=()=>clearTimeout(t);
+  });
+  document.getElementById('seltxt').textContent=`已选 ${state.sel.size} 项`;
+  if(state.view==='timeline')renderTimeline(ps);
+}
+function toggle(id){state.sel.has(id)?state.sel.delete(id):state.sel.add(id);if(!state.sel.size)state.selMode=false;render();}
+function preview(id){
+  const p=photos.find(x=>x.id===id);
+  show(`<h3>${p.name}</h3>
+   <div class="preview-img"><div style="width:100%;height:100%;background:${grad(p.g)}"></div></div>
+   <p style="padding-top:10px">${p.album} · ${fmt(p.date)} · ${fs(p.size)}</p>
+   <div class="acts">${showActs?`<div class="tbtn a" data-a="fav">${fav.has(id)?'取消收藏':'收藏'}</div>
+   <div class="tbtn p" data-a="trash">清理</div>
+   <div class="tbtn p" data-a="block">屏蔽此图集</div>`:''}
+   <div class="tbtn" data-a="close">关闭</div></div>`);
+  document.querySelectorAll('#dlg .tbtn').forEach(b=>b.onclick=()=>{
+    const a=b.dataset.a;hide();
+    if(a==='fav'){fav.has(id)?fav.delete(id):fav.add(id);toast('已更新收藏');}
+    if(a==='trash'){toTrash([id]);}
+    if(a==='block'){confirmBox('屏蔽图集',`「${p.album}」将从扫描结果中隐藏。`,()=>{BLOCKED.add(p.album);state.album='ALL';toast('已屏蔽图集');render();});}
+    render();
+  });
+}
+function toTrash(ids){
+  ids.forEach(id=>{const i=photos.findIndex(p=>p.id===id);if(i<0)return;const p=photos[i];photos.splice(i,1);trash.push({...p,at:new Date(),tid:'t'+id});});
+  state.sel.clear();state.selMode=false;toast(`已清理 ${ids.length} 张到回收站`);render();
+}
+function renderTimeline(ps){
+  const g={};ps.forEach(p=>{const k=`${p.date.getFullYear()}-${String(p.date.getMonth()+1).padStart(2,'0')}-${String(p.date.getDate()).padStart(2,'0')}`;(g[k]=g[k]||[]).push(p);});
+  const keys=Object.keys(g).sort().reverse();
+  document.getElementById('timeline').innerHTML=keys.map(k=>`<div class="tl-day">
+     <div class="row"><div class="tl-bar"></div><b>${k}</b><span style="font-size:11px;color:var(--dim)">${g[k].length} 张</span>
+       <div style="flex:1"></div><div class="tbtn p" data-clean="${k}">专清这日</div></div>
+     <div class="tl-cells">${g[k].map(p=>`<div class="tl-cell" style="background:${grad(p.g)}" data-id="${p.id}"></div>`).join('')}</div></div>`).join('');
+  document.querySelectorAll('#timeline .tl-cell').forEach(c=>c.onclick=()=>preview(+c.dataset.id));
+  document.querySelectorAll('#timeline [data-clean]').forEach(b=>b.onclick=()=>{const k=b.dataset.clean;
+    confirmBox('按日专清',`将 ${k} 的 ${g[k].length} 张照片移入回收站？`,()=>toTrash(g[k].map(p=>p.id)));});
+}
+
+// ---------------- 创作 / 水印（对齐 photoo v3.3）
+const WMS={template:'glass',filt:'原图',color_mode:'gradient',c1:'#A855F7',c2:'#22D3EE',
+  prompt:'胶片复古',custom_text:'',polka_text:'',polka_on:false};
+let craftId=null;
+let showActs=false;
+let customAlbums={};
+const FILTERS=['原图','黑白','胶片','冷调','暖调','褪色','高对比','柔光','暗角'];
+const PRESETS=['#A855F7','#22D3EE','#F472B6','#FACC15','#34D399','#FB923C','#64748B'];
+const STYLES=['胶片复古','日系清新','港风霓虹','赛博朋克','蒸汽波','莫兰迪','黑金质感','国风水墨','浮世绘','波普艺术','拍立得','CCD 质感'];
+function openCraft(){state.tab=4;if(craftId===null&&visible().length)craftId=visible()[0].id;render();}
+function renderCraft(){
+  const ps=visible();if(!ps.length){document.getElementById('pane-craft').innerHTML='';return;}
+  if(craftId===null||!ps.find(p=>p.id===craftId))craftId=ps[0].id;
+  const p=ps.find(x=>x.id===craftId);
+  const chip=(t,on,fn)=>`<div class="chip ${on?'on':''}" data-w="${fn}">${t}</div>`;
+  const el=document.getElementById('pane-craft');
+  el.innerHTML=`
+   <div class="row"><div class="tbtn" id="c-back">← 返回照片库</div><div style="flex:1"></div>
+     <div style="font-size:14px;font-weight:600">创作 / 水印</div></div>
+   <div class="craft-wrap">
+     <div class="craft-preview"><div class="craft-shot ${WMS.template}" style="background:${grad(p.g)}">
+        <div class="wm-bar ${WMS.template}" style="--c1:${WMS.c1};--c2:${WMS.c2}">
+          <b>${WMS.custom_text||'西湖 · 杭州'}</b>
+          <span>${p.date.getFullYear()}.${String(p.date.getMonth()+1).padStart(2,'0')}.${String(p.date.getDate()).padStart(2,'0')} · ${p.album} · ${WMS.prompt}</span></div>
+        ${WMS.polka_on?`<div class="polka">${Array(24).fill(WMS.polka_text||'✦').join(' ')}</div>`:''}
+        </div>
+        <div style="font-size:12px;color:var(--dim);margin-top:8px">${p.name}</div></div>
+     <div class="craft-panel">
+       <div class="card-blk"><h4>水印边框</h4><div class="row">
+         ${chip('玻璃面板',WMS.template==='glass','t:glass')}${chip('主体描边',WMS.template==='outline','t:outline')}${chip('冲破边框',WMS.template==='breakout','t:breakout')}</div></div>
+       <div class="card-blk"><h4>滤镜预览</h4><div class="chips">
+         ${FILTERS.map(f=>chip(f,WMS.filt===f,'f:'+f)).join('')}</div></div>
+       <div class="card-blk"><h4>色彩系统</h4>
+         <div class="row">${chip('无',WMS.color_mode==='none','c:none')}${chip('渐变色',WMS.color_mode==='gradient','c:gradient')}${chip('半屏色彩',WMS.color_mode==='half','c:half')}${chip('纯色',WMS.color_mode==='solid','c:solid')}</div>
+         <div class="row" style="margin-top:8px">${PRESETS.map(c=>`<div class="sw ${WMS.c1===c?'on':''}" style="background:${c}" data-c1="${c}"></div>`).join('')}</div>
+         <div class="row" style="margin-top:8px">${PRESETS.map(c=>`<div class="sw ${WMS.c2===c?'on':''}" style="background:${c}" data-c2="${c}"></div>`).join('')}</div></div>
+       <div class="card-blk"><h4>波点样式（文本 / Emoji）</h4>
+         <div class="row"><div class="chip ${WMS.polka_on?'on':''}" data-w="p:toggle">${WMS.polka_on?'已启用':'已关闭'}</div>
+           <div class="search" style="height:36px"><input id="ptext" placeholder="如 ✦ 或 摄影" value="${WMS.polka_text}"></div></div></div>
+       <div class="card-blk"><h4>美术风格提示词</h4>
+         <div class="row"><div class="chip on">${WMS.prompt}</div><div class="tbtn a" id="rand">🎲 随机（内置 128 种）</div></div>
+         <div class="search" style="height:36px;margin-top:8px"><input id="ctext" placeholder="自定义水印文字" value="${WMS.custom_text}"></div></div>
+       <div class="row"><div class="tbtn a" id="c-next">换一张照片</div>
+         <div class="chip on" id="c-export" style="background:var(--accent);color:#fff;padding:10px 16px">导出到创作图集</div></div>
+     </div></div>`;
+  el.querySelectorAll('[data-w]').forEach(c=>c.onclick=()=>{const[ k,v]=c.dataset.w.split(':');
+    if(k==='t')WMS.template=v; if(k==='f')WMS.filt=v; if(k==='c')WMS.color_mode=v;
+    if(k==='p')WMS.polka_on=!WMS.polka_on; render();});
+  el.querySelectorAll('[data-c1]').forEach(c=>c.onclick=()=>{WMS.c1=c.dataset.c1;render();});
+  el.querySelectorAll('[data-c2]').forEach(c=>c.onclick=()=>{WMS.c2=c.dataset.c2;render();});
+  document.getElementById('rand').onclick=()=>{WMS.prompt=STYLES[Math.floor(Math.random()*STYLES.length)];toast('风格：'+WMS.prompt);render();};
+  document.getElementById('ctext').oninput=e=>{WMS.custom_text=e.target.value;};
+  document.getElementById('ptext').oninput=e=>{WMS.polka_text=e.target.value;};
+  document.getElementById('c-back').onclick=()=>{state.tab=0;render();};
+  document.getElementById('c-next').onclick=()=>{const i=ps.findIndex(x=>x.id===craftId);craftId=ps[(i+1)%ps.length].id;render();};
+  document.getElementById('c-export').onclick=()=>toast('已导出到「创作」图集');
+}
+
+
+// ---------------- 卡片页：叠放浏览 + 归类到相册
+let cardQueue=[],cardIdx=0,cardMode='move',cardDone=0;
+const STACK=[[0,0,1,0,1],[-6,5,.94,-3.2,.92],[7,8,.90,3.4,.82],[-2,13,.86,-1.2,.68],[4,17,.82,1.7,.52]];
+function buildQueue(){cardQueue=visible().slice();cardIdx=0;cardDone=0;}
+function albumDirs(){
+  const out={};
+  photos.filter(p=>!BLOCKED.has(p.album)).forEach(p=>out[p.album]=(out[p.album]||0)+1);
+  Object.keys(customAlbums).forEach(n=>out[n]=(out[n]||0)+customAlbums[n]);
+  return Object.entries(out).sort((a,b)=>b[1]-a[1]);
+}
+function renderCard(){
+  if(!cardQueue.length)buildQueue();
+  const el=document.getElementById('pane-card');
+  if(!cardQueue.length){el.innerHTML='<div class="empty"><div><div class="ic">🃏</div>没有待分类的照片</div></div>';return;}
+  if(cardIdx>=cardQueue.length){
+    el.innerHTML=`<div class="empty"><div><div class="ic">✅</div>这一批都归好类了<div style="font-size:12px;margin-top:6px">本次处理 ${cardDone} 张</div>
+      <div class="tbtn a" id="refill">重新装填待分类</div></div></div>`;
+    document.getElementById('refill').onclick=()=>{buildQueue();render();};return;}
+  const cur=cardQueue[cardIdx],total=cardQueue.length;
+  const layers=STACK.slice(0,Math.min(5,total-cardIdx));
+  const stack=layers.map((l,i)=>{
+    const p=cardQueue[cardIdx+i];
+    return `<div class="cstack${i===0?' top':''}" data-ctop="${i===0?p.id:''}"
+      style="transform:translate(${l[0]*4}px,${l[1]*4}px) rotate(${l[2]===1?0:l[3]}deg) scale(${l[2]});opacity:${l[4]};z-index:${9-i}">
+      <div style="width:100%;height:100%;background:${grad(p.g)};border-radius:18px;border:3px solid rgba(255,255,255,.12)"></div></div>`;}).join('');
+  el.innerHTML=`
+   <div class="row"><div style="font-size:13px;color:var(--accent);font-weight:600">${cardIdx+1} / ${total}</div>
+     <div style="flex:1"></div>
+     <div class="chip ${cardMode==='move'?'on':''}" data-m="move">移动</div>
+     <div class="chip ${cardMode==='copy'?'on':''}" data-m="copy">复制</div></div>
+   <div class="card-stage"><div class="cwrap">${stack}</div></div>
+   <div class="ctip" id="ctip">上滑回收 · 下滑收藏 · 长按选择相册</div>
+   <div class="cinfo"><b>${cur.name}</b><span>当前来源：${cur.album} · ${fmt(cur.date).slice(0,10)} · ${fs(cur.size)}</span></div>
+   <div class="row" style="justify-content:center;gap:14px">
+     <div class="tbtn" id="c-prev">↩ 上一张</div>
+     <div class="tbtn" id="c-skip">跳过 ⏭</div>
+     <div class="tbtn p" id="c-del">清理到回收站</div></div>
+   <div style="font-size:11px;color:#6B5C8C">归类到相册（点击即归档）</div>
+   <div class="chips" id="albums">
+     <div class="chip" id="new-album" style="color:var(--accent)">＋ 新建文件夹</div>
+     ${albumDirs().map(([n,c])=>`<div class="chip" data-album="${n}">📁 ${n} <span style="opacity:.6">${c}</span></div>`).join('')}
+   </div>`;
+  el.querySelectorAll('[data-m]').forEach(c=>c.onclick=()=>{cardMode=c.dataset.m;renderCard();});
+  el.querySelectorAll('[data-album]').forEach(c=>c.onclick=()=>cardTo(c.dataset.album));
+  document.getElementById('new-album').onclick=newAlbum;
+  bindCardGesture(cur);
+  document.getElementById('c-prev').onclick=()=>{if(cardIdx>0)cardIdx--;renderCard();};
+  document.getElementById('c-skip').onclick=()=>{cardQueue.push(cardQueue.splice(cardIdx,1)[0]);if(cardIdx>=cardQueue.length)cardIdx=0;renderCard();};
+  document.getElementById('c-del').onclick=()=>{toTrash([cur.id]);cardQueue=cardQueue.filter(p=>p.id!==cur.id);renderCard();};
+}
+function cardTo(name){
+  if(!cardQueue.length||cardIdx>=cardQueue.length)return;
+  const cur=cardQueue.splice(cardIdx,1)[0];
+  cur.album=name;cardDone++;
+  customAlbums[name]=(customAlbums[name]||0)+1;
+  if(cardIdx>=cardQueue.length)cardIdx=0;
+  toast(`已${cardMode==='move'?'移动':'复制'}到「${name}」`);
+  renderCard();
+}
+function newAlbum(){
+  show(`<h3>新建相册</h3><p>创建后自动归档当前照片</p>
+    <div style="padding:0 16px 12px"><div class="search"><input id="na" placeholder="如：头像 / 小说封面底图" style="font-size:13px"></div></div>
+    <div class="acts"><div class="tbtn" id="no">取消</div><div class="tbtn a" id="yes">创建并归档</div></div>`);
+  document.getElementById('no').onclick=hide;
+  document.getElementById('yes').onclick=()=>{const n=document.getElementById('na').value.trim();hide();
+    if(!n)return;customAlbums[n]=0;toast('已创建相册「'+n+'」');if(cardQueue.length)cardTo(n);else renderCard();};
+}
+
+
+let dragY=0,dragId=null,dragT0=0,longTimer=null;
+function bindCardGesture(cur){
+  const top=document.querySelector('.cstack.top');
+  if(!top)return;
+  const tip=()=>document.getElementById('ctip');
+  const start=e=>{
+    const pt=e.touches?e.touches[0]:e;
+    dragY=pt.clientY;dragId=cur.id;dragT0=Date.now();
+    longTimer=setTimeout(()=>{longTimer=null;if(!dragMoved)openAlbumSheet(cur);},480);
+  };
+  let dragMoved=false;
+  const move=e=>{
+    const pt=e.touches?e.touches[0]:e;
+    const dy=pt.clientY-dragY;
+    if(Math.abs(dy)>8){dragMoved=true;if(longTimer){clearTimeout(longTimer);longTimer=null;}}
+    if(dragMoved&&e.cancelable)e.preventDefault();
+    top.style.transform=`translate(0,${dy}px) scale(1)`;
+    top.style.opacity=Math.max(.4,1-Math.abs(dy)/260);
+    const t=tip();
+    t.textContent=dy<-90?'松手 → 清理到回收站':(dy>90?'松手 → 收藏 ⭐':'');
+    t.style.color=dy<-90?'var(--danger)':(dy>90?'var(--accent)':'#6B5C8C');
+  };
+  const end=e=>{
+    if(longTimer){clearTimeout(longTimer);longTimer=null;}
+    const pt=(e.changedTouches?e.changedTouches[0]:e)||{};
+    const dy=(pt.clientY||0)-dragY;
+    top.style.transform='';top.style.opacity='';
+    const t=tip();t.textContent='上滑回收 · 下滑收藏 · 长按选择相册';t.style.color='#6B5C8C';
+    if(dy<=-90)cardSwipe(cur,'trash');
+    else if(dy>=90)cardSwipe(cur,'fav');
+    dragId=null;dragMoved=false;
+  };
+  top.addEventListener('touchstart',start,{passive:true});
+  top.addEventListener('touchmove',move,{passive:false});
+  top.addEventListener('touchend',end);
+  top.addEventListener('mousedown',start);
+  window.addEventListener('mousemove',e=>{if(dragId!==null)move(e);});
+  window.addEventListener('mouseup',e=>{if(dragId!==null)end(e);});
+  top.addEventListener('contextmenu',e=>{e.preventDefault();openAlbumSheet(cur);});
+}
+function cardSwipe(cur,act){
+  cardQueue=cardQueue.filter(p=>p.id!==cur.id);
+  if(cardIdx>=cardQueue.length)cardIdx=0;
+  if(act==='trash'){toTrash([cur.id]);cardDone++;}
+  else{fav.add(cur.id);toast('已收藏 ⭐');cardDone++;}
+  renderCard();
+}
+function openAlbumSheet(cur){
+  const rows=albumDirs().map(([n,c])=>
+    `<div class="srow" data-sa="${n}">📁 <span style="flex:1">${n}</span><span style="font-size:11px;color:var(--dim)">${c}</span>›</div>`).join('');
+  show(`<h3>移动到相册</h3><p>${cur.name}</p>
+    <div class="slist">${rows}
+      <div class="srow" id="s-new" style="color:var(--accent)">＋ 新建文件夹…</div></div>
+    <div class="acts"><div class="tbtn" id="s-copy">复制而非移动</div>
+      <div class="tbtn" id="no">取消</div></div>`);
+  document.querySelectorAll('[data-sa]').forEach(r=>r.onclick=()=>{const n=r.dataset.sa;hide();
+    cardQueue=cardQueue.filter(p=>p.id!==cur.id);if(cardIdx>=cardQueue.length)cardIdx=0;
+    cur.album=n;cardDone++;customAlbums[n]=(customAlbums[n]||0)+1;
+    toast(`已${cardMode==='move'?'移动':'复制'}到「${n}」`);renderCard();});
+  document.getElementById('s-new').onclick=()=>{hide();newAlbumFor(cur);};
+  document.getElementById('s-copy').onclick=()=>{cardMode='copy';toast('已切换为复制模式');hide();renderCard();};
+  document.getElementById('no').onclick=hide;
+}
+function newAlbumFor(cur){
+  show(`<h3>新建相册</h3><p>创建后自动把这张照片移动进去</p>
+    <div style="padding:0 16px 12px"><div class="search"><input id="na" placeholder="如：头像 / 小说封面底图" style="font-size:13px"></div></div>
+    <div class="acts"><div class="tbtn" id="no">取消</div><div class="tbtn a" id="yes">创建并移动</div></div>`);
+  document.getElementById('no').onclick=hide;
+  document.getElementById('yes').onclick=()=>{const n=document.getElementById('na').value.trim();hide();
+    if(!n)return;customAlbums[n]=customAlbums[n]||0;toast('已创建相册「'+n+'」');
+    cardQueue=cardQueue.filter(p=>p.id!==cur.id);if(cardIdx>=cardQueue.length)cardIdx=0;
+    cur.album=n;cardDone++;customAlbums[n]++;renderCard();};
+}
+
+function renderTrash(){
+  const s=state.tSort;
+  let items=[...trash].sort((a,b)=>s==='name_asc'?a.name.localeCompare(b.name):s==='size_desc'?b.size-a.size:s==='album_asc'?a.album.localeCompare(b.album)||b.at-a.at:b.at-a.at);
+  const tAlbums={};trash.forEach(t=>tAlbums[t.album]=(tAlbums[t.album]||0)+1);
+  if(state.tAlbum!=='ALL')items=items.filter(t=>t.album===state.tAlbum);
+  const el=document.getElementById('pane-trash');
+  el.innerHTML=`<div class="row"><div style="flex:1;font-size:15px;font-weight:600">回收站</div>
+      <div class="tbtn" id="restore">↩ 还原所选</div><div class="tbtn p" id="purge">🗑 彻底删除</div><div class="tbtn p" id="empty">清空</div></div>
+    <div class="chips"><div class="chip ${s==='time_desc'?'on':''}" data-s="time_desc">删除时间</div>
+     <div class="chip ${s==='name_asc'?'on':''}" data-s="name_asc">名称</div>
+     <div class="chip ${s==='size_desc'?'on':''}" data-s="size_desc">大小</div>
+     <div class="chip ${s==='album_asc'?'on':''}" data-s="album_asc">按图集</div></div>
+    ${trash.length?`<div class="chips">${[['ALL','全部图集']].concat(Object.entries(tAlbums)).map(([k,c])=>[k,k==='ALL'?c:`${k} (${c})`]).map(([k,t])=>`<div class="chip ${state.tAlbum===k?'on':''}" data-a="${k}">${t}</div>`).join('')}</div>`:''}`+
+    (items.length?items.map(t=>`<div class="lrow ${state.tSel.has(t.tid)?'on':''}" data-t="${t.tid}">
+       <div class="thumb" style="background:${grad(t.g)}"></div>
+       <div class="lmeta"><b>${t.name}</b><span>${t.album} · ${fs(t.size)} · 删除于 ${fmt(t.at)}</span></div>
+       <div class="tbtn a" data-r="${t.tid}">↩</div><div class="tbtn p" data-d="${t.tid}">✕</div></div>`).join('')
+     :`<div class="empty"><div><div class="ic">🗑</div>回收站是空的</div></div>`);
+  el.querySelectorAll('.chip[data-s]').forEach(c=>c.onclick=()=>{state.tSort=c.dataset.s;renderTrash();});
+  el.querySelectorAll('.chip[data-a]').forEach(c=>c.onclick=()=>{state.tAlbum=c.dataset.a;renderTrash();});
+  el.querySelectorAll('.lrow').forEach(r=>r.onclick=e=>{const id=r.dataset.t;state.tSel.has(id)?state.tSel.delete(id):state.tSel.add(id);renderTrash();});
+  el.querySelectorAll('[data-r]').forEach(b=>b.onclick=e=>{e.stopPropagation();trash=trash.filter(t=>t.tid!==b.dataset.r);state.tSel.clear();toast('已还原');render();});
+  el.querySelectorAll('[data-d]').forEach(b=>b.onclick=e=>{e.stopPropagation();trash=trash.filter(t=>t.tid!==b.dataset.d);state.tSel.clear();toast('已彻底删除');render();});
+  const R=document.getElementById('restore'),P=document.getElementById('purge'),E=document.getElementById('empty');
+  if(R)R.onclick=()=>{const ids=state.tSel.size?[...state.tSel]:trash.map(t=>t.tid);trash=trash.filter(t=>!ids.includes(t.tid));state.tSel.clear();toast(`已还原 ${ids.length} 项`);render();};
+  if(P)P.onclick=()=>{if(!state.tSel.size){toast('请先勾选要删除的项目');return;}confirmBox('彻底删除',`${state.tSel.size} 项将被永久删除，无法恢复。`,()=>{trash=trash.filter(t=>!state.tSel.has(t.tid));state.tSel.clear();render();});};
+  if(E)E.onclick=()=>{if(!trash.length){toast('回收站是空的');return;}confirmBox('清空回收站',`${trash.length} 项将被永久删除。`,()=>{trash=[];state.tSel.clear();render();});};
+}
+function renderBlock(){
+  const el=document.getElementById('pane-block');
+  el.innerHTML=`<div style="font-size:12px;color:var(--dim)">已屏蔽的图集不会出现在扫描结果中</div>`+
+   (BLOCKED.size?[...BLOCKED].map(b=>`<div class="pathrow">🚫<span>${b}</span><div class="tbtn a" data-u="${b}">取消屏蔽</div></div>`).join('')
+   :`<div class="empty"><div><div class="ic">🚫</div>没有屏蔽的图集</div></div>`);
+  el.querySelectorAll('[data-u]').forEach(x=>x.onclick=()=>{BLOCKED.delete(x.dataset.u);toast('已取消屏蔽');render();});
+}
+function renderSet(){
+  const el=document.getElementById('pane-set');
+  const tot=photos.filter(p=>!BLOCKED.has(p.album)).reduce((s,p)=>s+p.size,0);
+  const roots=(navigator.platform||'').toLowerCase().includes('win')?['C:\\Users\\me\\Pictures','C:\\Users\\me\\Desktop']:['/sdcard/DCIM','/sdcard/Pictures'];
+  el.innerHTML=`
+   <div class="row" style="gap:8px">
+     <div class="tile"><b>${photos.filter(p=>!BLOCKED.has(p.album)).length}</b><span>照片</span></div>
+     <div class="tile"><b>${fs(tot)}</b><span>占用</span></div>
+     <div class="tile"><b>${trash.length}</b><span>回收站</span></div>
+     <div class="tile"><b>${BLOCKED.size}</b><span>已屏蔽</span></div></div>
+   <div class="card-blk"><h4>扫描目录</h4>
+     ${roots.map(r=>`<div class="pathrow">📁<span>${r}</span><div class="tbtn p">✕</div></div>`).join('')}
+     <div class="row"><div class="search" style="height:38px"><input placeholder="手动添加目录…"></div><div class="tbtn a">添加</div></div></div>
+   <div class="card-blk"><h4>预览弹窗</h4>
+     <div class="row" style="justify-content:space-between">
+       <span style="font-size:12px;color:var(--dim)">显示快捷操作（收藏 / 清理 / 屏蔽）</span>
+       <div class="chip ${showActs?'on':''}" id="acts-sw">${showActs?'显示':'隐藏'}</div></div></div>
+   <div class="card-blk"><h4>视图</h4>
+     <div class="row"><div class="chip ${state.view==='grid'?'on':''}" data-v="grid">宫格</div><div class="chip ${state.view==='list'?'on':''}" data-v="list">列表</div></div>
+     <div style="margin-top:10px;font-size:12px;color:var(--dim)">缩略图尺寸</div>
+     <input type="range" min="160" max="640" value="300" step="60"></div>
+   <div class="card-blk"><h4>回收站自动清理</h4>
+     <div style="font-size:11px;color:var(--dim);margin-bottom:6px">超过设定天数自动彻底删除（0 = 关闭）</div>
+     <input type="range" min="0" max="90" value="0" step="10"></div>
+   <div class="card-blk"><h4>关于</h4>
+     <div style="font-size:12px;color:var(--dim);line-height:1.7">光影相册 PhotoBox v1.0.0<br>一套 Python 代码同时构建 Android APK 与 Windows EXE<br>图集屏蔽 · 按月份专清 · 回收站 · 收藏 · 宫格/列表双视图</div></div>
+   <div class="row"><div class="tbtn" id="cc">清除缩略图缓存</div><div class="tbtn a" id="rr">重新扫描</div></div>`;
+  el.querySelectorAll('[data-v]').forEach(c=>c.onclick=()=>{state.view=c.dataset.v;hl();render();});
+  const sw=document.getElementById('acts-sw');
+  if(sw)sw.onclick=()=>{showActs=!showActs;toast('预览快捷操作已'+(showActs?'显示':'隐藏'));renderSet();};
+  document.getElementById('cc').onclick=()=>toast('已清除 0 个缩略图缓存');
+  document.getElementById('rr').onclick=()=>{toast('开始扫描…');setTimeout(()=>toast('扫描完成'),800);};
+}
+function show(html){document.getElementById('dlg').innerHTML=html;document.getElementById('mask').classList.add('on');}
+function hide(){document.getElementById('mask').classList.remove('on');}
+document.getElementById('mask').onclick=e=>{if(e.target.id==='mask')hide();};
+function confirmBox(t,p,fn){show(`<h3>${t}</h3><p>${p}</p><div class="acts"><div class="tbtn" id="no">取消</div><div class="tbtn p" id="yes">确定</div></div>`);
+  document.getElementById('no').onclick=hide;document.getElementById('yes').onclick=()=>{hide();fn();};}
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1600);}
+
+document.getElementById('q').oninput=e=>{state.q=e.target.value.toLowerCase();renderLib();};
+const VIEW_ICON={grid:'▦',list:'☰',timeline:'📅'};
+function hl(){
+  const t=document.getElementById('v-toggle');
+  if(t){t.textContent=VIEW_ICON[state.view]||'▦';
+    t.style.color=(state.view==='timeline')?'var(--text)':'var(--accent)';}
+  const tl=document.getElementById('v-timeline');
+  if(tl)tl.style.color=(state.view==='timeline')?'var(--accent)':'var(--text)';
+  document.getElementById('grid').style.display=(state.view==='grid')?'grid':'none';
+  document.getElementById('list').style.display=(state.view==='list')?'flex':'none';
+  document.getElementById('timeline').style.display=(state.view==='timeline')?'flex':'none';}
+document.getElementById('v-toggle').onclick=()=>{
+  state.view=(state.view==='grid')?'list':'grid';
+  toast(state.view==='grid'?'宫格视图':'列表视图');hl();};
+document.getElementById('v-timeline').onclick=()=>{state.view='timeline';hl();render();};
+document.getElementById('v-craft').onclick=()=>openCraft();
+document.getElementById('sort').onclick=()=>{const order=['date_desc','date_asc','name_asc','size_desc'];state.sort=order[(order.indexOf(state.sort)+1)%4];toast('排序：'+state.sort);renderLib();};
+document.getElementById('clean').onclick=()=>{const ps=visible();if(!ps.length){toast('当前没有可清理的照片');return;}
+  const scope=state.month||document.getElementById('title').textContent;
+  confirmBox('按月份专清',`将「${scope}」的 ${ps.length} 张照片移入回收站？`,()=>toTrash(ps.map(p=>p.id)));};
+document.getElementById('selall').onclick=()=>{state.sel=new Set(visible().map(p=>p.id));render();};
+document.getElementById('op-fav').onclick=()=>{const ids=[...state.sel];
+  const add=ids.filter(i=>!fav.has(i));
+  if(add.length){ids.forEach(i=>fav.add(i));toast('已收藏 '+ids.length+' 张');}
+  else{ids.forEach(i=>fav.delete(i));toast('已取消收藏 '+ids.length+' 张');}render();};
+document.getElementById('op-move').onclick=()=>{const ids=[...state.sel];
+  if(!ids.length)return;
+  const rows=albumDirs().map(([n,c])=>`<div class="srow" data-sa="${n}">📁 <span style="flex:1">${n}</span><span style="font-size:11px;color:var(--dim)">${c}</span>›</div>`).join('');
+  show(`<h3>移动 ${ids.length} 张到相册</h3><p>移动后原位置不再保留</p>
+    <div class="slist">${rows}</div>
+    <div class="acts"><div class="tbtn" id="no">取消</div></div>`);
+  document.querySelectorAll('[data-sa]').forEach(r=>r.onclick=()=>{const n=r.dataset.sa;hide();
+    ids.forEach(i=>{const p=photos.find(x=>x.id===i);if(p)p.album=n;});
+    toast(`已移动 ${ids.length} 张到「${n}」`);state.sel.clear();state.selMode=false;render();});
+  document.getElementById('no').onclick=hide;};
+document.getElementById('op-rename').onclick=()=>{const [id]=[...state.sel];
+  const p=photos.find(x=>x.id===id);if(!p)return;
+  const stem=p.name.replace(/\.[^.]+$/,'');
+  show(`<h3>重命名</h3><p>扩展名保持不变</p>
+    <div style="padding:0 16px 12px"><div class="search"><input id="rn" value="${stem}" style="font-size:13px"></div></div>
+    <div class="acts"><div class="tbtn" id="no">取消</div><div class="tbtn a" id="rn-ok">确定</div></div>`);
+  document.getElementById('no').onclick=hide;
+  document.getElementById('rn-ok').onclick=()=>{const v=document.getElementById('rn').value.trim();hide();
+    if(!v)return;p.name=v+p.name.slice(p.name.lastIndexOf('.'));toast('已重命名');state.sel.clear();state.selMode=false;render();};};
+document.getElementById('op-del').onclick=()=>{const ids=[...state.sel];
+  confirmBox('删除所选',`这 ${ids.length} 张会先移入回收站，可在回收站还原。`,()=>toTrash(ids));};
+document.getElementById('selexit').onclick=()=>{state.sel.clear();state.selMode=false;render();};
+document.getElementById('fab').onclick=()=>toast('导入 / 扫描目录');
+document.getElementById('rescan').onclick=()=>{toast('开始扫描…');setTimeout(()=>toast('扫描完成'),800);};
+document.getElementById('about').onclick=()=>{state.tab=2;render();};
+function toggleAside(){document.getElementById('aside').classList.toggle('hidden');}
+document.getElementById('menu').onclick=toggleAside;
+document.querySelectorAll('#nav div').forEach(d=>d.onclick=()=>{state.tab=+d.dataset.t;state.blocked=false;
+  if(state.tab===1&&!cardQueue.length)buildQueue();render();});
+render();
+</script>
+</body>
+</html>
