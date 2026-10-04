@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#FF160A26</color>
+    <color name="surface">#FF241040</color>
+    <color name="glass">#14FFFFFF</color>
+    <color name="stroke">#18FFFFFF</color>
+    <color name="accent">#FFA855F7</color>
+    <color name="accent_soft">#33A855F7</color>
+    <color name="danger">#FFF43F5E</color>
+    <color name="text">#FFF4F0FF</color>
+    <color name="dim">#FF9A8BBF</color>
+    <color name="ok">#FF34D399</color>
+</resources>
