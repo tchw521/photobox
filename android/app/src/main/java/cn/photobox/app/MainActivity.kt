@@ -72,7 +72,6 @@ class MainActivity : ComponentActivity() {
         albumAdapter = AlbumAdapter { key -> onPickAlbum(key) }
         albumList.layoutManager = LinearLayoutManager(this)
         albumList.adapter = albumAdapter
-        albumList.setHasFixedSize(true)
 
         val nav = findViewById<BottomNavigationView>(R.id.bottomNav)
         nav.setOnItemSelectedListener {
@@ -181,7 +180,6 @@ class MainActivity : ComponentActivity() {
         chipAdapter = ChipAdapter { m -> month = m; refreshLibrary() }
         months.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         months.adapter = chipAdapter
-        months.setHasFixedSize(true)
 
         photoAdapter = PhotoAdapter(
             this, gridView,
