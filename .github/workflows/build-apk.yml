@@ -128,7 +128,19 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: 提交 APK 到仓库
+      - name: 创建 Release 并附带 APK
+        if: steps.collect.outputs.COUNT != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="apk-$(date +%Y%m%d-%H%M%S)"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          gh release create "$TAG" dist/*.apk \
+            --repo "${{ github.repository }}" \
+            --title "光影相册 APK $TAG" \
+            --notes "自动构建的 Android 安装包，直接下载安装即可。" || echo "release 创建失败，改用上传"
+
+      - name: 兜底提交小体积 APK 到仓库
         if: steps.collect.outputs.COUNT != '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -138,7 +150,9 @@ jobs:
           tok=os.environ["GH_TOKEN"]; repo=os.environ["GITHUB_REPOSITORY"]
           for path in sorted(glob.glob("dist/*.apk")):
               raw=open(path,"rb").read(); name=os.path.basename(path)
-              print(f"上传 {name} ({len(raw)//1024} KB)")
+              print(f"{name}: {len(raw)//1024//1024} MB")
+              if len(raw) > 90*1024*1024:
+                  print("  超过仓库直传上限，跳过（已走 Release）"); continue
               target=f"apk/{name}"
               body={"message":f"chore: {name}","content":base64.b64encode(raw).decode()}
               try:
