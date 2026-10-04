@@ -1,10 +1,10 @@
 Installing flet-cli 1.0.3 package...OK
-[17:11:10] Created app shell ✅                                                 
+[17:49:22] Created app shell ✅                                                 
            Excluded from app package by default: .git, .github (use --include   
            <path> or --no-default-excludes to package them)                     
-[17:11:33] Packaged Python app ✅                                               
-[17:11:35] Generated splash screens ✅                                          
-[17:16:05] Built .apk for Android ✅                                            
+[17:49:48] Packaged Python app ✅                                               
+[17:49:49] Generated splash screens ✅                                          
+[17:55:56] Built .apk for Android ✅                                            
 ( ●    ) Copying build to build directory...Traceback (most recent call last):
   File "/opt/hostedtoolcache/Python/3.11.16/x64/bin/flet", line 6, in <module>
     sys.exit(main())
