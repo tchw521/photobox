@@ -36,7 +36,7 @@ jobs:
         continue-on-error: true
         working-directory: android
         env:
-          PB_KEYSTORE: ../photobox.jks
+          PB_KEYSTORE: ${{ github.workspace }}/photobox.jks
           PB_STORE_PASS: photobox
           PB_ALIAS: photobox
           PB_KEY_PASS: photobox
@@ -46,7 +46,7 @@ jobs:
         id: collect
         run: |
           mkdir -p dist
-          find . -name "*.apk" -type f -not -path "*/intermediates/*" -exec cp -v {} dist/ \; || true
+          find . -name "app-release.apk" -type f -exec cp -v {} dist/ \; || true
           ls -lh dist/
           echo "COUNT=$(ls dist/*.apk 2>/dev/null | wc -l)" >> "$GITHUB_OUTPUT"
 
