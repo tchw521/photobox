@@ -1,0 +1,60 @@
+name: 构建 Android APK
+
+on:
+  workflow_dispatch:          # 手动点「Run workflow」触发
+  push:
+    tags: [ "v*" ]            # 或推送 v1.0.0 这样的标签自动构建
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装 Python 依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 构建 APK
+        run: |
+          flet build apk --yes \
+            --project photobox \
+            --product "光影相册" \
+            --org "cn.photobox" \
+            --bundle-id "cn.photobox.app" \
+            --description "本地照片管理与清理工具" \
+            --build-version "1.0.0" \
+            --permissions photo_library \
+            --android-permissions \
+                android.permission.READ_MEDIA_IMAGES \
+                android.permission.READ_MEDIA_VIDEO \
+                android.permission.READ_MEDIA_VISUAL_USER_SELECTED \
+                android.permission.READ_EXTERNAL_STORAGE \
+                android.permission.WRITE_EXTERNAL_STORAGE \
+                android.permission.MANAGE_EXTERNAL_STORAGE \
+                android.permission.INTERNET \
+            --android-legacy-packaging \
+            -o build
+
+      - name: 上传 APK 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: 光影相册-APK
+          path: build/apk/*.apk
+          retention-days: 30
+          if-no-files-found: error
