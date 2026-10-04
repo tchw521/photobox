@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:padding="10dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="设置" android:textSize="16sp" android:textColor="@color/text" android:textStyle="bold" android:paddingBottom="8dp"/>
+        <TextView android:id="@+id/stat" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="12sp" android:textColor="@color/dim" android:paddingBottom="8dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="预览弹窗显示快捷操作" android:textSize="12sp" android:textColor="@color/text"/>
+            <Switch android:id="@+id/swPreview" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:paddingTop="6dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="默认宫格视图" android:textSize="12sp" android:textColor="@color/text"/>
+            <Switch android:id="@+id/swGrid" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <Button android:id="@+id/btnRescan" style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:text="重新扫描照片" android:textSize="12sp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="光影相册 · 原生安卓版 v1.0" android:textSize="11sp" android:textColor="@color/dim"
+            android:gravity="center" android:paddingTop="16dp"/>
+    </LinearLayout>
+</ScrollView>
