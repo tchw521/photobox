@@ -33,6 +33,30 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # flet 1.0.3 在 Flutter 3.44 上会在“复制产物”阶段崩溃（期望旧的输出目录），
+      # 但 APK 已经编译完成。这里用后台监控在它崩溃前把 APK 抢出来。
+      - name: 后台监控并抢存 APK
+        run: |
+          mkdir -p dist
+          cat > /tmp/grab.sh <<'EOS'
+          #!/usr/bin/env bash
+          while true; do
+            find /home/runner/work -name "*.apk" -type f 2>/dev/null | while read -r f; do
+              base=$(basename "$f")
+              [ -s "$f" ] || continue
+              if [ ! -s "/home/runner/work/photobox/photobox/dist/$base" ]; then
+                cp -f "$f" "/home/runner/work/photobox/photobox/dist/$base" 2>/dev/null && \
+                  echo "GRABBED $base" >> /tmp/grab.log
+              fi
+            done
+            sleep 3
+          done
+          EOS
+          chmod +x /tmp/grab.sh
+          nohup /tmp/grab.sh > /dev/null 2>&1 &
+          echo $! > /tmp/grab.pid
+          echo "监控已启动 pid=$(cat /tmp/grab.pid)"
+
       - name: 构建 APK
         id: build
         continue-on-error: true
@@ -54,30 +78,18 @@ jobs:
             --android-legacy-packaging \
             -o build > build.log 2>&1
           echo "EXIT=$?" >> "$GITHUB_OUTPUT"
-          tail -40 build.log || true
+          tail -25 build.log || true
 
-      - name: 收集 APK（Flutter 3.44 输出路径与 flet 默认不一致，手动兜底）
+      - name: 停止监控并汇总 APK
         id: collect
         run: |
-          mkdir -p dist
-          echo "=== 全盘查找 apk ==="
-          find "$GITHUB_WORKSPACE" -name "*.apk" -type f 2>/dev/null | head -20 || true
-          # flet 期望的旧路径
-          for d in \
-            build/flutter/build/app/outputs/flutter-apk \
-            build/flutter/build/app/outputs/apk/release \
-            build/flutter/build/app/outputs/apk \
-            build/app/outputs/apk/release \
-            build/app/outputs/flutter-apk \
-            dist ; do
-            if [ -d "$d" ]; then
-              echo "发现目录: $d"
-              find "$d" -name "*.apk" -exec cp -v {} dist/ \; 2>/dev/null || true
-            fi
-          done
-          # 兜底：直接搜
+          sleep 8
+          if [ -f /tmp/grab.pid ]; then kill "$(cat /tmp/grab.pid)" 2>/dev/null || true; fi
+          echo "=== 抢存记录 ==="; cat /tmp/grab.log 2>/dev/null || true
+          echo "=== dist 目录 ==="; ls -lh dist/ || true
+          # 兜底再搜一次
           if [ -z "$(ls -A dist 2>/dev/null)" ]; then
-            find "$GITHUB_WORKSPACE" -name "*.apk" -type f -exec cp -v {} dist/ \; 2>/dev/null || true
+            find /home/runner/work -name "*.apk" -type f -exec cp -v {} dist/ \; 2>/dev/null || true
           fi
           ls -lh dist/ || true
           echo "COUNT=$(ls dist/*.apk 2>/dev/null | wc -l)" >> "$GITHUB_OUTPUT"
@@ -107,7 +119,7 @@ jobs:
           except Exception as e: print("回写失败:",e)
           PY
 
-      - name: 上传 APK
+      - name: 上传 APK 产物
         if: steps.collect.outputs.COUNT != '0'
         uses: actions/upload-artifact@v4
         with:
@@ -116,8 +128,7 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      # APK 产物下载需要登录 GitHub，这里额外把 apk 直接提交回仓库，方便直接取用
-      - name: 提交 APK 到仓库 apk 分支文件
+      - name: 提交 APK 到仓库
         if: steps.collect.outputs.COUNT != '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -125,12 +136,10 @@ jobs:
           python3 - <<'PY'
           import base64, glob, json, os, urllib.request
           tok=os.environ["GH_TOKEN"]; repo=os.environ["GITHUB_REPOSITORY"]
-          apks=sorted(glob.glob("dist/*.apk"))
-          for path in apks:
-              raw=open(path,"rb").read()
-              name=os.path.basename(path)
+          for path in sorted(glob.glob("dist/*.apk")):
+              raw=open(path,"rb").read(); name=os.path.basename(path)
+              print(f"上传 {name} ({len(raw)//1024} KB)")
               target=f"apk/{name}"
-              print(f"上传 {name} ({len(raw)//1024} KB) -> {target}")
               body={"message":f"chore: {name}","content":base64.b64encode(raw).decode()}
               try:
                   r=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/{target}",
@@ -141,10 +150,8 @@ jobs:
                   data=json.dumps(body).encode(),method="PUT",
                   headers={"Authorization":f"token {tok}","Accept":"application/vnd.github+json",
                            "Content-Type":"application/json","User-Agent":"gh"})
-              try:
-                  print("  结果:",urllib.request.urlopen(req,timeout=300).status)
-              except Exception as e:
-                  print("  失败:",e)
+              try: print("  结果:",urllib.request.urlopen(req,timeout=600).status)
+              except Exception as e: print("  失败:",e)
           PY
 
       - name: 失败则中断
