@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="6dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/trashCount" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:textSize="13sp" android:textColor="@color/text"/>
+        <Button android:id="@+id/btnEmpty" style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content" android:layout_height="32dp" android:text="清空" android:textSize="11sp"
+            android:textColor="@color/danger"/>
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/trashList"
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+</LinearLayout>
