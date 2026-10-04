@@ -1,0 +1,175 @@
+name: 构建 Android APK（Python/Flet 旧版）
+
+on:
+  workflow_dispatch:
+  push:
+    tags: [ "v*" ]
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装 Python 依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # flet 1.0.3 在 Flutter 3.44 上会在“复制产物”阶段崩溃（期望旧的输出目录），
+      # 但 APK 已经编译完成。这里用后台监控在它崩溃前把 APK 抢出来。
+      - name: 后台监控并抢存 APK
+        run: |
+          mkdir -p dist
+          cat > /tmp/grab.sh <<'EOS'
+          #!/usr/bin/env bash
+          while true; do
+            find /home/runner/work -name "*.apk" -type f 2>/dev/null | while read -r f; do
+              base=$(basename "$f")
+              [ -s "$f" ] || continue
+              if [ ! -s "/home/runner/work/photobox/photobox/dist/$base" ]; then
+                cp -f "$f" "/home/runner/work/photobox/photobox/dist/$base" 2>/dev/null && \
+                  echo "GRABBED $base" >> /tmp/grab.log
+              fi
+            done
+            sleep 3
+          done
+          EOS
+          chmod +x /tmp/grab.sh
+          nohup /tmp/grab.sh > /dev/null 2>&1 &
+          echo $! > /tmp/grab.pid
+          echo "监控已启动 pid=$(cat /tmp/grab.pid)"
+
+      - name: 构建 APK
+        id: build
+        continue-on-error: true
+        run: |
+          flet build apk --yes \
+            --project photobox \
+            --product "光影相册" \
+            --org "cn.photobox" \
+            --bundle-id "cn.photobox.app" \
+            --description "本地照片管理与清理工具" \
+            --build-version "1.0.0" \
+            --permissions photo_library \
+            --android-permissions \
+                android.permission.READ_MEDIA_IMAGES=true \
+                android.permission.READ_MEDIA_VIDEO=true \
+                android.permission.READ_MEDIA_VISUAL_USER_SELECTED=true \
+                android.permission.READ_EXTERNAL_STORAGE=true \
+                android.permission.INTERNET=true \
+            --android-legacy-packaging \
+            -o build > build.log 2>&1
+          echo "EXIT=$?" >> "$GITHUB_OUTPUT"
+          tail -25 build.log || true
+
+      - name: 停止监控并汇总 APK
+        id: collect
+        run: |
+          sleep 8
+          if [ -f /tmp/grab.pid ]; then kill "$(cat /tmp/grab.pid)" 2>/dev/null || true; fi
+          echo "=== 抢存记录 ==="; cat /tmp/grab.log 2>/dev/null || true
+          echo "=== dist 目录 ==="; ls -lh dist/ || true
+          # 兜底再搜一次
+          if [ -z "$(ls -A dist 2>/dev/null)" ]; then
+            find /home/runner/work -name "*.apk" -type f -exec cp -v {} dist/ \; 2>/dev/null || true
+          fi
+          ls -lh dist/ || true
+          echo "COUNT=$(ls dist/*.apk 2>/dev/null | wc -l)" >> "$GITHUB_OUTPUT"
+
+      - name: 回写构建日志
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, urllib.request
+          tok=os.environ["GH_TOKEN"]; repo=os.environ["GITHUB_REPOSITORY"]
+          try: raw=open("build.log","rb").read()
+          except OSError: raw=b"no log"
+          if len(raw)>600_000: raw=raw[:200_000]+b"\n...truncated...\n"+raw[-400_000:]
+          body={"message":"build log","content":base64.b64encode(raw).decode()}
+          try:
+              r=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/build-log.txt",
+                  headers={"Authorization":f"token {tok}","User-Agent":"gh"})
+              body["sha"]=json.loads(urllib.request.urlopen(r,timeout=60).read())["sha"]
+          except Exception: pass
+          req=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/build-log.txt",
+              data=json.dumps(body).encode(),method="PUT",
+              headers={"Authorization":f"token {tok}","Accept":"application/vnd.github+json",
+                       "Content-Type":"application/json","User-Agent":"gh"})
+          try: print("回写:",urllib.request.urlopen(req,timeout=120).status)
+          except Exception as e: print("回写失败:",e)
+          PY
+
+      - name: 上传 APK 产物
+        if: steps.collect.outputs.COUNT != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: 光影相册-APK
+          path: dist/*.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: 创建 Release 并附带 APK
+        if: steps.collect.outputs.COUNT != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="apk-$(date +%Y%m%d-%H%M%S)"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          gh release create "$TAG" dist/*.apk \
+            --repo "${{ github.repository }}" \
+            --title "光影相册 APK $TAG" \
+            --notes "自动构建的 Android 安装包，直接下载安装即可。" || echo "release 创建失败，改用上传"
+
+      - name: 兜底提交小体积 APK 到仓库
+        if: steps.collect.outputs.COUNT != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64, glob, json, os, urllib.request
+          tok=os.environ["GH_TOKEN"]; repo=os.environ["GITHUB_REPOSITORY"]
+          for path in sorted(glob.glob("dist/*.apk")):
+              raw=open(path,"rb").read(); name=os.path.basename(path)
+              print(f"{name}: {len(raw)//1024//1024} MB")
+              if len(raw) > 90*1024*1024:
+                  print("  超过仓库直传上限，跳过（已走 Release）"); continue
+              target=f"apk/{name}"
+              body={"message":f"chore: {name}","content":base64.b64encode(raw).decode()}
+              try:
+                  r=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/{target}",
+                      headers={"Authorization":f"token {tok}","User-Agent":"gh"})
+                  body["sha"]=json.loads(urllib.request.urlopen(r,timeout=60).read())["sha"]
+              except Exception: pass
+              req=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/{target}",
+                  data=json.dumps(body).encode(),method="PUT",
+                  headers={"Authorization":f"token {tok}","Accept":"application/vnd.github+json",
+                           "Content-Type":"application/json","User-Agent":"gh"})
+              try: print("  结果:",urllib.request.urlopen(req,timeout=600).status)
+              except Exception as e: print("  失败:",e)
+          PY
+
+      - name: 失败则中断
+        if: steps.collect.outputs.COUNT == '0'
+        run: |
+          echo "::error::未收集到 APK"
+          exit 1
