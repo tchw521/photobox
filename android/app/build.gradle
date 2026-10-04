@@ -18,7 +18,7 @@ android {
 
     signingConfigs {
         create("release") {
-            val ks = System.getenv("PB_KEYSTORE") ?: "photobox.jks"
+            def ks = System.getenv("PB_KEYSTORE") ?: "photobox.jks"
             storeFile = file(ks)
             storePassword = System.getenv("PB_STORE_PASS") ?: "photobox"
             keyAlias = System.getenv("PB_ALIAS") ?: "photobox"
