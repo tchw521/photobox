@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">光影相册</string>
+    <string name="tab_library">图库</string>
+    <string name="tab_cards">卡片</string>
+    <string name="tab_settings">设置</string>
+    <string name="all_photos">全部照片</string>
+    <string name="favorites">收藏</string>
+    <string name="blocked_albums">已屏蔽</string>
+    <string name="trash">回收站</string>
+    <string name="album_group">图集</string>
+    <string name="need_permission">需要相册访问权限才能整理照片</string>
+    <string name="grant">去授权</string>
+</resources>
