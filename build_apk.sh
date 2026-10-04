@@ -100,13 +100,11 @@ flet build apk --yes \
   --build-version "1.0.0" \
   --permissions photo_library \
   --android-permissions \
-      android.permission.READ_MEDIA_IMAGES \
-      android.permission.READ_MEDIA_VIDEO \
-      android.permission.READ_MEDIA_VISUAL_USER_SELECTED \
-      android.permission.READ_EXTERNAL_STORAGE \
-      android.permission.WRITE_EXTERNAL_STORAGE \
-      android.permission.MANAGE_EXTERNAL_STORAGE \
-      android.permission.INTERNET \
+      android.permission.READ_MEDIA_IMAGES=true \
+      android.permission.READ_MEDIA_VIDEO=true \
+      android.permission.READ_MEDIA_VISUAL_USER_SELECTED=true \
+      android.permission.READ_EXTERNAL_STORAGE=true \
+      android.permission.INTERNET=true \
   --android-legacy-packaging \
   -o build
 
