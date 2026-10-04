@@ -149,7 +149,7 @@ class TrashAdapter(
         val thumb: ImageView = v.findViewById(R.id.thumb)
         val name: TextView = v.findViewById(R.id.name)
         val meta: TextView = v.findViewById(R.id.meta)
-        val restore: View = v.findViewById(R.id.restore)
+        val restore: android.view.View = v.findViewById(R.id.restore)
     }
 
     override fun onCreateViewHolder(p: ViewGroup, t: Int) =
@@ -158,10 +158,10 @@ class TrashAdapter(
     override fun getItemCount() = data.size
 
     override fun onBindViewHolder(h: H, i: Int) {
-        val it = data[i]
-        Thumbs.file(it.file, 120, h.thumb)
-        h.name.text = it.name
-        h.meta.text = "${it.album} · ${formatSize(it.size)}"
-        h.restore.setOnClickListener { onRestore(it) }
+        val item = data[i]
+        Thumbs.file(item.file, 120, h.thumb)
+        h.name.text = item.name
+        h.meta.text = "${item.album} · ${formatSize(item.size)}"
+        h.restore.setOnClickListener { onRestore(item) }
     }
 }
