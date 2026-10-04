@@ -24,6 +24,8 @@ android {
 
     buildTypes {
         release {
+            // 使用 CI 自动生成的 debug 密钥签名，产出的 APK 可直接安装
+            signingConfig signingConfigs.debug
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
