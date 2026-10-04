@@ -20,7 +20,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
     // ---------- 状态
     private var photos: List<Photo> = emptyList()
@@ -305,7 +305,7 @@ class MainActivity : AppCompatActivity() {
     private fun selRename() {
         val p = selectedPhotos().firstOrNull() ?: return
         val input = EditText(this).apply { setText(p.name.substringBeforeLast('.')) }
-        android.app.AlertDialog.Builder(this)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("重命名")
             .setView(input)
             .setNegativeButton("取消", null)
@@ -322,7 +322,7 @@ class MainActivity : AppCompatActivity() {
     private fun selDelete() {
         val list = selectedPhotos()
         if (list.isEmpty()) return
-        android.app.AlertDialog.Builder(this)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("删除所选")
             .setMessage("这 ${list.size} 张会先移入回收站，可还原。")
             .setNegativeButton("取消", null)
@@ -375,7 +375,7 @@ class MainActivity : AppCompatActivity() {
     private fun preview(p: Photo) {
         val fav = Store.favorites(this)
         val isFav = fav.contains(p.id.toString())
-        val b = android.app.AlertDialog.Builder(this)
+        val b = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle(p.name)
             .setMessage("${p.album} · ${p.dateText} · ${formatSize(p.size)}")
             .setNegativeButton("关闭", null)
@@ -438,7 +438,7 @@ class MainActivity : AppCompatActivity() {
         list.adapter = trashAdapter
         trashAdapter?.submit(items)
         v.findViewById<Button>(R.id.btnEmpty).setOnClickListener {
-            android.app.AlertDialog.Builder(this)
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("清空回收站")
                 .setMessage("将彻底删除 ${items.size} 项，无法恢复。")
                 .setNegativeButton("取消", null)
