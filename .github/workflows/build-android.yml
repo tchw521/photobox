@@ -84,6 +84,32 @@ jobs:
             --title "光影相册 安卓版 $TAG" \
             --notes "原生 Kotlin 安卓版，直接下载安装即可。"
 
+      - name: 提交 APK 到仓库 apk 目录
+        if: steps.collect.outputs.COUNT != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64, glob, json, os, urllib.request
+          tok=os.environ["GH_TOKEN"]; repo=os.environ["GITHUB_REPOSITORY"]
+          for path in sorted(glob.glob("dist/*.apk")):
+              raw=open(path,"rb").read(); name=os.path.basename(path)
+              print(f"{name}: {len(raw)//1024} KB")
+              target=f"apk/{name}"
+              body={"message":f"chore: {name}","content":base64.b64encode(raw).decode()}
+              try:
+                  r=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/{target}",
+                      headers={"Authorization":f"token {tok}","User-Agent":"gh"})
+                  body["sha"]=json.loads(urllib.request.urlopen(r,timeout=60).read())["sha"]
+              except Exception: pass
+              req=urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/{target}",
+                  data=json.dumps(body).encode(),method="PUT",
+                  headers={"Authorization":f"token {tok}","Accept":"application/vnd.github+json",
+                           "Content-Type":"application/json","User-Agent":"gh"})
+              try: print("  结果:",urllib.request.urlopen(req,timeout=600).status)
+              except Exception as e: print("  失败:",e)
+          PY
+
       - name: 失败则中断
         if: steps.collect.outputs.COUNT == '0'
         run: |
