@@ -29,9 +29,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          python -c "import flet; print('flet', flet.__version__ if hasattr(flet,'__version__') else 'ok')"
 
       - name: 构建 APK
+        id: build
+        continue-on-error: true
         run: |
+          set -o pipefail
           flet build apk --yes \
             --project photobox \
             --product "光影相册" \
@@ -45,16 +49,30 @@ jobs:
                 android.permission.READ_MEDIA_VIDEO \
                 android.permission.READ_MEDIA_VISUAL_USER_SELECTED \
                 android.permission.READ_EXTERNAL_STORAGE \
-                android.permission.WRITE_EXTERNAL_STORAGE \
-                android.permission.MANAGE_EXTERNAL_STORAGE \
                 android.permission.INTERNET \
             --android-legacy-packaging \
-            -o build
+            -o build 2>&1 | tee build.log
+          echo "EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: 上传构建日志（成功失败都传）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 构建日志
+          path: build.log
+          if-no-files-found: warn
 
       - name: 上传 APK 产物
+        if: steps.build.outputs.EXIT == '0'
         uses: actions/upload-artifact@v4
         with:
           name: 光影相册-APK
           path: build/apk/*.apk
           retention-days: 30
           if-no-files-found: error
+
+      - name: 构建失败则中断
+        if: steps.build.outputs.EXIT != '0'
+        run: |
+          echo "::error::APK 构建失败，请查看「构建日志」产物"
+          exit 1
