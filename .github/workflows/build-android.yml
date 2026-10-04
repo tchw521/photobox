@@ -23,6 +23,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: 生成签名密钥
+        run: |
+          keytool -genkeypair -v             -keystore photobox.jks -keyalg RSA -keysize 2048 -validity 10000             -alias photobox -storepass photobox -keypass photobox             -dname "CN=PhotoBox, OU=App, O=PhotoBox, L=HZ, ST=ZJ, C=CN"
+          ls -lh photobox.jks
+
       - name: 授予 gradlew 执行权限
         run: chmod +x android/gradlew
 
@@ -30,6 +35,11 @@ jobs:
         id: gradle
         continue-on-error: true
         working-directory: android
+        env:
+          PB_KEYSTORE: ../photobox.jks
+          PB_STORE_PASS: photobox
+          PB_ALIAS: photobox
+          PB_KEY_PASS: photobox
         run: ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee ../build.log; echo "EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
       - name: 收集 APK
