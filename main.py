@@ -2349,4 +2349,9 @@ def main(page: ft.Page):
 
 
 if __name__ == "__main__":
-    ft.run(main, assets_dir="assets")
+    # assets 目录可选：不存在时不要传，避免打包阶段因缺目录失败
+    _assets = "assets" if os.path.isdir("assets") else None
+    if _assets:
+        ft.run(main, assets_dir=_assets)
+    else:
+        ft.run(main)
