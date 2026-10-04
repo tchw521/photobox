@@ -1,9 +1,12 @@
 name: 构建 Android APK
 
 on:
-  workflow_dispatch:          # 手动点「Run workflow」触发
+  workflow_dispatch:
   push:
-    tags: [ "v*" ]            # 或推送 v1.0.0 这样的标签自动构建
+    tags: [ "v*" ]
+
+permissions:
+  contents: write      # 允许回写构建日志，便于远程排错
 
 jobs:
   build-apk:
@@ -29,13 +32,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          python -c "import flet; print('flet', flet.__version__ if hasattr(flet,'__version__') else 'ok')"
 
       - name: 构建 APK
         id: build
         continue-on-error: true
         run: |
-          set -o pipefail
           flet build apk --yes \
             --project photobox \
             --product "光影相册" \
@@ -51,16 +52,48 @@ jobs:
                 android.permission.READ_EXTERNAL_STORAGE \
                 android.permission.INTERNET \
             --android-legacy-packaging \
-            -o build 2>&1 | tee build.log
-          echo "EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+            -o build > build.log 2>&1
+          echo "EXIT=$?" >> "$GITHUB_OUTPUT"
+          echo "----- 日志尾部 -----"
+          tail -60 build.log
 
-      - name: 上传构建日志（成功失败都传）
+      - name: 回写构建日志到仓库
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: 构建日志
-          path: build.log
-          if-no-files-found: warn
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, urllib.request
+          tok = os.environ["GH_TOKEN"]
+          repo = os.environ["GITHUB_REPOSITORY"]
+          try:
+              raw = open("build.log", "rb").read()
+          except OSError:
+              raw = b"no build.log"
+          if len(raw) > 600_000:
+              raw = raw[:200_000] + b"\n...[truncated]...\n" + raw[-400_000:]
+          body = {"message": "build log", "content": base64.b64encode(raw).decode()}
+          # 已存在则带 sha 覆盖
+          try:
+              r = urllib.request.Request(
+                  f"https://api.github.com/repos/{repo}/contents/build-log.txt",
+                  headers={"Authorization": f"token {tok}", "User-Agent": "gh"})
+              d = json.loads(urllib.request.urlopen(r, timeout=60).read())
+              body["sha"] = d["sha"]
+          except Exception:
+              pass
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{repo}/contents/build-log.txt",
+              data=json.dumps(body).encode(), method="PUT",
+              headers={"Authorization": f"token {tok}",
+                       "Accept": "application/vnd.github+json",
+                       "Content-Type": "application/json",
+                       "User-Agent": "gh"})
+          try:
+              print("回写:", urllib.request.urlopen(req, timeout=120).status)
+          except Exception as e:
+              print("回写失败:", e)
+          PY
 
       - name: 上传 APK 产物
         if: steps.build.outputs.EXIT == '0'
@@ -71,8 +104,8 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: 构建失败则中断
+      - name: 失败则中断
         if: steps.build.outputs.EXIT != '0'
         run: |
-          echo "::error::APK 构建失败，请查看「构建日志」产物"
+          echo "::error::APK 构建失败"
           exit 1
