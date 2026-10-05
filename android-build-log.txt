@@ -48,15 +48,15 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:generateReleaseAssets UP-TO-DATE
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
-> Task :app:processApplicationManifestReleaseForBundle
 > Task :app:processReleaseManifestForPackage
+> Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
 > Task :app:bundleReleaseResources
 > Task :app:sdkReleaseDependencyData
+> Task :app:processReleaseResources
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
-> Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:98:26 Unresolved reference: csMode
@@ -368,5 +368,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 49s
+BUILD FAILED in 1m
 30 actionable tasks: 30 executed
