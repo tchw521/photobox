@@ -78,12 +78,22 @@ object Store {
     var previewActions = true
     var defaultGrid = true
     var cardModeMove = true
+    var nameMarquee = true          // 相册名自动滚动
+    var cardHint = true             // 卡片页显示手势提示
+    var autoCleanTrash = false      // 回收站超期自动清理
+    var sortDefault = 0             // 默认排序
+    var longPressSelect = true      // 长按直接进入多选
 
     fun loadSettings(c: Context) {
         val s = sp(c)
         previewActions = s.getBoolean("previewActions", true)
         defaultGrid = s.getBoolean("defaultGrid", true)
         cardModeMove = s.getBoolean("cardModeMove", true)
+        nameMarquee = s.getBoolean("nameMarquee", true)
+        cardHint = s.getBoolean("cardHint", true)
+        autoCleanTrash = s.getBoolean("autoCleanTrash", false)
+        sortDefault = s.getInt("sortDefault", 0).coerceIn(0, 3)
+        longPressSelect = s.getBoolean("longPressSelect", true)
     }
 
     fun saveSettings(c: Context) {
@@ -91,6 +101,11 @@ object Store {
             .putBoolean("previewActions", previewActions)
             .putBoolean("defaultGrid", defaultGrid)
             .putBoolean("cardModeMove", cardModeMove)
+            .putBoolean("nameMarquee", nameMarquee)
+            .putBoolean("cardHint", cardHint)
+            .putBoolean("autoCleanTrash", autoCleanTrash)
+            .putInt("sortDefault", sortDefault)
+            .putBoolean("longPressSelect", longPressSelect)
             .apply()
     }
 }
