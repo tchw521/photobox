@@ -23,12 +23,10 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: 还原固定签名密钥
-        env:
-          PB_KEYSTORE_B64: ${{ secrets.PB_KEYSTORE_B64 }}
+      - name: 固定签名密钥（内置于仓库）
         run: |
-          # 密钥固定存放在仓库 Secret 中，保证每次构建签名完全一致
-          printf '%s' "$PB_KEYSTORE_B64" | base64 -d > photobox.jks
+          # 密钥文件随仓库分发，保证每次构建签名完全一致、可直接覆盖安装
+          cp android/keystore/photobox.jks photobox.jks
           ls -lh photobox.jks
 
       - name: 授予 gradlew 执行权限
@@ -40,9 +38,9 @@ jobs:
         working-directory: android
         env:
           PB_KEYSTORE: ${{ github.workspace }}/photobox.jks
-          PB_STORE_PASS: ${{ secrets.PB_STORE_PASS }}
-          PB_ALIAS: ${{ secrets.PB_ALIAS }}
-          PB_KEY_PASS: ${{ secrets.PB_KEY_PASS }}
+          PB_STORE_PASS: photobox2025
+          PB_ALIAS: photobox
+          PB_KEY_PASS: photobox2025
         run: ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee ../build.log; echo "EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
       - name: 验证签名一致性
