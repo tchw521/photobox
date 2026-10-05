@@ -92,8 +92,11 @@ class SkinPage(private val act: MainActivity, private val root: View) {
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
             )
             val cur = SkinNow.skin.key == sk.key
-            cell.findViewById<View>(R.id.skinSwatch).background =
-                Glass.block(sk, sk.accent, cur)
+            // 色块显示该皮肤的真实配色：背景渐变 + 光晕 + 底部主色条
+            cell.findViewById<View>(R.id.skinSwatch).apply {
+                background = Glass.preview(sk, (10 * act.resources.displayMetrics.density).toInt())
+                foreground = if (cur) Glass.block(sk, sk.accent, true) else null
+            }
             cell.findViewById<TextView>(R.id.skinName).apply {
                 text = sk.name
                 setTextColor(sk.text)
@@ -204,7 +207,8 @@ class SkinPage(private val act: MainActivity, private val root: View) {
     // ------------------------------------------------------------ 背景
     private fun bindBackground() {
         val pv = root.findViewById<ImageView>(R.id.bgPreview) ?: return
-        pv.background = Glass.card(SkinNow.skin, 12f)
+        // 底色即当前皮肤背景，无图时一眼能看出当前配色
+        pv.background = Glass.bgPreview(SkinNow.skin)
         if (Store.bgUri.isBlank()) {
             pv.setImageDrawable(null)
         } else {
