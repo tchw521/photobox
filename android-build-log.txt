@@ -34,10 +34,10 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mapReleaseSourceSetPaths
 > Task :app:generateReleaseResources
 > Task :app:packageReleaseResources
-> Task :app:mergeReleaseResources
 > Task :app:createReleaseCompatibleScreenManifests
 > Task :app:extractDeepLinksRelease
 > Task :app:parseReleaseLocalResources
+> Task :app:mergeReleaseResources
 > Task :app:processReleaseMainManifest
 > Task :app:processReleaseManifest
 > Task :app:javaPreCompileRelease
@@ -50,20 +50,21 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
+> Task :app:processReleaseManifestForPackage
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
-> Task :app:processReleaseManifestForPackage
 > Task :app:writeReleaseSigningConfigVersions
 > Task :app:bundleReleaseResources
 > Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:314:22 Variable 'ok' initializer is redundant
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:186:13 Variable 'selBar' is never used
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:187:13 Variable 'tip' is never used
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:309:13 Variable 'list' is never used
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:414:32 Parameter 'title' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Repo.kt:138:20 Parameter 'c' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Repo.kt:154:20 Parameter 'c' is never used
 
 > Task :app:compileReleaseJavaWithJavac NO-SOURCE
 > Task :app:mergeReleaseGeneratedProguardFiles
@@ -77,5 +78,5 @@ w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 > Task :app:createReleaseApkListingFileRedirect
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 1m 23s
+BUILD SUCCESSFUL in 1m 22s
 39 actionable tasks: 39 executed
