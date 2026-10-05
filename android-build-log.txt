@@ -60,7 +60,11 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 
 > Task :app:compileReleaseKotlin FAILED
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:175:31 Unresolved reference: item_photo_flow
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:367:19 Type mismatch: inferred type is Boolean but Int was expected
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:73:24 Unresolved reference: ic_view_flow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:94:26 Unresolved reference: viewMode
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:427:23 Unresolved reference: viewMode
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:847:67 Unresolved reference: viewMode
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:850:27 Unresolved reference: viewMode
 
 FAILURE: Build failed with an exception.
 
@@ -268,5 +272,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 58s
+BUILD FAILED in 54s
 30 actionable tasks: 30 executed
