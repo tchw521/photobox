@@ -52,7 +52,15 @@ object Thumbs {
         pool.execute {
             // 解码失败不能让线程抛出，否则会击穿线程池并触发未捕获异常
             val bmp = try {
-                Repo.systemThumb(c, p, px) ?: Repo.decodeStream(c, p, px)
+                if (px <= 0) {
+                    // 原图查看：跳过系统缩略图，直接按屏幕短边的 2 倍解码，
+                    // 既保证肉眼无损，又不至于把整张原图塞进内存。
+                    val m = c.resources.displayMetrics
+                    val target = maxOf(m.widthPixels, m.heightPixels) * 2
+                    Repo.decodeStream(c, p, target)
+                } else {
+                    Repo.systemThumb(c, p, px) ?: Repo.decodeStream(c, p, px)
+                }
             } catch (e: Throwable) {
                 CrashGuard.log(e); null
             }
