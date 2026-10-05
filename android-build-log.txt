@@ -42,7 +42,6 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processReleaseManifest
 > Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
-> Task :app:processReleaseManifestForPackage
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
@@ -51,12 +50,13 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
-> Task :app:processReleaseResources
 > Task :app:bundleReleaseResources
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
+> Task :app:processReleaseManifestForPackage
+> Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:109:13 Cannot find a parameter with this name: onLongClick
@@ -65,40 +65,6 @@ e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:311:17 Unresolved reference: DedupPage
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:363:16 Unresolved reference: swipeSelect
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:366:26 Cannot infer a type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:666:46 Unresolved reference: moveAlbum
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:668:35 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
-public fun <T> Array<out TypeVariable(T)>.getOrNull(index: Int): TypeVariable(T)? defined in kotlin.collections
-public fun BooleanArray.getOrNull(index: Int): Boolean? defined in kotlin.collections
-public fun ByteArray.getOrNull(index: Int): Byte? defined in kotlin.collections
-public fun CharArray.getOrNull(index: Int): Char? defined in kotlin.collections
-public fun CharSequence.getOrNull(index: Int): Char? defined in kotlin.text
-public fun DoubleArray.getOrNull(index: Int): Double? defined in kotlin.collections
-public fun FloatArray.getOrNull(index: Int): Float? defined in kotlin.collections
-public fun IntArray.getOrNull(index: Int): Int? defined in kotlin.collections
-public fun LongArray.getOrNull(index: Int): Long? defined in kotlin.collections
-public fun ShortArray.getOrNull(index: Int): Short? defined in kotlin.collections
-public fun UByteArray.getOrNull(index: Int): UByte? defined in kotlin.collections
-public fun UIntArray.getOrNull(index: Int): UInt? defined in kotlin.collections
-public fun ULongArray.getOrNull(index: Int): ULong? defined in kotlin.collections
-public fun UShortArray.getOrNull(index: Int): UShort? defined in kotlin.collections
-public fun <T> List<TypeVariable(T)>.getOrNull(index: Int): TypeVariable(T)? defined in kotlin.collections
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:669:36 Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
-public fun <T> Array<out TypeVariable(T)>.getOrNull(index: Int): TypeVariable(T)? defined in kotlin.collections
-public fun BooleanArray.getOrNull(index: Int): Boolean? defined in kotlin.collections
-public fun ByteArray.getOrNull(index: Int): Byte? defined in kotlin.collections
-public fun CharArray.getOrNull(index: Int): Char? defined in kotlin.collections
-public fun CharSequence.getOrNull(index: Int): Char? defined in kotlin.text
-public fun DoubleArray.getOrNull(index: Int): Double? defined in kotlin.collections
-public fun FloatArray.getOrNull(index: Int): Float? defined in kotlin.collections
-public fun IntArray.getOrNull(index: Int): Int? defined in kotlin.collections
-public fun LongArray.getOrNull(index: Int): Long? defined in kotlin.collections
-public fun ShortArray.getOrNull(index: Int): Short? defined in kotlin.collections
-public fun UByteArray.getOrNull(index: Int): UByte? defined in kotlin.collections
-public fun UIntArray.getOrNull(index: Int): UInt? defined in kotlin.collections
-public fun ULongArray.getOrNull(index: Int): ULong? defined in kotlin.collections
-public fun UShortArray.getOrNull(index: Int): UShort? defined in kotlin.collections
-public fun <T> List<TypeVariable(T)>.getOrNull(index: Int): TypeVariable(T)? defined in kotlin.collections
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:713:42 Unresolved reference: renameAlbum
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:840:64 Unresolved reference: trashGuard
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:841:19 Unresolved reference: trashGuard
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:977:20 Unresolved reference: trashGuard
