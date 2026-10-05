@@ -87,4 +87,5 @@
                 android:text="设置" android:textSize="10sp" android:paddingTop="2dp"/>
         </LinearLayout>
     </LinearLayout>
+</LinearLayout>
 </FrameLayout>
