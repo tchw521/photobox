@@ -34,9 +34,9 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mapReleaseSourceSetPaths
 > Task :app:generateReleaseResources
 > Task :app:packageReleaseResources
-> Task :app:mergeReleaseResources
 > Task :app:createReleaseCompatibleScreenManifests
 > Task :app:extractDeepLinksRelease
+> Task :app:mergeReleaseResources
 > Task :app:parseReleaseLocalResources
 > Task :app:processReleaseMainManifest
 > Task :app:processReleaseManifest
@@ -49,9 +49,9 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
-> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
 > Task :app:sdkReleaseDependencyData
+> Task :app:processReleaseManifestForPackage
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
@@ -74,15 +74,11 @@ Execution failed for task ':app:bundleReleaseResources'.
          
      ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_trash.xml:7: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
          
-     ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_trash.xml:17: AAPT: error: resource drawable/ic_restore (aka cn.photobox.app:drawable/ic_restore) not found.
-         
      ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:20: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
          
      ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:23: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
          
      ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:26: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
-         
-     ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_library.xml:14: AAPT: error: resource drawable/ic_search (aka cn.photobox.app:drawable/ic_search) not found.
          
 
 * Try:
@@ -259,15 +255,11 @@ ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_
     
 ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_trash.xml:7: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
     
-ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_trash.xml:17: AAPT: error: resource drawable/ic_restore (aka cn.photobox.app:drawable/ic_restore) not found.
-    
 ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:20: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
     
 ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:23: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
     
 ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:26: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
-    
-ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_library.xml:14: AAPT: error: resource drawable/ic_search (aka cn.photobox.app:drawable/ic_search) not found.
     
 	at com.android.builder.internal.aapt.v2.Aapt2Exception$Companion.create(Aapt2Exception.kt:45)
 	at com.android.builder.internal.aapt.v2.Aapt2Exception$Companion.create$default(Aapt2Exception.kt:33)
@@ -326,15 +318,11 @@ Execution failed for task ':app:processReleaseResources'.
          
      ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_trash.xml:7: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
          
-     ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_trash.xml:17: AAPT: error: resource drawable/ic_restore (aka cn.photobox.app:drawable/ic_restore) not found.
-         
      ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:20: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
          
      ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:23: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
          
      ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:26: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
-         
-     ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_library.xml:14: AAPT: error: resource drawable/ic_search (aka cn.photobox.app:drawable/ic_search) not found.
          
 
 * Try:
@@ -374,6 +362,38 @@ org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:pro
 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:116)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
@@ -505,6 +525,38 @@ Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionExcept
 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:116)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
@@ -519,15 +571,11 @@ ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_
     
 ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_trash.xml:7: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
     
-ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/item_trash.xml:17: AAPT: error: resource drawable/ic_restore (aka cn.photobox.app:drawable/ic_restore) not found.
-    
 ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:20: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
     
 ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:23: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
     
 ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_cards.xml:26: AAPT: error: resource drawable/thumb_ring (aka cn.photobox.app:drawable/thumb_ring) not found.
-    
-ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_library.xml:14: AAPT: error: resource drawable/ic_search (aka cn.photobox.app:drawable/ic_search) not found.
     
 	at com.android.builder.internal.aapt.v2.Aapt2Exception$Companion.create(Aapt2Exception.kt:45)
 	at com.android.builder.internal.aapt.v2.Aapt2Exception$Companion.create$default(Aapt2Exception.kt:33)
@@ -566,11 +614,9 @@ ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_
 	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
 	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)
 	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)
-	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
-	... 5 more
+	... 7 more
 
 ==============================================================================
 
-BUILD FAILED in 50s
+BUILD FAILED in 44s
 29 actionable tasks: 29 executed
