@@ -43,13 +43,13 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
 > Task :app:mergeReleaseShaders
+> Task :app:mergeReleaseArtProfile
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:generateReleaseAssets UP-TO-DATE
-> Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
-> Task :app:processReleaseManifestForPackage
 > Task :app:processApplicationManifestReleaseForBundle
+> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
@@ -59,16 +59,9 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:66:13 Public-API inline function cannot access non-public-API 'private final fun write(c: Context, t: Thread, e: Throwable): Unit defined in cn.photobox.app.CrashGuard'
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:77:9 Unresolved reference: SkinNow
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:78:18 Unresolved reference: Skins
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:78:30 Unresolved reference: SkinNow
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:117:20 Unresolved reference: SkinNow
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:119:13 Unresolved reference: SkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:66:13 Public-API inline function cannot access non-public-API 'internal final fun write(c: Context, t: Thread, e: Throwable): Unit defined in cn.photobox.app.CrashGuard'
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:542:28 Unresolved reference: SkinAdapter
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:543:23 Unresolved reference: SkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:544:24 Unresolved reference: key
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:544:31 Unresolved reference: SkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:545:35 Unresolved reference: it
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:53:33 Expecting a top level declaration
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:5 Expecting a top level declaration
@@ -321,5 +314,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 55s
+BUILD FAILED in 59s
 30 actionable tasks: 30 executed
