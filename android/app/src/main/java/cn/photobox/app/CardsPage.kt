@@ -30,6 +30,9 @@ import kotlin.math.max
  *    防止父容器在 MOVE 中抢走事件导致手势被 ACTION_CANCEL 中断。
  * 2. 长按生效后左滑弹归类菜单；直接抬手也弹，容错更高。
  */
+/** 左右操作阈值系数（相比上下翻页更大，避免误触）。 */
+private const val THRESHOLD_RATIO_X = 0.11f
+
 class CardsPage(private val act: MainActivity, private val root: View) {
 
     private var stage: View? = null
@@ -62,11 +65,6 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     private var moved = false
 
     companion object {
-        /** 本轮整理总数（含已处理）。 */
-        private fun ensureTotal(total: Int) {
-            if (Store.cardTotal <= 0 || Store.cardTotal < done) Store.cardTotal = total
-        }
-
         /** 结束一轮整理：清空已处理记录。 */
         fun resetSession() {
             Store.cardDoneIds = emptySet()
@@ -88,8 +86,8 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         /** 原图查看：传 0 表示不缩放，直接解码原图。 */
         const val ORIGINAL = 0
 
-        private const val THRESHOLD_MIN = 36f
-        private const val THRESHOLD_RATIO = 0.11f
+        private const val THRESHOLD_MIN = 26f
+        private const val THRESHOLD_RATIO = 0.06f
         private const val LONG_MS = 450L
         private const val TIP = "上滑上一张 · 下滑下一张 · 右滑回收 · 左滑收藏 · 长按左滑归类"
     }
