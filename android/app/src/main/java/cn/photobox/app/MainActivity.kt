@@ -71,7 +71,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.5.0"
+        const val APP_VERSION = "1.5.1"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
@@ -126,10 +126,11 @@ class MainActivity : Activity() {
         nav?.background = Glass.floating(s, 26f)
         nav?.let { v ->
             val lp = v.layoutParams as? android.widget.LinearLayout.LayoutParams
-            lp?.setMargins(16.dp, 0, 16.dp, 12.dp)
+            // 贴近底部：左右 14dp、底部仅 5dp，保留悬浮感又不过分抬高
+            lp?.setMargins(14.dp, 0, 14.dp, 5.dp)
             v.layoutParams = lp
-            v.setPadding(0, 8, 0, 8)
-            v.elevation = 12f * resources.displayMetrics.density
+            v.setPadding(0, 7, 0, 7)
+            v.elevation = 8f * resources.displayMetrics.density
         }
         val items = listOf(
             Triple(R.id.navLibrary, R.id.navLibraryIcon, R.id.navLibraryText) to R.drawable.ic_tab_library,
