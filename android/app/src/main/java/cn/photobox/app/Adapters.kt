@@ -1,12 +1,15 @@
 package cn.photobox.app
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.roundToInt
 
 /**
  * 侧边栏相册项：气泡包裹，只露前两字，超长跑马灯滚动。
@@ -27,6 +30,12 @@ class AlbumAdapter(
     class H(v: View) : RecyclerView.ViewHolder(v) {
         val name: TextView = v.findViewById(R.id.albumName)
         val count: TextView = v.findViewById(R.id.albumCount)
+        /** 跑马灯动画，随 ViewHolder 复用而重建，回收时必须取消。 */
+        var marquee: ValueAnimator? = null
+    }
+
+    override fun onViewRecycled(h: H) {
+        CrashGuard.guard { h.marquee?.cancel(); h.marquee = null; h.name.scrollTo(0, 0) }
     }
 
     override fun onCreateViewHolder(p: ViewGroup, t: Int) =
@@ -43,12 +52,54 @@ class AlbumAdapter(
         val r = rows[i]
         val s = SkinNow.skin
         h.name.text = r.label
-        h.name.isSelected = true                      // 触发跑马灯
         h.name.background = Glass.bubble(s, r.selected)
         h.name.setTextColor(if (r.selected) s.accent else s.text)
         h.count.text = if (r.count > 0) r.count.toString() else ""
         h.count.setTextColor(s.textDim)
         h.itemView.setOnClickListener { CrashGuard.guard { onClick(r.key) } }
+        setupMarquee(h, r.label)
+    }
+
+    /**
+     * 相册名跑马灯：**每 10 秒完成一轮**。
+     *
+     * 系统自带的 ellipsize=marquee 无法控制周期，因此改为代码驱动：
+     * 一轮 10s 内分四段——
+     *   0 ~ 15%  停在开头（1.5s）
+     *   15% ~ 50% 滚到末尾（3.5s）
+     *   50% ~ 65% 停在末尾（1.5s）
+     *   65% ~ 100% 滚回开头（3.5s）
+     * 循环执行。文字未超出可视宽度时不启动动画。
+     */
+    private fun setupMarquee(h: H, text: String) {
+        h.marquee?.cancel()
+        h.marquee = null
+        h.name.scrollTo(0, 0)
+        if (!Store.nameMarquee) return
+        h.name.post {
+            CrashGuard.guard {
+                val max = (h.name.paint.measureText(text) - h.name.width).toInt()
+                if (max <= 0) return@post
+                val a = ValueAnimator.ofFloat(0f, 1f).apply {
+                    duration = 10_000L
+                    repeatCount = ValueAnimator.INFINITE
+                    repeatMode = ValueAnimator.RESTART
+                    interpolator = LinearInterpolator()
+                    addUpdateListener { an ->
+                        val t = an.animatedFraction
+                        val pos = when {
+                            t < 0.15f -> 0f
+                            t < 0.50f -> (t - 0.15f) / 0.35f
+                            t < 0.65f -> 1f
+                            else -> 1f - (t - 0.65f) / 0.35f
+                        }
+                        h.name.scrollTo((pos * max).roundToInt(), 0)
+                    }
+                }
+                h.marquee = a
+                a.start()
+            }
+        }
     }
 }
 
