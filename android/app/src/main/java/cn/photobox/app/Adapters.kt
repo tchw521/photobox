@@ -191,7 +191,7 @@ class PhotoAdapter(
         // 缩略图尺寸按视图区分：流式需要大图才不糊
         val px = when (mode) {
             0 -> 220      // 宫格
-            2 -> 720      // 流式：接近全宽
+            2 -> CardsPage.ORIGINAL   // 流式：高清查看
             else -> 110   // 列表
         }
         h.thumb?.let { Thumbs.into(c, p, px, it) }
