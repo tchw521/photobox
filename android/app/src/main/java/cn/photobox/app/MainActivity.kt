@@ -64,6 +64,9 @@ class MainActivity : Activity() {
         return cardTotal
     }
     fun resetCardSession() { cardDone.clear(); cardTotal = 0 }
+
+    /** 卡片页处理完一张后立刻从内存列表移除，图库与侧边栏同步刷新。 */
+    fun dropPhotoNow(p: Photo) { dropFromMemory(setOf(p.id)) }
     fun cardDoneIds(): Set<Long> = cardDone
     private var tab = 0                  // 0 图库 1 卡片 2 设置 3 回收站 4 查重
 
@@ -97,7 +100,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.6.2"
+        const val APP_VERSION = "1.6.3"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
