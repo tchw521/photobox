@@ -1,5 +1,7 @@
 package cn.photobox.app
 
+import android.app.RecoverableSecurityException
+
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
