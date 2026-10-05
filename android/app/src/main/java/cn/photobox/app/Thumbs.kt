@@ -27,8 +27,27 @@ object Thumbs {
         }
     }
 
+    /**
+     * 高清图单独用很小的缓存（最多 2 张）。
+     * 高清图单张可达 20MB+，若放进共享缓存会把缩略图全挤掉，
+     * 导致滚动时反复解码。这里只保留最近两张即可。
+     */
+    private val hd: LruCache<Long, Bitmap> by lazy {
+        object : LruCache<Long, Bitmap>(2) {
+            override fun sizeOf(key: Long, value: Bitmap) = 1
+            override fun entryRemoved(
+                evicted: Boolean, key: Long, old: Bitmap, new: Bitmap?
+            ) {
+                if (evicted) runCatching { old.recycle() }
+            }
+        }
+    }
+
     fun clear() {
-        synchronized(lock) { try { cache.evictAll() } catch (e: Throwable) { CrashGuard.log(e) } }
+        synchronized(lock) {
+            try { cache.evictAll() } catch (e: Throwable) { CrashGuard.log(e) }
+            try { hd.evictAll() } catch (e: Throwable) { CrashGuard.log(e) }
+        }
     }
 
     /** LruCache 自身不是线程安全的，三个解码线程并发 get/put 会损坏内部结构。统一加锁。 */
@@ -46,17 +65,23 @@ object Thumbs {
 
     /** 加载并显示；命中缓存时直接同步设置，否则异步解码。 */
     fun into(c: Context, p: Photo, px: Int, view: ImageView) {
-        get(p.id)?.let { view.setImageBitmap(it); return }
+        if (px <= 0) {
+            synchronized(lock) { hd.get(p.id) }?.let { view.setImageBitmap(it); return }
+        } else {
+            get(p.id)?.let { view.setImageBitmap(it); return }
+        }
         view.setImageDrawable(null)
         view.tag = p.id
         pool.execute {
             // 解码失败不能让线程抛出，否则会击穿线程池并触发未捕获异常
             val bmp = try {
                 if (px <= 0) {
-                    // 原图查看：跳过系统缩略图，直接按屏幕短边的 2 倍解码，
-                    // 既保证肉眼无损，又不至于把整张原图塞进内存。
+                    // 高清查看：目标边长取「屏幕长边 × 3」并封顶 4096。
+                    // 屏幕长边通常 1080~1440，×3 后 3240~4320，
+                    // 已覆盖主流手机照片的原始长边，放大看不发虚；
+                    // 封顶是为了避免 1 亿像素类照片把内存打爆。
                     val m = c.resources.displayMetrics
-                    val target = maxOf(m.widthPixels, m.heightPixels) * 2
+                    val target = kotlin.math.min(maxOf(m.widthPixels, m.heightPixels) * 3, 4096)
                     Repo.decodeStream(c, p, target)
                 } else {
                     Repo.systemThumb(c, p, px) ?: Repo.decodeStream(c, p, px)
@@ -64,7 +89,9 @@ object Thumbs {
             } catch (e: Throwable) {
                 CrashGuard.log(e); null
             }
-            if (bmp != null) put(p.id, bmp)
+            if (bmp != null) {
+                if (px <= 0) synchronized(lock) { hd.put(p.id, bmp) } else put(p.id, bmp)
+            }
             main.post {
                 if (view.tag == p.id) view.setImageBitmap(bmp)
             }
