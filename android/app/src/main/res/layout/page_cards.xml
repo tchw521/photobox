@@ -1,56 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 卡片页：叠放卡片 + 手势提示 + 底部相册栏 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:padding="8dp">
+    android:orientation="vertical" android:padding="10dp">
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:gravity="center_vertical">
-        <TextView android:id="@+id/progress" android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:text="0 / 0" android:textSize="14sp"
-            android:textColor="?attr/textColorMain" android:textStyle="bold" android:letterSpacing="0.03"/>
-        <Button android:id="@+id/btnMode" style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content" android:layout_height="30dp" android:text="移动" android:textSize="11sp"
-            android:textColor="?attr/accentColor"/>
-    </LinearLayout>
+    <TextView android:id="@+id/progress"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textSize="12sp" android:textStyle="bold" android:gravity="center"
+        android:paddingBottom="4dp"/>
 
-    <FrameLayout android:id="@+id/stage" android:layout_width="match_parent"
-        android:layout_height="0dp" android:layout_weight="1">
-        <ImageView android:id="@+id/card2" android:layout_width="196dp" android:layout_height="252dp"
-            android:layout_gravity="center" android:scaleType="centerCrop" android:alpha="0.42"
-            android:background="@drawable/thumb_ring" android:clipToOutline="true"/>
-        <ImageView android:id="@+id/card1" android:layout_width="210dp" android:layout_height="268dp"
-            android:layout_gravity="center" android:scaleType="centerCrop" android:alpha="0.7"
-            android:background="@drawable/thumb_ring" android:clipToOutline="true"/>
-        <ImageView android:id="@+id/card0" android:layout_width="224dp" android:layout_height="284dp"
-            android:layout_gravity="center" android:scaleType="centerCrop"
-            android:background="@drawable/thumb_ring" android:clipToOutline="true"/>
+    <TextView android:id="@+id/tip"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textSize="11sp" android:gravity="center" android:paddingBottom="6dp"/>
+
+    <FrameLayout android:id="@+id/stage"
+        android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- 三层叠放：c2 最底，c1 居中，c0 最上（当前照片） -->
+        <ImageView android:id="@+id/c2"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:scaleType="fitCenter" android:contentDescription="后层照片"/>
+        <ImageView android:id="@+id/c1"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:scaleType="fitCenter" android:contentDescription="中层照片"/>
+        <ImageView android:id="@+id/c0"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:scaleType="fitCenter" android:contentDescription="当前照片"/>
     </FrameLayout>
 
-    <TextView android:id="@+id/cardTip" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textSize="11sp" android:textColor="?attr/textColorDim" android:gravity="center" android:padding="5dp"/>
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center" android:paddingTop="8dp">
 
-    <TextView android:id="@+id/cardName" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:gravity="center" android:textSize="13sp" android:textColor="?attr/textColorMain"
-        android:singleLine="true" android:ellipsize="middle" android:paddingBottom="4dp"/>
-
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:gravity="center">
-        <Button android:id="@+id/btnPrev" style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content" android:layout_height="32dp" android:text="上一张" android:textSize="11sp"
-            android:textColor="?attr/textColorDim"/>
-        <Button android:id="@+id/btnSkip" style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content" android:layout_height="32dp" android:text="跳过" android:textSize="11sp"
-            android:textColor="?attr/textColorDim"/>
-        <Button android:id="@+id/btnTrash" style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content" android:layout_height="32dp" android:text="清理" android:textSize="11sp"
-            android:textColor="?attr/dangerColor"/>
+        <Button android:id="@+id/btnPrev"
+            android:layout_width="wrap_content" android:layout_height="34dp"
+            android:text="上一张" android:textSize="11sp" android:minWidth="0dp"
+            android:paddingStart="14dp" android:paddingEnd="14dp"/>
+        <Button android:id="@+id/btnSkip"
+            android:layout_width="wrap_content" android:layout_height="34dp"
+            android:text="跳过" android:textSize="11sp" android:minWidth="0dp"
+            android:paddingStart="14dp" android:paddingEnd="14dp" android:layout_marginStart="8dp"/>
+        <Button android:id="@+id/btnMode"
+            android:layout_width="wrap_content" android:layout_height="34dp"
+            android:text="移动模式" android:textSize="11sp" android:minWidth="0dp"
+            android:paddingStart="14dp" android:paddingEnd="14dp" android:layout_marginStart="8dp"/>
+        <Button android:id="@+id/btnTrash"
+            android:layout_width="wrap_content" android:layout_height="34dp"
+            android:text="回收" android:textSize="11sp" android:minWidth="0dp"
+            android:paddingStart="14dp" android:paddingEnd="14dp" android:layout_marginStart="8dp"/>
     </LinearLayout>
 
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="归类到相册（点击即归档）" android:textSize="10sp" android:textColor="?attr/textColorDim"
-        android:gravity="center" android:paddingTop="6dp" android:letterSpacing="0.05"/>
+    <TextView
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="归类到相册（点击即归档）" android:textSize="10sp"
+        android:gravity="center" android:paddingTop="10dp" android:paddingBottom="4dp"/>
 
-    <androidx.recyclerview.widget.RecyclerView android:id="@+id/cardAlbums"
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/albumBar"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:overScrollMode="never"/>
 </LinearLayout>
