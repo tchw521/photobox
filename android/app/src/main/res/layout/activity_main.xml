@@ -41,7 +41,5 @@
         android:background="?attr/glassStrongColor"
         app:menu="@menu/bottom_nav"
         app:labelVisibilityMode="labeled"
-        app:itemActiveIndicatorStyle="@style/NavIndicator"
-        app:itemIconTint="@color/nav_tint"
-        app:itemTextColor="@color/nav_tint"/>
+/>
 </LinearLayout>
