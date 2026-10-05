@@ -49,35 +49,71 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
+> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
 > Task :app:sdkReleaseDependencyData
-> Task :app:processReleaseManifestForPackage
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
 > Task :app:bundleReleaseResources
 > Task :app:processReleaseResources
 
-> Task :app:compileReleaseKotlin
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:9:2 imports are only allowed in the beginning of file
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:114:34 Cannot access 'resolveColor': it is private in file
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:124:37 Cannot access 'resolveColor': it is private in file
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:356:34 Cannot access 'resolveColor': it is private in file
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:365:37 Cannot access 'resolveColor': it is private in file
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:66:13 Public-API inline function cannot access non-public-API 'private final fun write(c: Context, t: Thread, e: Throwable): Unit defined in cn.photobox.app.CrashGuard'
+> Task :app:compileReleaseKotlin FAILED
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:66:13 Public-API inline function cannot access non-public-API 'internal final fun write(c: Context, t: Thread, e: Throwable): Unit defined in cn.photobox.app.CrashGuard'
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:77:9 Unresolved reference: SkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:78:18 Unresolved reference: Skins
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:78:30 Unresolved reference: SkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:117:20 Unresolved reference: SkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:119:13 Unresolved reference: SkinNow
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:475:34 Cannot access 'resolveColor': it is private in file
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:542:28 Unresolved reference: SkinAdapter
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:543:23 Unresolved reference: SkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:544:24 Unresolved reference: key
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:544:31 Unresolved reference: SkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:545:35 Unresolved reference: it
-
-> Task :app:compileReleaseKotlin FAILED
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:53:33 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:5 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:8 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:9 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:11 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:14 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:19 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:21 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:25 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:27 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:33 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:34 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:40 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:41 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:47 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:48 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:58 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:59 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:60 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:62 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:63 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:70 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:71 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:73 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:75 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:77 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:54:86 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:5 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:10 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:11 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:13 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:14 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:16 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:18 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:22 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:23 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:24 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:37 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:38 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:39 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:40 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:41 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:55:44 Expecting a top level declaration
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Model.kt:53:1 Function 'formatSize' must have a body
 
 FAILURE: Build failed with an exception.
 
@@ -285,5 +321,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 1m 2s
+BUILD FAILED in 45s
 30 actionable tasks: 30 executed
