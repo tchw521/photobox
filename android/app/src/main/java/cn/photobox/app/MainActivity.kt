@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
             android.R.drawable.ic_menu_sort_alphabetically,
             android.R.drawable.ic_menu_sort_by_size,
         )
-        const val APP_VERSION = "1.1.0"
+        const val APP_VERSION = "1.2.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -196,11 +196,16 @@ class MainActivity : ComponentActivity() {
                 if (photoAdapter?.selectMode == true) { toggleSelect(p); refreshLibrary() }
                 else preview(p)
             },
-            onLongClick = { p, _, anchor ->
+            onLongClick = { p, pos, anchor ->
+                // 关键：不能在长按回调里同步刷新。notifyDataSetChanged 会重建
+                // ViewHolder，使 anchor 失效、并把长按事件掐断，菜单就弹不出来。
                 photoAdapter?.selectMode = true
                 photoAdapter?.selected?.add(p.id)
-                refreshLibrary()
-                showPhotoMenu(p, anchor)
+                anchor.post {
+                    photoAdapter?.notifyItemChanged(pos)
+                    refreshLibrary()
+                    anchor.post { showPhotoMenu(p, anchor) }
+                }
                 true
             }
         )
@@ -412,7 +417,7 @@ class MainActivity : ComponentActivity() {
             layoutManager = LinearLayoutManager(this@MainActivity)
             setPadding(12, 12, 12, 12)
         }
-        val names = photos.map { it.album }.distinct().sorted()
+        val names = allAlbumNames()
         val adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             override fun onCreateViewHolder(p: ViewGroup, t: Int): RecyclerView.ViewHolder {
                 val tv = TextView(this@MainActivity).apply {
@@ -459,6 +464,9 @@ class MainActivity : ComponentActivity() {
     }
 
     fun cardPhotos(): List<Photo> = visible()
+
+    /** 全量相册名：归类目标必须来自完整列表，不能受当前筛选影响。 */
+    fun allAlbumNames(): List<String> = photos.map { it.album }.distinct().sorted()
 
     fun afterCardAction() {
         loadPhotos()
