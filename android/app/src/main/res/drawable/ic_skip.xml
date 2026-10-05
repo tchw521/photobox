@@ -1,5 +1,8 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp"
     android:viewportWidth="24" android:viewportHeight="24">
+    <!-- 跳过：三角 + 双竖条 -->
     <path android:fillColor="#FFFFFF"
-        android:pathData="M5.2,5.4l7.4,6.6 -7.4,6.6zM14.2,5.4h1.8v13.2h-1.8zM17.8,5.4h1.8v13.2h-1.8z"/>
+        android:pathData="M4.9,5.2l7.5,6.8 -7.5,6.8z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.85"
+        android:pathData="M14.1,5.2h1.9v13.6h-1.9zM17.8,5.2h1.9v13.6h-1.9z"/>
 </vector>
