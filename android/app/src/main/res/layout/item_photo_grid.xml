@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 宫格单元：缩略图 + 选中标记 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="108dp"
-    android:background="@drawable/thumb_ring">
+    android:id="@+id/cell"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:padding="3dp">
 
-    <ImageView
-        android:id="@+id/thumb"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        android:scaleType="centerCrop"/>
+    <FrameLayout
+        android:layout_width="match_parent" android:layout_height="80dp">
 
-    <ImageView
-        android:id="@+id/check"
-        android:layout_width="20dp" android:layout_height="20dp"
-        android:layout_gravity="top|end" android:layout_margin="7dp"
-        android:src="@drawable/ic_check"
-        android:background="@drawable/sel_ring"
-        android:visibility="gone"/>
+        <ImageView
+            android:id="@+id/thumb"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:scaleType="centerCrop" android:contentDescription="照片"/>
 
-    <View android:id="@+id/mask"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        android:background="?attr/accentSoftColor" android:visibility="gone"/>
+        <View android:id="@+id/mask"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+        <ImageView android:id="@+id/check"
+            android:layout_width="20dp" android:layout_height="20dp"
+            android:layout_gravity="top|end" android:layout_margin="4dp"
+            android:visibility="gone" android:contentDescription="已选"/>
+    </FrameLayout>
 </FrameLayout>
