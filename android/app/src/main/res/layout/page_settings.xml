@@ -1,47 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 设置页：皮肤选择 + 通用开关 + 版本信息 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:padding="10dp">
-    <LinearLayout android:id="@+id/settingsBody" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:padding="12dp">
 
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="皮肤" android:textSize="13sp" android:textColor="?attr/accentColor"
-            android:textStyle="bold" android:paddingBottom="6dp" android:letterSpacing="0.05"/>
+    <LinearLayout android:id="@+id/settingsBody"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="皮肤" android:textSize="13sp" android:textStyle="bold" android:paddingBottom="8dp"/>
 
         <androidx.recyclerview.widget.RecyclerView android:id="@+id/skinList"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:overScrollMode="never" android:nestedScrollingEnabled="false"/>
+            android:paddingBottom="16dp"/>
 
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="通用" android:textSize="13sp" android:textColor="?attr/accentColor"
-            android:textStyle="bold" android:paddingTop="14dp" android:paddingBottom="6dp" android:letterSpacing="0.05"/>
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="通用" android:textSize="13sp" android:textStyle="bold" android:paddingBottom="8dp"/>
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="vertical" android:background="@drawable/glass_card" android:padding="10dp">
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <TextView android:id="@+id/stat" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:textSize="11sp" android:textColor="?attr/textColorDim" android:paddingBottom="8dp"/>
-
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="horizontal" android:gravity="center_vertical">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="预览弹窗显示快捷操作" android:textSize="12sp" android:textColor="?attr/textColorMain"/>
-                <Switch android:id="@+id/swPreview" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <TextView
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:text="预览弹窗显示快捷操作" android:textSize="12sp"/>
+                <Switch android:id="@+id/swPreview"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
 
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical" android:paddingTop="6dp">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:text="默认宫格视图" android:textSize="12sp" android:textColor="?attr/textColorMain"/>
-                <Switch android:id="@+id/swGrid" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <LinearLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:paddingTop="8dp">
+                <TextView
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:text="默认宫格视图" android:textSize="12sp"/>
+                <Switch android:id="@+id/swGrid"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:paddingTop="8dp">
+                <TextView
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:text="卡片页归档用移动（关闭则复制）" android:textSize="12sp"/>
+                <Switch android:id="@+id/swCardMode"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
         </LinearLayout>
 
-        <Button android:id="@+id/btnRescan" style="?android:attr/buttonBarButtonStyle"
+        <Button android:id="@+id/btnRescan"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="重新扫描照片" android:textSize="12sp" android:textColor="?attr/textColorMain"
-            android:background="@drawable/glass_bubble" android:layout_marginTop="12dp"/>
+            android:text="重新扫描照片" android:textSize="12sp" android:layout_marginTop="16dp"/>
 
-        <TextView android:id="@+id/version" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:textSize="11sp" android:textColor="?attr/textColorDim" android:gravity="center" android:paddingTop="16dp"/>
+        <TextView android:id="@+id/stat"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="11sp" android:gravity="center" android:paddingTop="12dp"/>
+
+        <TextView android:id="@+id/version"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="11sp" android:gravity="center" android:paddingTop="16dp"/>
     </LinearLayout>
 </ScrollView>
