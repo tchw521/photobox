@@ -27,11 +27,26 @@ object Thumbs {
         }
     }
 
-    fun clear() = try { cache.evictAll() } catch (e: Throwable) { CrashGuard.log(e) }
+    fun clear() {
+        synchronized(lock) { try { cache.evictAll() } catch (e: Throwable) { CrashGuard.log(e) } }
+    }
+
+    /** LruCache 自身不是线程安全的，三个解码线程并发 get/put 会损坏内部结构。统一加锁。 */
+    private val lock = Any()
+
+    private fun get(key: Long): Bitmap? = synchronized(lock) {
+        try { cache.get(key) } catch (e: Throwable) { CrashGuard.log(e); null }
+    }
+
+    private fun put(key: Long, bmp: Bitmap) {
+        synchronized(lock) {
+            try { cache.put(key, bmp) } catch (e: Throwable) { CrashGuard.log(e) }
+        }
+    }
 
     /** 加载并显示；命中缓存时直接同步设置，否则异步解码。 */
     fun into(c: Context, p: Photo, px: Int, view: ImageView) {
-        cache.get(p.id)?.let { view.setImageBitmap(it); return }
+        get(p.id)?.let { view.setImageBitmap(it); return }
         view.setImageDrawable(null)
         view.tag = p.id
         pool.execute {
@@ -41,7 +56,7 @@ object Thumbs {
             } catch (e: Throwable) {
                 CrashGuard.log(e); null
             }
-            if (bmp != null) cache.put(p.id, bmp)
+            if (bmp != null) put(p.id, bmp)
             main.post {
                 if (view.tag == p.id) view.setImageBitmap(bmp)
             }
@@ -51,7 +66,7 @@ object Thumbs {
     /** 回收站缩略图：同样走缓存，并用 tag 校验防止快速滚动时错位。 */
     fun file(path: String, px: Int, view: ImageView) {
         val key = -(path.hashCode().toLong())      // 负号区隔，避免与 MediaStore id 撞键
-        cache.get(key)?.let { view.setImageBitmap(it); return }
+        get(key)?.let { view.setImageBitmap(it); return }
         view.setImageDrawable(null)
         view.tag = key
         pool.execute {
@@ -60,13 +75,17 @@ object Thumbs {
             } catch (e: Throwable) {
                 CrashGuard.log(e); null
             }
-            if (bmp != null) cache.put(key, bmp)
+            if (bmp != null) put(key, bmp)
             main.post { if (view.tag == key) view.setImageBitmap(bmp) }
         }
     }
 
     /** 皮肤切换等场景整体清空（例如需要更大缩略图时）。 */
-    fun trim() { cache.trimToSize(cache.maxSize() / 2) }
+    fun trim() {
+        synchronized(lock) {
+            try { cache.trimToSize(cache.maxSize() / 2) } catch (e: Throwable) { CrashGuard.log(e) }
+        }
+    }
 }
 
 /** 主线程调度小工具。 */
