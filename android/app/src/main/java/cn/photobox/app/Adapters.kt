@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
-/** 侧边栏相册项：气泡包裹，只露前两字，超长跑马灯。 */
+/**
+ * 侧边栏相册项：气泡包裹，只露前两字，超长跑马灯滚动。
+ * 颜色全部取自 SkinNow.skin，不使用 ?attr。
+ */
 class AlbumAdapter(
     private val onClick: (String) -> Unit,
 ) : RecyclerView.Adapter<AlbumAdapter.H>() {
@@ -39,17 +41,14 @@ class AlbumAdapter(
 
     private fun bind(h: H, i: Int) {
         val r = rows[i]
+        val s = SkinNow.skin
         h.name.text = r.label
         h.name.isSelected = true                      // 触发跑马灯
-        h.name.background = ContextCompat.getDrawable(
-            h.itemView.context,
-            if (r.selected) R.drawable.glass_bubble_on else R.drawable.glass_bubble
-        )
-        h.name.setTextColor(
-            resolveColor(h.itemView.context, if (r.selected) R.attr.textColorMain else R.attr.textColorDim)
-        )
+        h.name.background = Glass.bubble(s, r.selected)
+        h.name.setTextColor(if (r.selected) s.accent else s.text)
         h.count.text = if (r.count > 0) r.count.toString() else ""
-        h.itemView.setOnClickListener { onClick(r.key) }
+        h.count.setTextColor(s.textDim)
+        h.itemView.setOnClickListener { CrashGuard.guard { onClick(r.key) } }
     }
 }
 
@@ -79,13 +78,17 @@ class ChipAdapter(private val onClick: (String?) -> Unit) :
 
     private fun bindChip(h: H, i: Int) {
         val m = items[i]
+        val s = SkinNow.skin
         h.t.text = m
         val on = m == current
-        h.t.setTextColor(resolveColor(h.itemView.context, if (on) R.attr.accentColor else R.attr.textColorDim))
+        h.t.setTextColor(if (on) s.accent else s.textDim)
+        h.t.background = Glass.bubble(s, on)
         h.t.setOnClickListener {
-            current = if (current == m) null else m
-            notifyDataSetChanged()
-            onClick(current)
+            CrashGuard.guard {
+                current = if (current == m) null else m
+                notifyDataSetChanged()
+                onClick(current)
+            }
         }
     }
 }
@@ -135,18 +138,21 @@ class PhotoAdapter(
 
     private fun bindPhoto(h: H, i: Int) {
         val p = data[i]
+        val s = SkinNow.skin
         val px = if (grid) 220 else 110
         h.thumb?.let { Thumbs.into(c, p, px, it) }
         val sel = selected.contains(p.id)
         h.check?.visibility = if (sel && selectMode) View.VISIBLE else View.GONE
+        h.check?.setImageResource(R.drawable.ic_check)
+        h.check?.setColorFilter(s.accent)
         h.mask?.visibility = if (sel && selectMode) View.VISIBLE else View.GONE
-        h.rowRoot?.setBackgroundColor(
-            if (sel && selectMode) resolveColor(h.itemView.context, R.attr.accentSoftColor)
-            else resolveColor(h.itemView.context, R.attr.glassColor)
-        )
+        h.mask?.setBackgroundColor(s.accentSoft)
+        h.rowRoot?.background = Glass.card(s, 12f)
         h.name?.text = p.name
+        h.name?.setTextColor(s.text)
         h.meta?.text = "${p.album} · ${p.dateText} · ${formatSize(p.size)}"
-        h.itemView.setOnClickListener { onClick(p, i) }
+        h.meta?.setTextColor(s.textDim)
+        h.itemView.setOnClickListener { CrashGuard.guard { onClick(p, i) } }
         h.itemView.setOnLongClickListener { onLongClick(p, i, h.itemView) }
     }
 }
@@ -164,7 +170,7 @@ class TrashAdapter(
         val thumb: ImageView = v.findViewById(R.id.thumb)
         val name: TextView = v.findViewById(R.id.name)
         val meta: TextView = v.findViewById(R.id.meta)
-        val restore: android.view.View = v.findViewById(R.id.restore)
+        val restore: View = v.findViewById(R.id.restore)
     }
 
     override fun onCreateViewHolder(p: ViewGroup, t: Int) =
@@ -179,9 +185,16 @@ class TrashAdapter(
 
     private fun bindTrash(h: H, i: Int) {
         val item = data[i]
+        val s = SkinNow.skin
         Thumbs.file(item.file, 120, h.thumb)
         h.name.text = item.name
+        h.name.setTextColor(s.text)
         h.meta.text = "${item.album} · ${formatSize(item.size)}"
-        h.restore.setOnClickListener { onRestore(item) }
+        h.meta.setTextColor(s.textDim)
+        h.restore.setOnClickListener { CrashGuard.guard { onRestore(item) } }
+        if (h.restore is android.widget.Button) {
+            (h.restore as android.widget.Button).setTextColor(s.text)
+            h.restore.background = Glass.solid(s.glass, 8f)
+        }
     }
 }
