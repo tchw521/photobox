@@ -18,7 +18,6 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.ComponentActivity
@@ -61,7 +60,7 @@ class MainActivity : ComponentActivity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.9.0"
+        const val APP_VERSION = "2.0.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -313,13 +312,13 @@ class MainActivity : ComponentActivity() {
             gridView = !gridView
             Store.defaultGrid = gridView; Store.saveSettings(this)
             switchTab(0)
-            Toast.makeText(this, if (gridView) "已切换为宫格" else "已切换为列表", Toast.LENGTH_SHORT).show()
+            Ui.toast(this, if (gridView) "已切换为宫格" else "已切换为列表")
         }
         v.findViewById<ImageButton>(R.id.btnSort).setOnClickListener {
             sort = (sort + 1) % 4
             applyToolbarIcons(v)
             refreshLibrary()
-            Toast.makeText(this, "排序：${SORT_LABELS[sort]}", Toast.LENGTH_SHORT).show()
+            Ui.toast(this, "排序：${SORT_LABELS[sort]}")
         }
 
         applyToolbarIcons(v)
@@ -349,10 +348,9 @@ class MainActivity : ComponentActivity() {
 
     /** 工具栏图标按当前主题的强调色着色。 */
     private fun tintIcons(v: View) {
-        val tv = TypedValue()
-        theme.resolveAttribute(R.attr.accentColor, tv, true)
-        v.findViewById<ImageButton>(R.id.btnView).setColorFilter(tv.data)
-        v.findViewById<ImageButton>(R.id.btnSort).setColorFilter(tv.data)
+        val c = resolveColor(this, R.attr.accentColor)
+        v.findViewById<ImageButton>(R.id.btnView).setColorFilter(c)
+        v.findViewById<ImageButton>(R.id.btnSort).setColorFilter(c)
     }
 
     /** 长按单张照片弹出的操作菜单：增删改 + 进入多选。 */
@@ -375,13 +373,13 @@ class MainActivity : ComponentActivity() {
                 1 -> {
                     if (isFav) fav.remove(p.id.toString()) else fav.add(p.id.toString())
                     Store.setFavorites(this, fav)
-                    Toast.makeText(this, if (isFav) "已取消收藏" else "已收藏", Toast.LENGTH_SHORT).show()
+                    Ui.toast(this, if (isFav) "已取消收藏" else "已收藏")
                     exitSelect()
                 }
                 2 -> { Ui.albumSheet(this, allAlbumNames()) { a -> moveOne(p, a) } }
                 3 -> renameOne(p)
                 4 -> confirmDelete(listOf(p))
-                5 -> Toast.makeText(this, "已进入多选，可继续点选更多", Toast.LENGTH_SHORT).show()
+                5 -> Ui.toast(this, "已进入多选，可继续点选更多")
             }
             true
         }
@@ -424,8 +422,7 @@ class MainActivity : ComponentActivity() {
         val tip = v.findViewById<TextView>(R.id.tip)
 
         val data = visible()
-        photoAdapter?.submit(data)
-        photoAdapter?.notifyDataSetChanged()
+        photoAdapter?.submit(data)          // submit 内部已刷新，无需再调
         tip.text = when {
             photos.isEmpty() -> "暂无照片，点右上角设置 → 重新扫描，或先授予照片权限"
             data.isEmpty() -> "当前筛选下没有照片"
@@ -465,7 +462,7 @@ class MainActivity : ComponentActivity() {
         val allFav = list.all { fav.contains(it.id.toString()) }
         list.forEach { if (allFav) fav.remove(it.id.toString()) else fav.add(it.id.toString()) }
         Store.setFavorites(this, fav)
-        Toast.makeText(this, if (allFav) "已取消收藏" else "已收藏 ${list.size} 张", Toast.LENGTH_SHORT).show()
+        Ui.toast(this, if (allFav) "已取消收藏" else "已收藏 ${list.size} 张")
         exitSelect()
     }
 
@@ -606,7 +603,7 @@ class MainActivity : ComponentActivity() {
 
         v.findViewById<Button>(R.id.btnRescan).setOnClickListener {
             Thumbs.clear(); loadPhotos()
-            Toast.makeText(this, "扫描完成", Toast.LENGTH_SHORT).show()
+            Ui.toast(this, "扫描完成")
         }
     }
 
