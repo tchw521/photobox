@@ -3,10 +3,18 @@
   极简根布局：只负责结构，颜色与质感全部由代码设置。
   布局中不使用任何 ?attr/，避免主题属性解析导致的 inflate 崩溃。
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/root"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <!-- 自定义背景图片层：位于内容之下，透明度由「图片浓度遮罩」控制 -->
+    <ImageView android:id="@+id/bgLayer"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:scaleType="centerCrop" android:contentDescription="背景"/>
+
+    <LinearLayout
+        android:id="@+id/root"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent" android:layout_height="0dp"
@@ -79,4 +87,4 @@
                 android:text="设置" android:textSize="10sp" android:paddingTop="2dp"/>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>
