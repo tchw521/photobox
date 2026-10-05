@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.abs
@@ -108,7 +107,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         albumList.adapter = AlbumSheetAdapter(act, act.allAlbumNames(), true, true) { name ->
             val p = current()
             if (p == null) {
-                Toast.makeText(act, "没有待整理的照片", Toast.LENGTH_SHORT).show()
+                Ui.toast(act, "没有待整理的照片")
                 return@AlbumSheetAdapter
             }
             classify(p, name)
@@ -182,7 +181,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     private fun settle(dx: Float, dy: Float, wasLong: Boolean) {
         val p = current()
         if (p == null) {
-            Toast.makeText(act, "没有待整理的照片", Toast.LENGTH_SHORT).show()
+            Ui.toast(act, "没有待整理的照片")
             return
         }
         val far = maxOf(abs(dx), abs(dy)) >= THRESHOLD
@@ -211,7 +210,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
             idx--
             render()
         } else {
-            Toast.makeText(act, "已经是第一张", Toast.LENGTH_SHORT).show()
+            Ui.toast(act, "已经是第一张")
         }
     }
 
@@ -220,7 +219,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
             idx++
             render()
         } else {
-            Toast.makeText(act, "没有更多了", Toast.LENGTH_SHORT).show()
+            Ui.toast(act, "没有更多了")
         }
     }
 
@@ -267,7 +266,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         val fav = Store.favorites(act)
         fav.add(p.id.toString())
         Store.setFavorites(act, fav)
-        Toast.makeText(act, "已收藏", Toast.LENGTH_SHORT).show()
+        Ui.toast(act, "已收藏")
         advance(p)
         act.afterCardAction()
     }
