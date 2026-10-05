@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:orientation="horizontal" android:padding="4dp" android:gravity="center_vertical">
+    android:orientation="horizontal" android:padding="3dp" android:gravity="center_vertical">
 
-    <!-- 气泡：只露两字，超长跑马灯 -->
+    <!-- 液态玻璃气泡：只露前两字，超长跑马灯 -->
     <TextView
         android:id="@+id/albumName"
         android:layout_width="0dp" android:layout_height="wrap_content"
-        android:layout_weight="1" android:maxWidth="48dp"
+        android:layout_weight="1" android:maxWidth="52dp"
         android:singleLine="true" android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
-        android:textSize="12sp" android:textColor="@color/dim"
-        android:background="@drawable/bg_bubble" android:padding="4dp"
+        android:textSize="12sp" android:textColor="?attr/textColorDim"
+        android:background="@drawable/glass_bubble" android:padding="5dp"
         android:gravity="center"/>
 
     <TextView
         android:id="@+id/albumCount"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:textSize="10sp" android:textColor="@color/dim" android:paddingStart="4dp"/>
+        android:textSize="9sp" android:textColor="?attr/textColorDim" android:paddingStart="3dp"/>
 </LinearLayout>
