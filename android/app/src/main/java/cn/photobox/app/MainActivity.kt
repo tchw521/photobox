@@ -32,7 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
  *
  * 设计原则（本版重点）：
  * 1. **不使用任何 Material / AppCompat 组件**，只用系统控件，依赖极少。
- * 2. **布局与 drawable 中不使用 ?attr/**，颜色全部由 Skin 在代码里提供。
+ * 2. **布局与 drawable 中不使用主题属性 ?attr**，颜色全部由 Skin 在代码里提供。
  *    此前多次崩溃都源于主题属性在资源解析阶段的时序问题。
  * 3. 所有弹窗在 show 前校验 Activity 存活，避免 BadTokenException。
  * 4. 媒体库写操作统一走 Ui.write，捕获 RecoverableSecurityException。
