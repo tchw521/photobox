@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:orientation="vertical" android:gravity="center" android:padding="5dp">
+    <View android:id="@+id/swatch" android:layout_width="52dp" android:layout_height="52dp"/>
+    <TextView android:id="@+id/skinName" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textSize="10sp" android:textColor="?attr/textColorDim" android:paddingTop="4dp" android:gravity="center"/>
+</LinearLayout>
