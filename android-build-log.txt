@@ -55,8 +55,8 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
-> Task :app:bundleReleaseResources
 > Task :app:processReleaseResources
+> Task :app:bundleReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:44:17 Unresolved reference: SkinNow
@@ -81,15 +81,12 @@ e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:93:26 Unresolved reference: MainActivity
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:743:1 Unclosed comment
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:193:1 Unclosed comment
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:26:35 Unresolved reference: Skins
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:29:19 Unresolved reference: Skins
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:31:21 Unresolved reference: Skins
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:33:35 Unresolved reference: Glass
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:35:20 None of the following functions can be called with the arguments supplied: 
-public open fun setTextColor(p0: ColorStateList!): Unit defined in android.widget.TextView
-public open fun setTextColor(p0: Int): Unit defined in android.widget.TextView
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:35:41 Unresolved reference: SkinNow
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:35:66 Unresolved reference: SkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:18:26 Unresolved reference: Skin
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:29:35 Unresolved reference: Skins
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:32:17 Unresolved reference: Skins
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:39:13 None of the following functions can be called with the arguments supplied: 
+public open fun setStroke(p0: Int, p1: ColorStateList!): Unit defined in android.graphics.drawable.GradientDrawable
+public open fun setStroke(p0: Int, p1: Int): Unit defined in android.graphics.drawable.GradientDrawable
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:107:26 Unresolved reference: SkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:108:30 Unresolved reference: SkinNow
 
@@ -299,5 +296,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 54s
+BUILD FAILED in 1m 6s
 30 actionable tasks: 30 executed
