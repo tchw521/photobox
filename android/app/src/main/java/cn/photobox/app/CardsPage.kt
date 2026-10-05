@@ -28,6 +28,8 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     private var queue: MutableList<Photo> = mutableListOf()
     private var idx = 0
     private var done = 0
+    /** 视图是否绑定成功。绑定失败时手势整体不响应，避免空引用崩溃。 */
+    private var bound = false
 
     private lateinit var stage: View
     private lateinit var c0: ImageView
@@ -65,6 +67,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     }
 
     private fun bindInner() {
+        bound = false
         stage = root.findViewById(R.id.stage)
         c0 = root.findViewById(R.id.card0)
         c1 = root.findViewById(R.id.card1)
@@ -93,6 +96,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         tip.text = TIP
         c0.isClickable = true          // 保证 ImageView 稳定接收触摸序列
         bindAlbums()
+        bound = true
         attachGesture()
         render()
     }
@@ -117,6 +121,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         c0.setOnTouchListener { _, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    if (!bound) return@setOnTouchListener false
                     // 防止父容器把后续 MOVE 抢走，导致滑动中途收到 ACTION_CANCEL
                     c0.parent?.requestDisallowInterceptTouchEvent(true)
                     startX = e.rawX
