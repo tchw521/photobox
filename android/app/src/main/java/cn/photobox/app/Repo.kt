@@ -79,6 +79,22 @@ object Repo {
         }
     }
 
+    /**
+     * 真正移动：直接改写媒体库的 RELATIVE_PATH，把照片从原图集挪到目标图集。
+     * 不是「复制 + 删除原图」，所以原图不会进回收站。
+     */
+    fun moveToAlbum(c: Context, p: Photo, album: String): Boolean {
+        if (Build.VERSION.SDK_INT < 29) return false
+        return try {
+            val cv = ContentValues().apply {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$album")
+            }
+            c.contentResolver.update(uriOf(p), cv, null, null) > 0
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     /** 清理到回收站：先复制进私有目录，再删除系统媒体。 */
     fun moveToTrash(c: Context, p: Photo, onConsent: ((android.app.RecoverableSecurityException) -> Unit)? = null): TrashItem? {
         val dir = File(c.filesDir, "trash").apply { mkdirs() }
