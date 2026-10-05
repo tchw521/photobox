@@ -70,7 +70,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.3.0"
+        const val APP_VERSION = "1.4.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_TRASH = "\u0000trash"
@@ -118,7 +118,16 @@ class MainActivity : Activity() {
     /** 底栏三个按钮：自绘图标 + 文字，选中态用强调色。 */
     private fun bindNav() {
         val s = SkinNow.skin
-        findViewById<View>(R.id.bottomNav)?.background = Glass.card(s, 0f, strong = true)
+        // 底栏：悬浮液态玻璃胶囊，浮在内容之上并留出外边距
+        val nav = findViewById<View>(R.id.bottomNav)
+        nav?.background = Glass.floating(s, 26f)
+        nav?.let { v ->
+            val lp = v.layoutParams as? android.widget.LinearLayout.LayoutParams
+            lp?.setMargins(16.dp, 0, 16.dp, 12.dp)
+            v.layoutParams = lp
+            v.setPadding(0, 8, 0, 8)
+            v.elevation = 12f * resources.displayMetrics.density
+        }
         val items = listOf(
             Triple(R.id.navLibrary, R.id.navLibraryIcon, R.id.navLibraryText) to R.drawable.ic_tab_library,
             Triple(R.id.navCards, R.id.navCardsIcon, R.id.navCardsText) to R.drawable.ic_tab_cards,
@@ -810,7 +819,7 @@ class MainActivity : Activity() {
                 recreate()
             }
         })
-        body.addView(Ui.switchRow(this, "相册名自动滚动（10 秒一轮）", Store.nameMarquee) {
+        body.addView(Ui.switchRow(this, "相册名显示前 4 字", Store.nameMarquee) {
             Store.nameMarquee = it; Store.saveSettings(this); renderSidebar()
         })
 
@@ -871,21 +880,19 @@ class MainActivity : Activity() {
         body.addView(Ui.section(this, "关于"))
         val stat = TextView(this).apply {
             text = "共 ${photos.size} 张照片 · ${photos.map { it.album }.distinct().size} 个图集 · 回收站 ${Store.trash(this@MainActivity).size} 项"
-            textSize = 11f; setTextColor(s.textDim); setPadding(0, 8, 0, 4)
+            textSize = 13f; setTextColor(s.textDim); setPadding(0, 8, 0, 4)
         }
         body.addView(stat)
         val ver = TextView(this).apply {
             text = "光影相册 · 原生安卓版 v$APP_VERSION"
-            textSize = 11f; setTextColor(s.textDim); setPadding(0, 4, 0, 8)
+            textSize = 13f; setTextColor(s.textDim); setPadding(0, 4, 0, 8)
         }
         body.addView(ver)
     }
 
     /** 皮肤选择：收纳在设置页右上角按钮内，点开弹列表。 */
     private fun showSkinPicker() {
-        Ui.listSheet(this, "选择皮肤", Skins.ALL.map { it.name }) { i ->
-            CrashGuard.guard { switchSkin(Skins.ALL[i].key) }
-        }
+        SkinPicker.show(this) { key -> switchSkin(key) }
     }
 
     /** 崩溃记录：可长按复制。 */
@@ -897,7 +904,7 @@ class MainActivity : Activity() {
         }
         val tv = TextView(this).apply {
             text = log
-            textSize = 10f
+            textSize = 12f
             setTextColor(SkinNow.skin.textDim)
             setTextIsSelectable(true)
             setPadding(20, 20, 20, 20)
