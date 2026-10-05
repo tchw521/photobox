@@ -40,8 +40,8 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:parseReleaseLocalResources
 > Task :app:processReleaseMainManifest
 > Task :app:processReleaseManifest
-> Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
+> Task :app:javaPreCompileRelease
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
@@ -50,28 +50,19 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
-> Task :app:bundleReleaseResources
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
-> Task :app:writeReleaseSigningConfigVersions
 > Task :app:processReleaseManifestForPackage
+> Task :app:bundleReleaseResources
+> Task :app:writeReleaseSigningConfigVersions
 > Task :app:processReleaseResources
 
-> Task :app:compileReleaseKotlin FAILED
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:30:34 Unresolved reference: MainActivity
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:127:38 Overload resolution ambiguity: 
-public operator fun <T> Collection<TypeVariable(T)>.plus(elements: Array<out TypeVariable(T)>): List<TypeVariable(T)> defined in kotlin.collections
-public operator fun <T> Collection<TypeVariable(T)>.plus(elements: Iterable<TypeVariable(T)>): List<TypeVariable(T)> defined in kotlin.collections
-public operator fun <T> Collection<TypeVariable(T)>.plus(elements: Sequence<TypeVariable(T)>): List<TypeVariable(T)> defined in kotlin.collections
-public operator fun <T> Iterable<TypeVariable(T)>.plus(elements: Array<out TypeVariable(T)>): List<TypeVariable(T)> defined in kotlin.collections
-public operator fun <T> Iterable<TypeVariable(T)>.plus(elements: Iterable<TypeVariable(T)>): List<TypeVariable(T)> defined in kotlin.collections
-public operator fun <T> Iterable<TypeVariable(T)>.plus(elements: Sequence<TypeVariable(T)>): List<TypeVariable(T)> defined in kotlin.collections
+> Task :app:compileReleaseKotlin
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:130:66 Type mismatch: inferred type is () -> Unit but Int was expected
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:130:70 Type mismatch: inferred type is Int but View.OnClickListener was expected
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:46:58 Unresolved reference: MainActivity
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:93:26 Unresolved reference: MainActivity
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:743:1 Unclosed comment
+
+> Task :app:compileReleaseKotlin FAILED
 
 FAILURE: Build failed with an exception.
 
@@ -279,5 +270,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 53s
+BUILD FAILED in 50s
 30 actionable tasks: 30 executed
