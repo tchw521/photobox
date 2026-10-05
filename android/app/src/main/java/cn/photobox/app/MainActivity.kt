@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
             android.R.drawable.ic_menu_sort_alphabetically,
             android.R.drawable.ic_menu_sort_by_size,
         )
+        const val APP_VERSION = "1.1.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -471,6 +472,7 @@ class MainActivity : ComponentActivity() {
         swGrid.isChecked = Store.defaultGrid
         swPreview.setOnCheckedChangeListener { _, b -> Store.previewActions = b; Store.saveSettings(this) }
         swGrid.setOnCheckedChangeListener { _, b -> Store.defaultGrid = b; Store.saveSettings(this) }
+        v.findViewById<TextView>(R.id.version).text = "光影相册 · 原生安卓版 v${APP_VERSION}"
         v.findViewById<Button>(R.id.btnRescan).setOnClickListener {
             Thumbs.clear(); loadPhotos()
             Toast.makeText(this, "扫描完成", Toast.LENGTH_SHORT).show()
