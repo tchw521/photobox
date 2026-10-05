@@ -29,8 +29,8 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:buildKotlinToolingMetadata
 > Task :app:checkKotlinGradlePluginConfigurationErrors
 > Task :app:checkReleaseDuplicateClasses
-> Task :app:checkReleaseAarMetadata
 > Task :app:generateReleaseResValues
+> Task :app:checkReleaseAarMetadata
 > Task :app:mapReleaseSourceSetPaths
 > Task :app:generateReleaseResources
 > Task :app:packageReleaseResources
@@ -49,11 +49,11 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
+> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
+> Task :app:bundleReleaseResources
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
-> Task :app:processReleaseManifestForPackage
-> Task :app:bundleReleaseResources
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
 > Task :app:processReleaseResources
@@ -81,6 +81,86 @@ public final operator fun times(other: Short): Float defined in kotlin.Float
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:113:49 Unresolved reference: csAccent
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:114:51 Unresolved reference: csAccentLevel
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:115:46 Unresolved reference: csAccentLevel
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:55:18 Unresolved reference: skinSectionBuiltin
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:55:43 Unresolved reference: skinSectionCustom
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:55:67 Unresolved reference: skinSectionBg
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:56:11 Overload resolution ambiguity: 
+public inline fun <T> Iterable<TypeVariable(T)>.forEach(action: (TypeVariable(T)) -> Unit): Unit defined in kotlin.collections
+public inline fun <K, V> Map<out TypeVariable(K), TypeVariable(V)>.forEach(action: (Map.Entry<TypeVariable(K), TypeVariable(V)>) -> Unit): Unit defined in kotlin.collections
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:56:21 Cannot infer a type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:60:18 Unresolved reference: lblAccent
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:60:34 Unresolved reference: lblAccent2
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:60:51 Unresolved reference: lblMode
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:60:65 Unresolved reference: lblBase
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:61:18 Unresolved reference: lblAccentLevel
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:61:39 Unresolved reference: lblBrightness
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:61:59 Unresolved reference: lblBgDim
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:62:11 Overload resolution ambiguity: 
+public inline fun <T> Iterable<TypeVariable(T)>.forEach(action: (TypeVariable(T)) -> Unit): Unit defined in kotlin.collections
+public inline fun <K, V> Map<out TypeVariable(K), TypeVariable(V)>.forEach(action: (Map.Entry<TypeVariable(K), TypeVariable(V)>) -> Unit): Unit defined in kotlin.collections
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:62:21 Cannot infer a type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:65:21 Unresolved reference: btnPickBg
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:65:37 Unresolved reference: btnClearBg
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:65:54 Unresolved reference: btnResetSkin
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:65:68 Overload resolution ambiguity: 
+public inline fun <T> Iterable<TypeVariable(T)>.forEach(action: (TypeVariable(T)) -> Unit): Unit defined in kotlin.collections
+public inline fun <K, V> Map<out TypeVariable(K), TypeVariable(V)>.forEach(action: (Map.Entry<TypeVariable(K), TypeVariable(V)>) -> Unit): Unit defined in kotlin.collections
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:65:78 Cannot infer a type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:71:40 Unresolved reference: btnApplyCustom
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:79:55 Unresolved reference: skinGrid
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:84:65 Unresolved reference: item_skin_card
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:99:48 Unresolved reference: applySkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:107:48 Unresolved reference: skinSwatch
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:113:29 Unresolved reference: accentGrid
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:114:29 Unresolved reference: accent2Grid
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:123:65 Unresolved reference: item_swatch
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:131:51 Unresolved reference: csAccent
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:131:76 Unresolved reference: csAccent2
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:135:49 Unresolved reference: csAccent
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:135:73 Unresolved reference: csAccent2
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:153:55 Unresolved reference: modeGroup
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:154:31 Unresolved reference: csMode
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:154:49 Unresolved reference: modeDark
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:154:68 Unresolved reference: modeLight
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:156:19 Unresolved reference: csMode
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:156:43 Unresolved reference: modeDark
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:159:55 Unresolved reference: baseGroup
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:160:31 Unresolved reference: csBaseFollow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:160:50 Unresolved reference: baseFollow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:160:71 Unresolved reference: baseCustom
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:162:19 Unresolved reference: csBaseFollow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:162:45 Unresolved reference: baseFollow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:168:50 Unresolved reference: seekAccentLevel
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:169:30 Unresolved reference: csAccentLevel
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:172:23 Unresolved reference: csAccentLevel
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:178:50 Unresolved reference: seekBrightness
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:179:30 Unresolved reference: csBrightness
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:182:23 Unresolved reference: csBrightness
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:188:51 Unresolved reference: seekBgDim
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:189:31 Unresolved reference: bgDim
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:192:23 Unresolved reference: bgDim
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:212:52 Unresolved reference: bgPreview
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:214:19 Unresolved reference: bgUri
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:218:60 Unresolved reference: bgUri
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:223:40 Unresolved reference: btnPickBg
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:230:61 Unresolved reference: REQ_PICK_BG
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:233:40 Unresolved reference: btnClearBg
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:235:23 Unresolved reference: bgUri
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:237:21 Unresolved reference: applyBackground
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:244:43 Unresolved reference: bgPreview
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:245:20 Unresolved reference: bgDim
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:250:40 Unresolved reference: btnApplyCustom
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:253:21 Unresolved reference: applySkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:256:40 Unresolved reference: btnResetSkin
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:258:23 Unresolved reference: csMode
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:259:23 Unresolved reference: csAccent
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:260:23 Unresolved reference: csAccent2
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:261:23 Unresolved reference: csBaseFollow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:262:23 Unresolved reference: csBrightness
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:263:23 Unresolved reference: csAccentLevel
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:264:23 Unresolved reference: bgUri
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:265:23 Unresolved reference: bgDim
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:267:21 Unresolved reference: applySkinNow
 
 FAILURE: Build failed with an exception.
 
@@ -288,5 +368,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 50s
+BUILD FAILED in 49s
 30 actionable tasks: 30 executed
