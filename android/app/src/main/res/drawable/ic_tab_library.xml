@@ -1,12 +1,12 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp"
     android:viewportWidth="24" android:viewportHeight="24">
-    <!-- 相册：背层卡片 + 前层照片，带山形与太阳 -->
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.42"
-        android:pathData="M6.6,3.4h10.8c0.9,0 1.6,0.7 1.6,1.6v1.2H5V5c0,-0.9 0.7,-1.6 1.6,-1.6z"/>
+    <!-- 图库：后排卡片 + 前排照片（含山形与太阳） -->
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.34"
+        android:pathData="M7.2,2.9h10.4c0.55,0 1,0.45 1,1v1.5H6.2V3.9c0,-0.55 0.45,-1 1,-1z"/>
     <path android:fillColor="#FFFFFF"
-        android:pathData="M4.6,7.4h14.8c0.9,0 1.6,0.7 1.6,1.6v9.4c0,0.9 -0.7,1.6 -1.6,1.6H4.6c-0.9,0 -1.6,-0.7 -1.6,-1.6V9c0,-0.9 0.7,-1.6 1.6,-1.6zM4.6,9v9.4h14.8V9H4.6z"/>
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.92"
-        android:pathData="M7.1,15.3l2.6,-3.3 2,2.5 1.5,-1.8 2.1,2.6z"/>
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.92"
-        android:pathData="M15.4,10.6m-1.05,0a1.05,1.05 0 1,0 2.1,0a1.05,1.05 0 1,0 -2.1,0"/>
+        android:pathData="M3.9,6.6h16.2c0.55,0 1,0.45 1,1v11.6c0,0.55 -0.45,1 -1,1H3.9c-0.55,0 -1,-0.45 -1,-1V7.6c0,-0.55 0.45,-1 1,-1zM3.9,8.4v10.2h16.2V8.4H3.9z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.9"
+        android:pathData="M4.7,17.1l4.1,-4.9 3,3.6 2.1,-2.5 3.6,4.4z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.9"
+        android:pathData="M15.9,9.9m-1.15,0a1.15,1.15 0 1,0 2.3,0a1.15,1.15 0 1,0 -2.3,0"/>
 </vector>
