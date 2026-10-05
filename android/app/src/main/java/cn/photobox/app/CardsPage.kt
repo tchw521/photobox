@@ -13,8 +13,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.math.abs
 
 /**
@@ -112,7 +110,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
                 val tv = TextView(act).apply {
                     setPadding(20, 16, 20, 16); textSize = 12f
                     setTextColor(resolveColor(act, R.attr.textColorMain))
-                    background = act.getDrawable(R.drawable.bg_bubble)
+                    background = act.getDrawable(R.drawable.glass_bubble)
                 }
                 return object : RecyclerView.ViewHolder(tv) {}
             }
@@ -304,76 +302,43 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     }
 
     private fun dropTrash(p: Photo) {
-        Thread {
+        Ui.async(act, io = {
             val items = Store.trash(act).toMutableList()
-            Repo.moveToTrash(act, p) { e -> act.runOnUiThread { act.requestDeleteConsent(e) } }
-                ?.let { items.add(it) }
+            var ok = false
+            Ui.write(act, {
+                Repo.moveToTrash(act, p) { e -> Ui.main { act.requestDeleteConsent(e) } }?.let { items.add(it); ok = true }
+                true
+            }) { e -> Ui.main { act.requestDeleteConsent(e) } }
             Store.saveTrash(act, items)
-            act.runOnUiThread {
-                Toast.makeText(act, "已清理到回收站", Toast.LENGTH_SHORT).show()
-                advance(p)
-                act.afterCardAction()
-            }
-        }.start()
+            ok
+        }, ui = { ok ->
+            Ui.toast(act, if (ok) "已清理到回收站" else "清理失败")
+            if (ok) advance(p)
+            act.afterCardAction()
+        })
     }
 
     private fun classify(p: Photo, album: String) {
         val move = Store.cardModeMove
-        Thread {
+        Ui.async(act, io = {
             var ok = false
             if (move) {
-                ok = Repo.moveToAlbum(act, p, album)
+                ok = Ui.write(act, { Repo.moveToAlbum(act, p, album) }) { e -> act.requestDeleteConsent(e) }
                 if (!ok) ok = Repo.copyToAlbum(act, p, album)   // 低版本退回复制
             } else {
                 ok = Repo.copyToAlbum(act, p, album)
             }
-            act.runOnUiThread {
-                Toast.makeText(
-                    act,
-                    if (ok) "已${if (move) "移动" else "复制"}到「$album」" else "操作失败",
-                    Toast.LENGTH_SHORT
-                ).show()
-                if (ok) advance(p)
-                act.afterCardAction()
-                bindAlbums()
-            }
-        }.start()
+            ok
+        }, ui = { ok ->
+            Ui.toast(act, if (ok) "已${if (move) "移动" else "复制"}到「$album」" else "操作失败")
+            if (ok) advance(p)
+            act.afterCardAction()
+            bindAlbums()
+        })
     }
 
     // ------------------------------------------------------------ 归类弹窗
     private fun showMoveSheet(p: Photo) {
-        val names = act.allAlbumNames()
-        val dialog = BottomSheetDialog(act)
-        val rv = RecyclerView(act).apply {
-            layoutManager = LinearLayoutManager(act)
-            setPadding(12, 12, 12, 12)
-        }
-        rv.adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-            override fun onCreateViewHolder(p2: ViewGroup, t: Int): RecyclerView.ViewHolder {
-                val tv = TextView(act).apply {
-                    setPadding(24, 28, 24, 28)
-                    textSize = 14f
-                    setTextColor(resolveColor(act, R.attr.textColorMain))
-                }
-                return object : RecyclerView.ViewHolder(tv) {}
-            }
-
-            override fun onBindViewHolder(h: RecyclerView.ViewHolder, i: Int) {
-                val tv = h.itemView as TextView
-                if (i == 0) {
-                    tv.text = "＋ 新建图集"
-                    tv.setTextColor(resolveColor(act, R.attr.accentColor))
-                    tv.setOnClickListener { dialog.dismiss(); newAlbum(p) }
-                } else {
-                    val n = names[i - 1]
-                    tv.text = "📁 $n"
-                    tv.setOnClickListener { dialog.dismiss(); classify(p, n) }
-                }
-            }
-
-            override fun getItemCount() = names.size + 1
-        }
-        dialog.setContentView(rv)
-        dialog.show()
+        Ui.albumSheet(act, act.allAlbumNames()) { name -> classify(p, name) }
     }
 }
