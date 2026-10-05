@@ -146,6 +146,96 @@ object Repo {
     }
 
     /** 从系统相册删除；Android 11+ 可能需要用户授权，由调用方捕获处理。 */
+    /**
+     * 批量整理：把一个图集内的照片整组移到目标图集。
+     *
+     * 逐张改写 RELATIVE_PATH。Android 10+ 上对本应用创建的文件可直接改写；
+     * 对他方文件会抛 RecoverableSecurityException，由调用方统一走系统授权，
+     * 失败的单张自动退回「复制 + 原图入回收站」，保证整组操作不中断。
+     */
+    fun moveAlbum(
+        c: Context, from: String, to: String,
+        onProgress: ((Int, Int) -> Unit)? = null,
+    ): IntArray {
+        val list = scan(c).filter { it.album == from }
+        var ok = 0
+        var fallback = 0
+        list.forEachIndexed { i, p ->
+            onProgress?.invoke(i + 1, list.size)
+            var moved = false
+            try {
+                val cv = ContentValues().apply {
+                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$to")
+                }
+                moved = c.contentResolver.update(uriOf(p), cv, null, null) > 0
+            } catch (e: Throwable) {
+                CrashGuard.log(e)
+            }
+            if (moved) {
+                ok++
+            } else {
+                // 退回复制，原图随后由调用方清理
+                if (copyToAlbum(c, p, to)) fallback++
+            }
+        }
+        return intArrayOf(ok, fallback, list.size)
+    }
+
+    /**
+     * 图集重命名：把该图集内所有照片的 RELATIVE_PATH 改写为新名。
+     * 若目标图集名已存在，效果等同于合并。
+     */
+    fun renameAlbum(c: Context, from: String, to: String): Int {
+        var n = 0
+        scan(c).filter { it.album == from }.forEach { p ->
+            val moved = try {
+                val cv = ContentValues().apply {
+                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$to")
+                }
+                c.contentResolver.update(uriOf(p), cv, null, null) > 0
+            } catch (e: Throwable) {
+                CrashGuard.log(e); false
+            }
+            if (moved) n++
+        }
+        return n
+    }
+
+    /**
+     * 相似照片查重分组。
+     *
+     * 判重依据：**文件大小相同 + 拍摄时间相近（默认 10 秒内）**。
+     * 这个组合能覆盖绝大多数截图重复保存与连拍场景，
+     * 且不需要解码像素、不占内存，万张照片也能秒出结果。
+     *
+     * @return 每个分组至少 2 张；每组内已按时间升序，第一张建议保留。
+     */
+    fun duplicates(c: Context, windowSec: Long = 10): List<List<Photo>> {
+        val all = scan(c)
+        val bySize = all.groupBy { it.size }.filter { it.value.size >= 2 }
+        val out = ArrayList<List<Photo>>()
+        bySize.values.forEach { sameSize ->
+            val sorted = sameSize.sortedBy { it.dateSec }
+            var bucket = ArrayList<Photo>()
+            bucket.add(sorted.first())
+            for (i in 1 until sorted.size) {
+                if (sorted[i].dateSec - bucket.last().dateSec <= windowSec) {
+                    bucket.add(sorted[i])
+                } else {
+                    if (bucket.size >= 2) out.add(bucket)
+                    bucket = ArrayList()
+                    bucket.add(sorted[i])
+                }
+            }
+            if (bucket.size >= 2) out.add(bucket)
+        }
+        return out.sortedByDescending { it.size }
+    }
+
+    /** 一组重复照片的冗余体积（保留一张后可释放的空间）。 */
+    fun wastedBytes(group: List<Photo>): Long =
+        if (group.size < 2) 0L else group.drop(1).sumOf { it.size }
+
     fun deleteFromSystem(c: Context, p: Photo) {
         c.contentResolver.delete(uriOf(p), null, null)
     }
