@@ -380,11 +380,13 @@ class MainActivity : ComponentActivity() {
             }.show()
     }
 
-    private fun selDelete() {
-        val list = selectedPhotos()
+    private fun selDelete() { confirmDelete(selectedPhotos()) }
+
+    /** 删除确认：单张与批量共用，先入回收站。 */
+    private fun confirmDelete(list: List<Photo>) {
         if (list.isEmpty()) return
         MaterialAlertDialogBuilder(this)
-            .setTitle("删除所选")
+            .setTitle("删除")
             .setMessage("这 ${list.size} 张会先移入回收站，可还原。")
             .setNegativeButton("取消", null)
             .setPositiveButton("删除") { _, _ -> trashPhotos(list) }
