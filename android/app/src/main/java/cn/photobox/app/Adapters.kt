@@ -54,8 +54,8 @@ class AlbumAdapter(
      * 便于在长列表中靠颜色快速定位。
      */
     private fun albumColor(key: String): Int {
-        if (key == KEY_ALL || key == KEY_FAV) return SkinNow.skin.accent
-        if (key == KEY_TRASH) return SkinNow.skin.danger
+        if (key == MainActivity.KEY_ALL || key == MainActivity.KEY_FAV) return SkinNow.skin.accent
+        if (key == MainActivity.KEY_TRASH) return SkinNow.skin.danger
         return PALETTE[(key.hashCode() and 0x7FFFFFFF) % PALETTE.size]
     }
 
