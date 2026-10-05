@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.5.0"
+        const val APP_VERSION = "1.6.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -88,10 +88,12 @@ class MainActivity : ComponentActivity() {
 
         val nav = findViewById<BottomNavigationView>(R.id.bottomNav)
         nav.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.nav_library -> switchTab(0)
-                R.id.nav_cards -> switchTab(1)
-                R.id.nav_settings -> switchTab(2)
+            CrashGuard.guard {
+                when (it.itemId) {
+                    R.id.nav_library -> switchTab(0)
+                    R.id.nav_cards -> switchTab(1)
+                    R.id.nav_settings -> switchTab(2)
+                }
             }
             true
         }
@@ -523,8 +525,8 @@ class MainActivity : ComponentActivity() {
         val swGrid = v.findViewById<Switch>(R.id.swGrid)
         swPreview.isChecked = Store.previewActions
         swGrid.isChecked = Store.defaultGrid
-        swPreview.setOnCheckedChangeListener { _, b -> Store.previewActions = b; Store.saveSettings(this) }
-        swGrid.setOnCheckedChangeListener { _, b -> Store.defaultGrid = b; Store.saveSettings(this) }
+        swPreview.setOnCheckedChangeListener { _, b -> CrashGuard.guard { Store.previewActions = b; Store.saveSettings(this) } }
+        swGrid.setOnCheckedChangeListener { _, b -> CrashGuard.guard { Store.defaultGrid = b; Store.saveSettings(this) } }
         v.findViewById<TextView>(R.id.version).text = "光影相册 · 原生安卓版 v${APP_VERSION}"
         val skinList = v.findViewById<RecyclerView>(R.id.skinList)
         skinList.layoutManager = GridLayoutManager(this, 3)
