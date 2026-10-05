@@ -27,7 +27,7 @@ object Thumbs {
         }
     }
 
-    fun clear() = cache.evictAll()
+    fun clear() = try { cache.evictAll() } catch (e: Throwable) { CrashGuard.log(e) }
 
     /** 加载并显示；命中缓存时直接同步设置，否则异步解码。 */
     fun into(c: Context, p: Photo, px: Int, view: ImageView) {
@@ -35,7 +35,12 @@ object Thumbs {
         view.setImageDrawable(null)
         view.tag = p.id
         pool.execute {
-            val bmp = Repo.systemThumb(c, p, px) ?: Repo.decodeStream(c, p, px)
+            // 解码失败不能让线程抛出，否则会击穿线程池并触发未捕获异常
+            val bmp = try {
+                Repo.systemThumb(c, p, px) ?: Repo.decodeStream(c, p, px)
+            } catch (e: Throwable) {
+                CrashGuard.log(e); null
+            }
             if (bmp != null) cache.put(p.id, bmp)
             main.post {
                 if (view.tag == p.id) view.setImageBitmap(bmp)
@@ -43,12 +48,25 @@ object Thumbs {
         }
     }
 
+    /** 回收站缩略图：同样走缓存，并用 tag 校验防止快速滚动时错位。 */
     fun file(path: String, px: Int, view: ImageView) {
+        val key = -(path.hashCode().toLong())      // 负号区隔，避免与 MediaStore id 撞键
+        cache.get(key)?.let { view.setImageBitmap(it); return }
+        view.setImageDrawable(null)
+        view.tag = key
         pool.execute {
-            val bmp = Repo.decodeFile(path, px)
-            main.post { view.setImageBitmap(bmp) }
+            val bmp = try {
+                Repo.decodeFile(path, px)
+            } catch (e: Throwable) {
+                CrashGuard.log(e); null
+            }
+            if (bmp != null) cache.put(key, bmp)
+            main.post { if (view.tag == key) view.setImageBitmap(bmp) }
         }
     }
+
+    /** 皮肤切换等场景整体清空（例如需要更大缩略图时）。 */
+    fun trim() { cache.trimToSize(cache.maxSize() / 2) }
 }
 
 /** 主线程调度小工具。 */
