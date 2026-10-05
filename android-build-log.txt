@@ -49,14 +49,14 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
-> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
-> Task :app:bundleReleaseResources
-> Task :app:processReleaseResources
 > Task :app:sdkReleaseDependencyData
+> Task :app:processReleaseManifestForPackage
+> Task :app:bundleReleaseResources
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
+> Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:44:17 Unresolved reference: SkinNow
@@ -374,5 +374,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 52s
+BUILD FAILED in 55s
 30 actionable tasks: 30 executed
