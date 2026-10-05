@@ -55,13 +55,27 @@ object Ui {
     }
 
     // ------------------------------------------------------------ 弹窗
+    /**
+     * 统一弹窗入口。
+     *
+     * 注意：必须用 apply(build) 把配置 lambda 真正应用到 builder 上。
+     * 此前的写法误调用了 AlertDialog.Builder.build()（该方法是 create + show），
+     * 导致配置全部丢失且多弹出一个空窗。
+     */
     fun dialog(a: Activity, build: MaterialAlertDialogBuilder.() -> Unit) {
         if (!alive(a)) return
         run {
             val b = MaterialAlertDialogBuilder(a)
-            b.build()
+            b.apply(build)                 // 真正应用调用方的配置
             val d = b.create()
-            if (alive(a)) d.show()
+            // show 前再确认一次，避免 Activity 已销毁时的 BadTokenException
+            if (alive(a)) {
+                try {
+                    d.show()
+                } catch (e: Throwable) {
+                    CrashGuard.log(e)
+                }
+            }
         }
     }
 
