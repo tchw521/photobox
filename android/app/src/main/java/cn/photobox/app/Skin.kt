@@ -277,6 +277,60 @@ object Glass {
         return LayerDrawable(arrayOf(body, gloss, bottom))
     }
 
+    /**
+     * 皮肤预览色块：完整呈现一套皮肤的实际配色。
+     *
+     * 三层结构：
+     * 1. 背景三段渐变（bgTop → bgMid → bgBottom），斜向 315°
+     * 2. 左上强调色光晕，模拟该皮肤的环境光
+     * 3. 底部一条强调色实色条，让主色一眼可辨
+     *
+     * 相比只用主色填充，这样能在小色块里看出整套皮肤的真实观感。
+     */
+    fun preview(s: Skin, barPx: Int = 10): Drawable {
+        val bg = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(s.bgTop, s.bgMid, s.bgBottom)
+        )
+        val glow = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            gradientType = GradientDrawable.RADIAL_GRADIENT
+            gradientRadius = 56f
+            setGradientCenter(0.28f, 0.25f)
+            colors = intArrayOf(s.glow, 0x00000000)
+        }
+        val bar = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(s.accent)
+        }
+        // 强调色条固定在底部：gravity 设为 bottom 并给定像素高度
+        val out = LayerDrawable(arrayOf(bg, glow, bar))
+        try {
+            out.setLayerGravity(2, android.view.Gravity.BOTTOM)
+            out.setLayerHeight(2, barPx)
+            out.setLayerWidth(2, -1)
+        } catch (e: Throwable) {
+            CrashGuard.log(e)
+        }
+        return out
+    }
+
+    /** 背景设置区预览：只画背景渐变 + 光晕，不加色条。 */
+    fun bgPreview(s: Skin): Drawable {
+        val bg = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(s.bgTop, s.bgMid, s.bgBottom)
+        )
+        val glow = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            gradientType = GradientDrawable.RADIAL_GRADIENT
+            gradientRadius = 80f
+            setGradientCenter(0.3f, 0.2f)
+            colors = intArrayOf(s.glow, 0x00000000)
+        }
+        return LayerDrawable(arrayOf(bg, glow))
+    }
+
     fun block(s: Skin, tone: Int, selected: Boolean): Drawable {
         val fill = if (selected) (tone and 0x00FFFFFF) or 0x20000000 else s.glass
         val body = GradientDrawable().apply {
