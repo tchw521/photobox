@@ -62,9 +62,9 @@ class AlbumAdapter(
     companion object {
         /** 相册配色池：与六套皮肤解耦，保证任何皮肤下都可辨识。 */
         private val PALETTE = intArrayOf(
-            0xFFA855F7.toInt(), 0xFF38BDF8.toInt(), 0xFF34D399.toInt(),
-            0xFFFBBF24.toInt(), 0xFFFB7185.toInt(), 0xFF818CF8.toInt(),
-            0xFF2DD4BF.toInt(), 0xFFF472B6.toInt(), 0xFF4ADE80.toInt(),
+            0xFF8B5CF6.toInt(), 0xFF0284C7.toInt(), 0xFF059669.toInt(),
+            0xFFD97706.toInt(), 0xFFDB2777.toInt(), 0xFF4F46E5.toInt(),
+            0xFF0D9488.toInt(), 0xFFBE185D.toInt(), 0xFF047857.toInt(),
         )
     }
 
