@@ -20,8 +20,8 @@
         </LinearLayout>
         <Button android:id="@+id/btnRescan" style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent" android:layout_height="wrap_content" android:text="重新扫描照片" android:textSize="12sp"/>
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="光影相册 · 原生安卓版 v1.0" android:textSize="11sp" android:textColor="@color/dim"
+        <TextView android:id="@+id/version" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="11sp" android:textColor="@color/dim"
             android:gravity="center" android:paddingTop="16dp"/>
     </LinearLayout>
 </ScrollView>
