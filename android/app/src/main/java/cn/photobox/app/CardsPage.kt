@@ -82,7 +82,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         private const val THRESHOLD_MIN = 26f
         private const val THRESHOLD_RATIO = 0.06f
         private const val LONG_MS = 450L
-        private const val TIP = "上滑上一张 · 下滑下一张 · 右滑回收 · 左滑收藏 · 长按左滑归类"
+        private const val TIP = "上滑下一张 · 下滑上一张 · 右滑回收 · 左滑收藏 · 长按左滑归类"
     }
 
     fun bind() {
@@ -105,7 +105,9 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         // 用 Activity 上的已处理集合过滤，页面重建后不会重复出现
         val doneIds = act.cardDoneIds()
         queue = act.cardPhotos().filter { it.id !in doneIds }.toMutableList()
-        idx = 0
+        // 不重置 idx：处理完当前张后，后面的照片依次顶上来，
+        // 序号保持连续。只在越界时收敛到末尾。
+        if (idx >= queue.size) idx = (queue.size - 1).coerceAtLeast(0)
         // 总数 = 已处理 + 当前队列
         Store.cardTotal = act.cardTotal()
 
@@ -287,8 +289,8 @@ class CardsPage(private val act: MainActivity, private val root: View) {
 
     private fun hint(dx: Float, dy: Float): String = when {
         longMode && dx <= -thresholdX -> "松手 → 归类到相册"
-        abs(dy) > abs(dx) && dy <= -threshold -> "松手 → 上一张"
-        abs(dy) > abs(dx) && dy >= threshold -> "松手 → 下一张"
+        abs(dy) > abs(dx) && dy <= -threshold -> "松手 → 下一张"
+        abs(dy) > abs(dx) && dy >= threshold -> "松手 → 上一张"
         dx >= thresholdX -> "松手 → 清理到回收站"
         dx <= -thresholdX -> "松手 → 收藏"
         else -> if (longMode) "按住并左滑 → 归类到相册" else TIP
@@ -303,8 +305,9 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         when {
             // 长按 + 左滑 → 归类；长按后直接抬手也弹菜单，容错更高
             wasLong && (dx <= -thresholdX || max(abs(dx), abs(dy)) < threshold) -> showMoveSheet(p)
-            abs(dy) > abs(dx) && dy <= -threshold -> prev()
-            abs(dy) > abs(dx) && dy >= threshold -> next()
+            // 上滑（dy 为负）→ 下一张；下滑（dy 为正）→ 上一张
+            abs(dy) > abs(dx) && dy <= -threshold -> next()
+            abs(dy) > abs(dx) && dy >= threshold -> prev()
             dx >= thresholdX -> dropTrash(p)
             dx <= -thresholdX -> dropFav(p)
         }
@@ -345,7 +348,8 @@ class CardsPage(private val act: MainActivity, private val root: View) {
 
     private fun render() {
         CrashGuard.guard {
-            progress?.text = "$done / ${maxOf(act.cardTotal(), queue.size + done)}"
+            // 显示当前是第几张：第一张为 1，滑动即加减
+            progress?.text = "${idx + 1} / ${maxOf(act.cardTotal(), queue.size + done)}"
             val p = current()
             if (p == null) {
                 c0?.setImageDrawable(null)
@@ -399,7 +403,10 @@ class CardsPage(private val act: MainActivity, private val root: View) {
             ok
         }, ui = { ok ->
             Ui.toast(act, if (ok) "已清理到回收站" else "清理失败")
-            if (ok) advance(p)
+            if (ok) {
+                act.dropPhotoNow(p)      // 图库立刻少掉这张
+                advance(p)
+            }
             act.afterCardAction()
         })
     }
