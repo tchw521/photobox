@@ -74,6 +74,8 @@ object Repo {
                 c.contentResolver.update(uri, cv, null, null)
             }
             true
+        } catch (e: RecoverableSecurityException) {
+            throw e
         } catch (e: Exception) {
             false
         }
@@ -90,6 +92,8 @@ object Repo {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$album")
             }
             c.contentResolver.update(uriOf(p), cv, null, null) > 0
+        } catch (e: RecoverableSecurityException) {
+            throw e                       // 交给 Ui.write 转系统授权弹窗
         } catch (e: Exception) {
             false
         }
@@ -115,6 +119,8 @@ object Repo {
                 onConsent?.invoke(e)
             }
             item
+        } catch (e: RecoverableSecurityException) {
+            throw e
         } catch (e: Exception) {
             null
         }
