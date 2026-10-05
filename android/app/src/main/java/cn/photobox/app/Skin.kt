@@ -32,47 +32,47 @@ data class Skin(
 object Skins {
     val ALL = listOf(
         Skin("aurora", "极光紫",
-            0xFF1E0B38.toInt(), 0xFF14082A.toInt(), 0xFF0A0416.toInt(),
-            0x4DC084FC.toInt(), 0x2E6366F1.toInt(),
-            0x1FFFFFFF.toInt(), 0x2EFFFFFF.toInt(), 0x2BFFFFFF.toInt(),
-            0xFFC084FC.toInt(), 0x3DC084FC.toInt(),
-            0xFFF7F3FF.toInt(), 0xFFA08FC4.toInt(),
+            0xFF241041.toInt(), 0xFF1A0B33.toInt(), 0xFF0C0619.toInt(),
+            0x5EC084FC.toInt(), 0x3A6366F1.toInt(),
+            0x2AFFFFFF.toInt(), 0x3DFFFFFF.toInt(), 0x3EFFFFFF.toInt(),
+            0xFFD8B4FE.toInt(), 0x4DC084FC.toInt(),
+            0xFFFBF8FF.toInt(), 0xFFB3A2D6.toInt(),
             0xFFFB7185.toInt(), 0xFF4ADE80.toInt()),
         Skin("ink", "墨夜黑",
-            0xFF1A1A1E.toInt(), 0xFF121215.toInt(), 0xFF08080A.toInt(),
-            0x2664E3E3.toInt(), 0x1A8B7FD4.toInt(),
-            0x1CFFFFFF.toInt(), 0x2AFFFFFF.toInt(), 0x26FFFFFF.toInt(),
-            0xFFE8E8EC.toInt(), 0x33E8E8EC.toInt(),
-            0xFFF2F2F5.toInt(), 0xFF97979F.toInt(),
-            0xFFEF4444.toInt(), 0xFF22C55E.toInt()),
+            0xFF202024.toInt(), 0xFF16161A.toInt(), 0xFF0A0A0C.toInt(),
+            0x3664E3E3.toInt(), 0x248B7FD4.toInt(),
+            0x24FFFFFF.toInt(), 0x36FFFFFF.toInt(), 0x38FFFFFF.toInt(),
+            0xFFF5F5F7.toInt(), 0x40F5F5F7.toInt(),
+            0xFFFAFAFC.toInt(), 0xFFA8A8B0.toInt(),
+            0xFFF87171.toInt(), 0xFF34D399.toInt()),
         Skin("dawn", "晨曦金",
-            0xFF3A2210.toInt(), 0xFF28170B.toInt(), 0xFF160C06.toInt(),
-            0x4DFBBF24.toInt(), 0x2EE0559F.toInt(),
-            0x22FFFFFF.toInt(), 0x30FFFFFF.toInt(), 0x2EFFFFFF.toInt(),
-            0xFFFCD34D.toInt(), 0x3DFCD34D.toInt(),
-            0xFFFFF8EE.toInt(), 0xFFC4A580.toInt(),
-            0xFFF87171.toInt(), 0xFF86EFAC.toInt()),
+            0xFF422813.toInt(), 0xFF2E1B0D.toInt(), 0xFF180E07.toInt(),
+            0x5EFBBF24.toInt(), 0x3AE0559F.toInt(),
+            0x2CFFFFFF.toInt(), 0x3EFFFFFF.toInt(), 0x40FFFFFF.toInt(),
+            0xFFFDE68A.toInt(), 0x4DFBBF24.toInt(),
+            0xFFFFFBF4.toInt(), 0xFFD4B894.toInt(),
+            0xFFFCA5A5.toInt(), 0xFFA7F3D0.toInt()),
         Skin("glacier", "冰川蓝",
-            0xFF0E2A44.toInt(), 0xFF0A1E31.toInt(), 0xFF050F1A.toInt(),
-            0x4D38BDF8.toInt(), 0x2E22D3EE.toInt(),
-            0x1FFFFFFF.toInt(), 0x2EFFFFFF.toInt(), 0x2BFFFFFF.toInt(),
-            0xFF7DD3FC.toInt(), 0x3D7DD3FC.toInt(),
-            0xFFEFF8FF.toInt(), 0xFF87A5C0.toInt(),
-            0xFFFB7185.toInt(), 0xFF34D399.toInt()),
+            0xFF123050.toInt(), 0xFF0D2338.toInt(), 0xFF07121E.toInt(),
+            0x5E38BDF8.toInt(), 0x3A22D3EE.toInt(),
+            0x2AFFFFFF.toInt(), 0x3DFFFFFF.toInt(), 0x3EFFFFFF.toInt(),
+            0xFFBAE6FD.toInt(), 0x4D38BDF8.toInt(),
+            0xFFF8FCFF.toInt(), 0xFF9DBBD4.toInt(),
+            0xFFFDA4AF.toInt(), 0xFF6EE7B7.toInt()),
         Skin("sakura", "樱雾粉",
-            0xFF3B1428.toInt(), 0xFF2A0E1D.toInt(), 0xFF15070F.toInt(),
-            0x4DF472B6.toInt(), 0x2EC084FC.toInt(),
-            0x22FFFFFF.toInt(), 0x30FFFFFF.toInt(), 0x2EFFFFFF.toInt(),
-            0xFFF9A8D4.toInt(), 0x3DF9A8D4.toInt(),
-            0xFFFFF2F7.toInt(), 0xFFC490AC.toInt(),
-            0xFFFB7185.toInt(), 0xFF86EFAC.toInt()),
+            0xFF44182F.toInt(), 0xFF301122.toInt(), 0xFF180811.toInt(),
+            0x5EF472B6.toInt(), 0x3AC084FC.toInt(),
+            0x2CFFFFFF.toInt(), 0x3EFFFFFF.toInt(), 0x40FFFFFF.toInt(),
+            0xFFFBCFE8.toInt(), 0x4DF472B6.toInt(),
+            0xFFFFF8FB.toInt(), 0xFFD4A3BC.toInt(),
+            0xFFFDA4AF.toInt(), 0xFFA7F3D0.toInt()),
         Skin("mint", "薄荷绿",
-            0xFF0E2B22.toInt(), 0xFF0A1F18.toInt(), 0xFF05100C.toInt(),
-            0x4D34D399.toInt(), 0x2E14B8A6.toInt(),
-            0x1FFFFFFF.toInt(), 0x2EFFFFFF.toInt(), 0x2BFFFFFF.toInt(),
-            0xFF6EE7B7.toInt(), 0x3D6EE7B7.toInt(),
-            0xFFEFFFF6.toInt(), 0xFF81AF9D.toInt(),
-            0xFFFB7185.toInt(), 0xFF4ADE80.toInt()),
+            0xFF123228.toInt(), 0xFF0D241C.toInt(), 0xFF07140E.toInt(),
+            0x5E34D399.toInt(), 0x3A14B8A6.toInt(),
+            0x2AFFFFFF.toInt(), 0x3DFFFFFF.toInt(), 0x3EFFFFFF.toInt(),
+            0xFFA7F3D0.toInt(), 0x4D34D399.toInt(),
+            0xFFF7FFFA.toInt(), 0xFF97C3B0.toInt(),
+            0xFFFDA4AF.toInt(), 0xFF86EFAC.toInt()),
     )
 
     fun of(key: String): Skin = ALL.firstOrNull { it.key == key } ?: ALL[0]
@@ -144,11 +144,17 @@ object Glass {
             setColor(fill)
             setStroke(1, s.stroke)
         }
+        // 顶部高光：模拟玻璃上沿折射
         val gloss = GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(0x26FFFFFF, 0x0AFFFFFF, 0x00FFFFFF)
+            intArrayOf(0x3AFFFFFF, 0x10FFFFFF, 0x00FFFFFF)
         ).apply { cornerRadius = radius }
-        return LayerDrawable(arrayOf(body, gloss))
+        // 底部反光：模拟环境反射，制造厚度感
+        val bottom = GradientDrawable(
+            GradientDrawable.Orientation.BOTTOM_TOP,
+            intArrayOf(0x20FFFFFF, 0x00FFFFFF)
+        ).apply { cornerRadius = radius }
+        return LayerDrawable(arrayOf(body, gloss, bottom))
     }
 
     /** 胶囊气泡（侧栏相册项）。 */
@@ -182,6 +188,47 @@ object Glass {
             shape = GradientDrawable.OVAL
             setColor(color)
         }
+
+    /**
+     * 方框气泡：圆角小方块，撑满容器宽度。
+     * 玻璃质感 + 专属色描边，选中时填充该色并加深描边。
+     */
+    /**
+     * 悬浮液态玻璃：用于底部导航等浮层。
+     * 相比普通卡片加重底部反光，视觉上像一片浮在内容之上的玻璃。
+     */
+    fun floating(s: Skin, radius: Float): Drawable {
+        val body = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = radius
+            setColor(s.glassStrong)
+            setStroke(1, s.stroke)
+        }
+        val gloss = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(0x33FFFFFF, 0x12FFFFFF, 0x00FFFFFF)
+        ).apply { cornerRadius = radius }
+        val bottom = GradientDrawable(
+            GradientDrawable.Orientation.BOTTOM_TOP,
+            intArrayOf(0x2AFFFFFF, 0x00FFFFFF)
+        ).apply { cornerRadius = radius }
+        return LayerDrawable(arrayOf(body, gloss, bottom))
+    }
+
+    fun block(s: Skin, tone: Int, selected: Boolean): Drawable {
+        val fill = if (selected) (tone and 0x00FFFFFF) or 0x33000000 else s.glass
+        val body = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 10f
+            setColor(fill)
+            setStroke(if (selected) 2 else 1, if (selected) tone else (tone and 0x00FFFFFF) or 0x66000000)
+        }
+        val gloss = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(0x22FFFFFF, 0x00FFFFFF)
+        ).apply { cornerRadius = 10f }
+        return LayerDrawable(arrayOf(body, gloss))
+    }
 
     /** 色卡预览（设置页皮肤选择）。 */
     fun swatch(s: Skin): Drawable =
