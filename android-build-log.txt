@@ -50,11 +50,8 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
-> Task :app:sdkReleaseDependencyData
-> Task :app:validateSigningRelease
 > Task :app:bundleReleaseResources FAILED
-> Task :app:writeReleaseAppMetadata
-> Task :app:writeReleaseSigningConfigVersions
+> Task :app:sdkReleaseDependencyData
 > Task :app:processReleaseManifestForPackage
 
 FAILURE: Build failed with an exception.
@@ -343,5 +340,5 @@ error: failed linking references.
 		at java.base/java.lang.Thread.run(Thread.java:840)
 
 
-BUILD FAILED in 43s
-28 actionable tasks: 28 executed
+BUILD FAILED in 36s
+25 actionable tasks: 25 executed
