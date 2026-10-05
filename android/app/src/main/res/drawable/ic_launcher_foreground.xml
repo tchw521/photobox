@@ -1,6 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <path android:fillColor="#A855F7" android:pathData="M24,30h60v48H24z"/>
-    <path android:fillColor="#F4F0FF" android:pathData="M32,62l14,-18l10,12l8,-8l12,14z"/>
+    <!-- 启动图标：圆角底 + 照片意象（山与太阳） -->
+    <path android:fillColor="#C084FC" android:pathData="M26,30h56c2.2,0 4,1.8 4,4v44c0,2.2 -1.8,4 -4,4H26c-2.2,0 -4,-1.8 -4,-4V34c0,-2.2 1.8,-4 4,-4zM26,36v40h56V36z"/>
+    <path android:fillColor="#F7F3FF"
+        android:pathData="M32,70l14,-17 10.5,12.5 8.5,-9.5 12.5,14z"/>
+    <path android:fillColor="#F7F3FF"
+        android:pathData="M64,46m-5,0a5,5 0 1,0 10,0a5,5 0 1,0 -10,0"/>
 </vector>
