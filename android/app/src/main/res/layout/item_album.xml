@@ -11,7 +11,7 @@
         android:layout_weight="1"
         android:singleLine="true" android:scrollHorizontally="true"
         android:textSize="12sp" android:gravity="center"
-        android:paddingTop="6dp" android:paddingBottom="6dp" android:paddingStart="2dp" android:paddingEnd="2dp"/>
+        android:paddingTop="9dp" android:paddingBottom="9dp" android:paddingStart="4dp" android:paddingEnd="4dp"/>
 
     <TextView
         android:id="@+id/albumCount"
