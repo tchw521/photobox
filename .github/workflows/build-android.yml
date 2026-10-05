@@ -46,7 +46,8 @@ jobs:
         id: collect
         run: |
           mkdir -p dist
-          find . -name "app-release.apk" -type f -exec cp -v {} dist/ \; || true
+          # 只取本次构建产物，排除仓库里已提交的旧 apk 目录
+          find android/app/build/outputs -name "*.apk" -type f -exec cp -v {} dist/ \; || true
           ls -lh dist/
           echo "=== APK 指纹 ==="
           for f in dist/*.apk; do echo "$f"; sha256sum "$f"; done
