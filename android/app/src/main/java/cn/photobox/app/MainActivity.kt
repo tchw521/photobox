@@ -1,34 +1,43 @@
 package cn.photobox.app
 
 import android.Manifest
+import android.app.Activity
 import android.app.RecoverableSecurityException
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.util.TypedValue
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class MainActivity : ComponentActivity() {
+/**
+ * 主界面：左侧相册栏（1/5）+ 内容区（4/5）+ 底部三导航。
+ *
+ * 设计原则（本版重点）：
+ * 1. **不使用任何 Material / AppCompat 组件**，只用系统控件，依赖极少。
+ * 2. **布局与 drawable 中不使用 ?attr/**，颜色全部由 Skin 在代码里提供。
+ *    此前多次崩溃都源于主题属性在资源解析阶段的时序问题。
+ * 3. 所有弹窗在 show 前校验 Activity 存活，避免 BadTokenException。
+ * 4. 媒体库写操作统一走 Ui.write，捕获 RecoverableSecurityException。
+ */
+class MainActivity : Activity() {
 
     // ---------- 状态
     private var photos: List<Photo> = emptyList()
@@ -39,18 +48,19 @@ class MainActivity : ComponentActivity() {
     private var gridView = true
     private var tab = 0                  // 0 图库 1 卡片 2 设置 3 回收站
 
-    private lateinit var sidebar: View
+    private var root: View? = null
+    private var sidebar: View? = null
     private var libraryView: View? = null
     private var cardsView: View? = null
     private var settingsView: View? = null
     private var trashView: View? = null
 
-    private lateinit var albumAdapter: AlbumAdapter
-    private lateinit var chipAdapter: ChipAdapter
+    private var albumAdapter: AlbumAdapter? = null
+    private var chipAdapter: ChipAdapter? = null
     private var photoAdapter: PhotoAdapter? = null
     private var trashAdapter: TrashAdapter? = null
 
-    private lateinit var cards: CardsPage
+    private var cards: CardsPage? = null
 
     companion object {
         val SORT_LABELS = arrayOf("日期新→旧", "日期旧→新", "名称", "大小")
@@ -60,23 +70,20 @@ class MainActivity : ComponentActivity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "2.0.0"
+        const val APP_VERSION = "1.2.1"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
-        const val KEY_BLOCKED = "\u0000blocked"
         const val KEY_TRASH = "\u0000trash"
     }
 
     // ---------- 生命周期
     override fun onCreate(s: Bundle?) {
-        // setTheme 必须在 super.onCreate 之前
-        CrashGuard.result({ SkinNow.load(applicationContext); Skins.style(SkinNow.skin.key) }, R.style.Skin_Aurora).let {
-            setTheme(it)
-        }
         super.onCreate(s)
-        CrashGuard.install(applicationContext)      // 双保险：App 内已装一次
+        CrashGuard.install(applicationContext)
+        SkinNow.load(applicationContext)
+        Store.loadSettings(this)
+        gridView = Store.defaultGrid
 
-        // 整体兜底：即便初始化失败，也要保证有界面，而不是黑屏
         CrashGuard.guard { initUi() }
         // 先渲染主页，界面立即可见；权限与扫描并行进行
         CrashGuard.guard { switchTab(tab) }
@@ -85,111 +92,110 @@ class MainActivity : ComponentActivity() {
 
     private fun initUi() {
         setContentView(R.layout.activity_main)
-        Store.loadSettings(this)
-        gridView = Store.defaultGrid
-
+        root = findViewById(R.id.root)
         sidebar = findViewById(R.id.sidebar)
-        val albumList = findViewById<RecyclerView>(R.id.albumList)
-        albumAdapter = AlbumAdapter { key -> onPickAlbum(key) }
-        albumList.layoutManager = LinearLayoutManager(this)
-        albumList.adapter = albumAdapter
 
-        val nav = findViewById<BottomNavigationView>(R.id.bottomNav)
-        nav.setOnItemSelectedListener {
-            CrashGuard.guard {
-                when (it.itemId) {
-                    R.id.nav_library -> switchTab(0)
-                    R.id.nav_cards -> switchTab(1)
-                    R.id.nav_settings -> switchTab(2)
-                }
-            }
-            true
+        // 背景与分隔线
+        skin {
+            root?.background = Glass.background(it)
+            findViewById<View>(R.id.divider)?.setBackgroundColor(it.stroke)
+            findViewById<TextView>(R.id.sidebarTitle)?.setTextColor(it.text)
         }
 
-        applyNavTint()
+        val albumList = findViewById<RecyclerView>(R.id.albumList)
+        albumAdapter = AlbumAdapter { key -> CrashGuard.guard { onPickAlbum(key) } }
+        albumList?.layoutManager = LinearLayoutManager(this)
+        albumList?.adapter = albumAdapter
+
+        bindNav()
         applyBars()
     }
 
-    /**
-     * 底栏图标与文字着色，在代码中动态构建 ColorStateList。
-     *
-     * 不能写成 XML 的 <selector> + ?attr/：ColorStateList 中的主题属性解析
-     * 由资源框架缓存且依赖时序，在部分设备上 inflate 会直接抛异常
-     * （正是此前 Binary XML 崩溃的来源）。动态构建则始终使用当前皮肤色，
-     * 换肤后也随之生效。
-     */
-    private fun applyNavTint() {
-        CrashGuard.guard {
-            val accent = resolveColor(this, R.attr.accentColor)
-            val dim = resolveColor(this, R.attr.textColorDim)
-            val soft = resolveColor(this, R.attr.accentSoftColor)
-            val tint = android.content.res.ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(accent, dim)
-            )
-            val nav = findViewById<BottomNavigationView>(R.id.bottomNav)
-            nav.itemIconTintList = tint
-            nav.itemTextColor = tint
-            nav.itemActiveIndicatorColor = android.content.res.ColorStateList.valueOf(soft)
+    /** 底栏三个按钮：自绘图标 + 文字，选中态用强调色。 */
+    private fun bindNav() {
+        val s = SkinNow.skin
+        findViewById<View>(R.id.bottomNav)?.background = Glass.card(s, 0f, strong = true)
+        val items = listOf(
+            Triple(R.id.navLibrary, R.id.navLibraryIcon, R.id.navLibraryText) to R.drawable.ic_tab_library,
+            Triple(R.id.navCards, R.id.navCardsIcon, R.id.navCardsText) to R.drawable.ic_tab_cards,
+            Triple(R.id.navSettings, R.id.navSettingsIcon, R.id.navSettingsText) to R.drawable.ic_tab_settings,
+        )
+        val targets = listOf(0, 1, 2)
+        items.forEachIndexed { i, (ids, icon) ->
+            val box = findViewById<View>(ids.first)
+            val iv = findViewById<ImageView>(ids.second)
+            val tv = findViewById<TextView>(ids.third)
+            iv?.setImageResource(icon)
+            box?.setOnClickListener { CrashGuard.guard { switchTab(targets[i]) } }
+            Unit
         }
     }
 
-    /** 状态栏与导航栏半透明，让背景渐变透上来，形成整体通透感。 */
+    /** 底栏选中态高亮。 */
+    private fun updateNavState() {
+        val s = SkinNow.skin
+        val map = listOf(
+            Triple(R.id.navLibraryIcon, R.id.navLibraryText, 0),
+            Triple(R.id.navCardsIcon, R.id.navCardsText, 1),
+            Triple(R.id.navSettingsIcon, R.id.navSettingsText, 2),
+        )
+        map.forEach { (iconId, textId, t) ->
+            val on = (t == tab)
+            findViewById<ImageView>(iconId)?.setColorFilter(if (on) s.accent else s.textDim)
+            findViewById<TextView>(textId)?.setTextColor(if (on) s.accent else s.textDim)
+        }
+    }
+
     private fun applyBars() {
         CrashGuard.guard {
-            val v = TypedValue()
-            if (theme.resolveAttribute(R.attr.bgTopColor, v, true)) window.statusBarColor = v.data
-            if (theme.resolveAttribute(R.attr.bgBottomColor, v, true)) window.navigationBarColor = v.data
+            val s = SkinNow.skin
+            window.statusBarColor = s.bgTop
+            window.navigationBarColor = s.bgBottom
         }
     }
 
-    /** 换肤：写入偏好 → 重建 Activity，主题属性自动生效。 */
-    private fun switchSkin(key: String) {
-        if (key == SkinNow.skin.key) return
-        CrashGuard.safe(this, "换肤失败") {
-            SkinNow.apply(applicationContext, key)
-            Thumbs.clear()
-            recreate()
-        }
-    }
+    /** 读取当前皮肤并执行。 */
+    private inline fun skin(block: (Skin) -> Unit) = CrashGuard.guard { block(SkinNow.skin) }
 
+    // ---------- 权限
     private fun ensurePermission(after: () -> Unit) {
         val need = if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_IMAGES
         else Manifest.permission.READ_EXTERNAL_STORAGE
-        if (ContextCompat.checkSelfPermission(this, need) == PackageManager.PERMISSION_GRANTED) after()
-        else permLauncher.launch(arrayOf(need))
-    }
-
-    private val permLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { res ->
-        // 拒绝也要进主页，不能停在空白页
-        if (res.values.any { it }) loadPhotos()
-        else {
-            Ui.toast(this, getString(R.string.need_permission))
-            loadPhotos()
+        if (ContextCompat.checkSelfPermission(this, need) == PackageManager.PERMISSION_GRANTED) {
+            CrashGuard.guard(after)
+        } else {
+            CrashGuard.guard {
+                requestPermissions(arrayOf(need), 1001)
+            }
+            pendingAfterPermission = after
         }
     }
 
-    private val deleteConsent = registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { loadPhotos() }
+    private var pendingAfterPermission: (() -> Unit)? = null
+
+    override fun onRequestPermissionsResult(
+        code: Int, perms: Array<out String>, res: IntArray,
+    ) {
+        super.onRequestPermissionsResult(code, perms, res)
+        val granted = res.isNotEmpty() && res[0] == PackageManager.PERMISSION_GRANTED
+        // 无论是否授权都进入主页，避免停在空白页
+        CrashGuard.guard { loadPhotos() }
+        if (!granted) Ui.toast(this, getString(R.string.need_permission))
+        pendingAfterPermission = null
+    }
 
     // ---------- 数据
-    /** 扫描：后台线程执行，主线程只做赋值与刷新，避免上万张时 ANR。 */
     private fun loadPhotos() {
         Ui.io.execute {
             val list = CrashGuard.result({ Repo.scan(this@MainActivity) }, emptyList())
             val blocked = Store.blocked(this@MainActivity)
-            val keep = try {
-                list.filter { it.album !in blocked }
-            } catch (e: Throwable) {
-                CrashGuard.log(e); list
-            }
+            val keep = CrashGuard.result({ list.filter { it.album !in blocked } }, list)
             Ui.main {
-                if (!isFinishing && !isDestroyed) {
-                    photos = keep
-                    switchTab(tab)
+                CrashGuard.guard {
+                    if (!isFinishing) {
+                        photos = keep
+                        switchTab(tab)
+                    }
                 }
             }
         }
@@ -217,17 +223,17 @@ class MainActivity : ComponentActivity() {
 
     // ---------- 侧边栏
     private fun renderSidebar() {
-        if (!::albumAdapter.isInitialized) return
+        val s = SkinNow.skin
         val fav = Store.favorites(this)
         val rows = ArrayList<AlbumAdapter.Row>()
         rows.add(AlbumAdapter.Row(KEY_ALL, getString(R.string.all_photos), photos.size, albumKey == KEY_ALL && tab == 0))
         rows.add(AlbumAdapter.Row(KEY_FAV, getString(R.string.favorites), fav.size, albumKey == KEY_FAV))
-        val groups = photos.groupBy { it.album }.toList().sortedByDescending { it.second.size }
-        groups.forEach { (name, list) ->
+        photos.groupBy { it.album }.toList().sortedByDescending { it.second.size }.forEach { (name, list) ->
             rows.add(AlbumAdapter.Row(name, name, list.size, albumKey == name))
         }
         rows.add(AlbumAdapter.Row(KEY_TRASH, getString(R.string.trash), Store.trash(this).size, tab == 3))
-        albumAdapter.submit(rows)
+        albumAdapter?.submit(rows)
+        Unit
     }
 
     private fun onPickAlbum(key: String) {
@@ -244,52 +250,72 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun switchTabInner(t: Int) {
-        // lateinit 未就绪说明界面初始化失败过，先补做一次，避免二次崩溃
-        if (!::sidebar.isInitialized || !::albumAdapter.isInitialized) initUi()
         tab = t
-        val holder = findViewById<android.widget.FrameLayout>(R.id.content)
+        val holder = findViewById<FrameLayout>(R.id.content) ?: return
         holder.removeAllViews()
-        if (::sidebar.isInitialized) {
-            sidebar.visibility = if (t == 1 || t == 2) View.GONE else View.VISIBLE
-        }
+        // 卡片页与设置页不显示侧栏
+        sidebar?.visibility = if (t == 1 || t == 2) View.GONE else View.VISIBLE
         when (t) {
-            0 -> { libraryView = layoutInflater.inflate(R.layout.page_library, holder, false); holder.addView(libraryView); bindLibrary(libraryView!!) }
-            1 -> { cardsView = layoutInflater.inflate(R.layout.page_cards, holder, false); holder.addView(cardsView); bindCards(cardsView!!) }
-            2 -> { settingsView = layoutInflater.inflate(R.layout.page_settings, holder, false); holder.addView(settingsView); bindSettings(settingsView!!) }
-            3 -> { trashView = layoutInflater.inflate(R.layout.page_trash, holder, false); holder.addView(trashView); bindTrash(trashView!!) }
+            0 -> {
+                libraryView = layoutInflater.inflate(R.layout.page_library, holder, false)
+                holder.addView(libraryView)
+                bindLibrary(libraryView!!)
+            }
+            1 -> {
+                cardsView = layoutInflater.inflate(R.layout.page_cards, holder, false)
+                holder.addView(cardsView)
+                bindCards(cardsView!!)
+            }
+            2 -> {
+                settingsView = layoutInflater.inflate(R.layout.page_settings, holder, false)
+                holder.addView(settingsView)
+                bindSettings(settingsView!!)
+            }
+            3 -> {
+                trashView = layoutInflater.inflate(R.layout.page_trash, holder, false)
+                holder.addView(trashView)
+                bindTrash(trashView!!)
+            }
         }
         renderSidebar()
+        updateNavState()
     }
 
     // ---------- 图库
     private fun bindLibrary(v: View) {
+        val s = SkinNow.skin
         val list = v.findViewById<RecyclerView>(R.id.photos)
         val months = v.findViewById<RecyclerView>(R.id.months)
         val search = v.findViewById<EditText>(R.id.search)
         val selBar = v.findViewById<LinearLayout>(R.id.selBar)
         val tip = v.findViewById<TextView>(R.id.tip)
 
+        search?.setTextColor(s.text)
+        search?.setHintTextColor(s.textDim)
+        tip?.setTextColor(s.textDim)
+
         chipAdapter = ChipAdapter { m -> month = m; refreshLibrary() }
-        months.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        months.adapter = chipAdapter
+        months?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        months?.adapter = chipAdapter
 
         photoAdapter = PhotoAdapter(
             this, gridView,
             onClick = { p, _ ->
-                if (photoAdapter?.selectMode == true) { toggleSelect(p); refreshLibrary() }
-                else preview(p)
+                CrashGuard.guard {
+                    if (photoAdapter?.selectMode == true) { toggleSelect(p); refreshLibrary() }
+                    else preview(p)
+                }
             },
             onLongClick = { p, _, anchor ->
-                // 不能在长按回调里同步刷新：notifyDataSetChanged 会重建 ViewHolder
-                // 使 anchor 失效并掐断长按事件，菜单就弹不出来。延后一帧再处理。
+                // 不能在长按回调里同步刷新：notifyDataSetChanged 会重建 ViewHolder，
+                // 使 anchor 失效并掐断长按序列，菜单就弹不出来。延后一帧再处理。
                 photoAdapter?.selectMode = true
                 photoAdapter?.selected?.add(p.id)
                 anchor.post {
                     refreshLibrary()
-                    // 再延一帧，并确认视图仍附着、Activity 仍存活，避免 BadTokenException
                     anchor.post {
-                        if (anchor.isAttachedToWindow && !isFinishing && !isDestroyed) {
-                            showPhotoMenu(p, anchor)
+                        if (anchor.isAttachedToWindow && !isFinishing) {
+                            CrashGuard.guard { showPhotoMenu(p) }
                         }
                     }
                 }
@@ -297,114 +323,87 @@ class MainActivity : ComponentActivity() {
             }
         )
         applyLayoutManager(list)
-        list.adapter = photoAdapter
-        list.setHasFixedSize(true)
-        list.setItemViewCacheSize(12)
-        list.recycledViewPool.setMaxRecycledViews(0, 24)
+        list?.adapter = photoAdapter
+        list?.setHasFixedSize(true)
+        list?.setItemViewCacheSize(12)
+        list?.recycledViewPool?.setMaxRecycledViews(0, 24)
 
-        search.addTextChangedListener(object : TextWatcher {
+        search?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
             override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
-            override fun afterTextChanged(s: Editable?) { query = s?.toString() ?: ""; refreshLibrary() }
+            override fun afterTextChanged(e: Editable?) {
+                query = e?.toString() ?: ""
+                CrashGuard.guard { refreshLibrary() }
+            }
         })
 
-        v.findViewById<ImageButton>(R.id.btnView).setOnClickListener {
-            gridView = !gridView
-            Store.defaultGrid = gridView; Store.saveSettings(this)
-            switchTab(0)
-            Ui.toast(this, if (gridView) "已切换为宫格" else "已切换为列表")
+        v.findViewById<ImageButton>(R.id.btnView)?.setOnClickListener {
+            CrashGuard.guard {
+                gridView = !gridView
+                Store.defaultGrid = gridView
+                Store.saveSettings(this)
+                switchTab(0)
+                Ui.toast(this, if (gridView) "已切换为宫格" else "已切换为列表")
+            }
         }
-        v.findViewById<ImageButton>(R.id.btnSort).setOnClickListener {
-            sort = (sort + 1) % 4
-            applyToolbarIcons(v)
-            refreshLibrary()
-            Ui.toast(this, "排序：${SORT_LABELS[sort]}")
+        v.findViewById<ImageButton>(R.id.btnSort)?.setOnClickListener {
+            CrashGuard.guard {
+                sort = (sort + 1) % 4
+                applyToolbarIcons(v)
+                refreshLibrary()
+                Ui.toast(this, "排序：${SORT_LABELS[sort]}")
+            }
         }
 
         applyToolbarIcons(v)
 
-        v.findViewById<Button>(R.id.btnSelAll).setOnClickListener {
-            photoAdapter?.selected?.addAll(visible().map { it.id }); refreshLibrary()
+        v.findViewById<Button>(R.id.btnSelAll)?.setOnClickListener {
+            CrashGuard.guard {
+                photoAdapter?.selected?.addAll(visible().map { it.id })
+                refreshLibrary()
+            }
         }
-        v.findViewById<Button>(R.id.btnSelExit).setOnClickListener { exitSelect() }
-        v.findViewById<Button>(R.id.btnFav).setOnClickListener { selFav() }
-        v.findViewById<Button>(R.id.btnMove).setOnClickListener { selMove() }
-        v.findViewById<Button>(R.id.btnRename).setOnClickListener { selRename() }
-        v.findViewById<Button>(R.id.btnDelete).setOnClickListener { selDelete() }
+        v.findViewById<Button>(R.id.btnSelExit)?.setOnClickListener { CrashGuard.guard { exitSelect() } }
+        v.findViewById<Button>(R.id.btnFav)?.setOnClickListener { CrashGuard.guard { selFav() } }
+        v.findViewById<Button>(R.id.btnMove)?.setOnClickListener { CrashGuard.guard { selMove() } }
+        v.findViewById<Button>(R.id.btnRename)?.setOnClickListener { CrashGuard.guard { selRename() } }
+        v.findViewById<Button>(R.id.btnDelete)?.setOnClickListener { CrashGuard.guard { selDelete() } }
 
+        styleButtons(v)
         refreshLibrary()
     }
 
     /** 右上角两个按钮的图标随当前视图 / 排序实时变化。 */
     private fun applyToolbarIcons(v: View) {
-        v.findViewById<ImageButton>(R.id.btnView).setImageResource(
-            if (gridView) R.drawable.ic_view_grid else R.drawable.ic_view_list
-        )
-        v.findViewById<ImageButton>(R.id.btnSort).apply {
+        val s = SkinNow.skin
+        v.findViewById<ImageButton>(R.id.btnView)?.apply {
+            setImageResource(if (gridView) R.drawable.ic_view_grid else R.drawable.ic_view_list)
+            setColorFilter(s.accent)
+        }
+        v.findViewById<ImageButton>(R.id.btnSort)?.apply {
             setImageResource(SORT_ICONS[sort])
+            setColorFilter(s.accent)
         }
-        tintIcons(v)
     }
 
-    /** 工具栏图标按当前主题的强调色着色。 */
-    private fun tintIcons(v: View) {
-        val c = resolveColor(this, R.attr.accentColor)
-        v.findViewById<ImageButton>(R.id.btnView).setColorFilter(c)
-        v.findViewById<ImageButton>(R.id.btnSort).setColorFilter(c)
-    }
-
-    /** 长按单张照片弹出的操作菜单：增删改 + 进入多选。 */
-    private fun showPhotoMenu(p: Photo, anchor: View) {
-        CrashGuard.safe(this, "打开菜单失败") { showPhotoMenuInner(p, anchor) }
-    }
-
-    private fun showPhotoMenuInner(p: Photo, anchor: View) {
-        if (isFinishing || isDestroyed || !anchor.isAttachedToWindow) return
-        val fav = Store.favorites(this)
-        val isFav = fav.contains(p.id.toString())
-        val menu = android.widget.PopupMenu(this, anchor)
-        menu.menu.add(0, 1, 0, if (isFav) "取消收藏" else "收藏")
-        menu.menu.add(0, 2, 0, "移动到相册")
-        menu.menu.add(0, 3, 0, "重命名")
-        menu.menu.add(0, 4, 0, "删除到回收站")
-        menu.menu.add(0, 5, 0, "多选更多")
-        menu.setOnMenuItemClickListener {
-            when (it.itemId) {
-                1 -> {
-                    if (isFav) fav.remove(p.id.toString()) else fav.add(p.id.toString())
-                    Store.setFavorites(this, fav)
-                    Ui.toast(this, if (isFav) "已取消收藏" else "已收藏")
-                    exitSelect()
-                }
-                2 -> { Ui.albumSheet(this, allAlbumNames()) { a -> moveOne(p, a) } }
-                3 -> renameOne(p)
-                4 -> confirmDelete(listOf(p))
-                5 -> Ui.toast(this, "已进入多选，可继续点选更多")
+    /** 页面内按钮统一皮肤着色（系统 Button 默认样式与深色底不搭）。 */
+    private fun styleButtons(v: View) {
+        val s = SkinNow.skin
+        val ids = listOf(
+            R.id.btnSelAll, R.id.btnSelExit, R.id.btnFav, R.id.btnMove,
+            R.id.btnRename, R.id.btnDelete, R.id.btnRescan, R.id.btnEmpty, R.id.restore,
+        )
+        ids.forEach { id ->
+            val b = v.findViewById<Button>(id)
+            if (b != null) {
+                b.setTextColor(s.text)
+                b.background = Glass.solid(s.glass, 8f)
             }
-            true
         }
-        menu.show()
     }
 
-    private fun moveOne(p: Photo, album: String) {
-        Ui.async(this, io = {
-            val move = Store.cardModeMove
-            var ok = false
-            if (move) {
-                ok = Ui.write(this, { Repo.moveToAlbum(this, p, album) }) { e -> requestDeleteConsent(e) }
-                if (!ok) ok = Repo.copyToAlbum(this, p, album)
-            } else {
-                ok = Repo.copyToAlbum(this, p, album)
-            }
-            ok
-        }, ui = { ok ->
-            Ui.toast(this, if (ok) "已移动到「$album」" else "移动失败")
-            exitSelect(); loadPhotos()
-        })
-    }
-
-    private fun applyLayoutManager(list: RecyclerView) {
-        list.layoutManager = if (gridView) {
+    private fun applyLayoutManager(list: RecyclerView?) {
+        list?.layoutManager = if (gridView) {
             val w = resources.displayMetrics.widthPixels
             val span = (w * 0.8f / 104.dp).toInt().coerceIn(3, 6)
             GridLayoutManager(this, span)
@@ -415,27 +414,27 @@ class MainActivity : ComponentActivity() {
 
     private fun refreshLibrary() {
         val v = libraryView ?: return
-        val list = v.findViewById<RecyclerView>(R.id.photos)
         val selBar = v.findViewById<LinearLayout>(R.id.selBar)
         val selText = v.findViewById<TextView>(R.id.selText)
         val btnRename = v.findViewById<Button>(R.id.btnRename)
         val tip = v.findViewById<TextView>(R.id.tip)
 
         val data = visible()
-        photoAdapter?.submit(data)          // submit 内部已刷新，无需再调
-        tip.text = when {
-            photos.isEmpty() -> "暂无照片，点右上角设置 → 重新扫描，或先授予照片权限"
-            data.isEmpty() -> "当前筛选下没有照片"
-            else -> "${data.size} 张"
-        }
+        photoAdapter?.submit(data)
 
-        chipAdapter.submit(data.map { it.month }.distinct().sortedDescending(), month)
+        chipAdapter?.submit(data.map { it.month }.distinct().sortedDescending(), month)
 
         val sel = photoAdapter?.selected?.size ?: 0
         val mode = photoAdapter?.selectMode == true && sel > 0
-        selBar.visibility = if (mode) View.VISIBLE else View.GONE
-        selText.text = "已选 $sel 项"
-        btnRename.visibility = if (sel == 1) View.VISIBLE else View.GONE
+        selBar?.visibility = if (mode) View.VISIBLE else View.GONE
+        selText?.text = "已选 $sel 项"
+        btnRename?.visibility = if (sel == 1) View.VISIBLE else View.GONE
+
+        tip?.text = when {
+            photos.isEmpty() -> "暂无照片，可在设置里重新扫描，或先授予照片权限"
+            data.isEmpty() -> "当前筛选下没有照片"
+            else -> "${data.size} 张"
+        }
     }
 
     private fun toggleSelect(p: Photo) {
@@ -486,27 +485,30 @@ class MainActivity : ComponentActivity() {
     private fun selRename() { renameOne(selectedPhotos().firstOrNull() ?: return) }
 
     private fun renameOne(p: Photo) {
-        val input = EditText(this).apply { setText(p.name.substringBeforeLast('.')) }
-        MaterialAlertDialogBuilder(this)
-            .setTitle("重命名")
-            .setView(input)
-            .setNegativeButton("取消", null)
-            .setPositiveButton("确定") { _, _ ->
+        val input = EditText(this).apply {
+            setText(p.name.substringBeforeLast('.'))
+            setTextColor(SkinNow.skin.text)
+        }
+        Ui.dialog(this) {
+            setTitle("重命名")
+            setView(input)
+            setNegativeButton("取消", null)
+            setPositiveButton("确定") { _, _ ->
                 val new = input.text.toString().trim()
                 if (new.isBlank()) return@setPositiveButton
                 val ext = p.name.substringAfterLast('.', "")
                 val cv = ContentValues().apply { put(MediaStore.Images.Media.DISPLAY_NAME, "$new.$ext") }
-                val ok = Ui.write(this, {
+                val ok = Ui.write(this@MainActivity, {
                     contentResolver.update(Repo.uriOf(p), cv, null, null) > 0
                 }) { e -> requestDeleteConsent(e) }
-                Ui.toast(this, if (ok) "已重命名" else "重命名失败，可能无权修改该文件")
+                Ui.toast(this@MainActivity, if (ok) "已重命名" else "重命名失败，可能无权修改该文件")
                 if (ok) { exitSelect(); loadPhotos() }
-            }.show()
+            }
+        }
     }
 
     private fun selDelete() { confirmDelete(selectedPhotos()) }
 
-    /** 删除确认：单张与批量共用，先入回收站。 */
     private fun confirmDelete(list: List<Photo>) {
         if (list.isEmpty()) return
         Ui.confirm(this, "删除", "这 ${list.size} 张会先移入回收站，可还原。", okText = "删除") {
@@ -533,6 +535,55 @@ class MainActivity : ComponentActivity() {
         })
     }
 
+    /** 长按单张照片的操作菜单：增删改 + 进入多选。用列表弹窗，不用 PopupMenu。 */
+    private fun showPhotoMenu(p: Photo) {
+        val fav = Store.favorites(this)
+        val isFav = fav.contains(p.id.toString())
+        val actions = arrayOf(
+            if (isFav) "取消收藏" else "收藏",
+            "移动到相册", "重命名", "删除到回收站", "多选更多",
+        )
+        Ui.dialog(this) {
+            setTitle(p.name)
+            setItems(actions) { _, which ->
+                CrashGuard.guard {
+                    when (which) {
+                        0 -> {
+                            if (isFav) fav.remove(p.id.toString()) else fav.add(p.id.toString())
+                            Store.setFavorites(this@MainActivity, fav)
+                            Ui.toast(this@MainActivity, if (isFav) "已取消收藏" else "已收藏")
+                            exitSelect()
+                        }
+                        1 -> moveOne(p)
+                        2 -> renameOne(p)
+                        3 -> confirmDelete(listOf(p))
+                        4 -> Ui.toast(this@MainActivity, "已进入多选，可继续点选更多")
+                    }
+                }
+            }
+            setNegativeButton("取消", null)
+        }
+    }
+
+    private fun moveOne(p: Photo) {
+        Ui.albumSheet(this, allAlbumNames()) { album ->
+            Ui.async(this, io = {
+                var ok = false
+                if (Store.cardModeMove) {
+                    ok = Ui.write(this, { Repo.moveToAlbum(this, p, album) }) { e -> requestDeleteConsent(e) }
+                    if (!ok) ok = Repo.copyToAlbum(this, p, album)
+                } else {
+                    ok = Repo.copyToAlbum(this, p, album)
+                }
+                ok
+            }, ui = { ok ->
+                Ui.toast(this, if (ok) "已移动到「$album」" else "移动失败")
+                exitSelect(); loadPhotos()
+            })
+        }
+    }
+
+    // ---------- 预览
     private fun preview(p: Photo) {
         CrashGuard.safe(this, "预览失败") { previewInner(p) }
     }
@@ -547,7 +598,8 @@ class MainActivity : ComponentActivity() {
             if (Store.previewActions) {
                 setNeutralButton(if (isFav) "取消收藏" else "收藏") { _, _ ->
                     if (isFav) fav.remove(p.id.toString()) else fav.add(p.id.toString())
-                    Store.setFavorites(this@MainActivity, fav); renderSidebar()
+                    Store.setFavorites(this@MainActivity, fav)
+                    renderSidebar()
                 }
                 setPositiveButton("清理") { _, _ -> trashPhotos(listOf(p)) }
             }
@@ -557,7 +609,8 @@ class MainActivity : ComponentActivity() {
     // ---------- 卡片页
     private fun bindCards(v: View) {
         cards = CardsPage(this, v)
-        cards.bind()
+        cards?.bind()
+        styleButtons(v)
     }
 
     fun cardPhotos(): List<Photo> = visible()
@@ -566,53 +619,84 @@ class MainActivity : ComponentActivity() {
     fun allAlbumNames(): List<String> = photos.map { it.album }.distinct().sorted()
 
     fun afterCardAction() {
-        loadPhotos()
+        CrashGuard.guard { loadPhotos() }
     }
 
     // ---------- 设置页
     private fun bindSettings(v: View) {
+        val s = SkinNow.skin
         val stat = v.findViewById<TextView>(R.id.stat)
-        stat.text = "共 ${photos.size} 张照片 · ${photos.map { it.album }.distinct().size} 个图集 · 回收站 ${Store.trash(this).size} 项"
-        val swPreview = v.findViewById<Switch>(R.id.swPreview)
-        val swGrid = v.findViewById<Switch>(R.id.swGrid)
-        swPreview.isChecked = Store.previewActions
-        swGrid.isChecked = Store.defaultGrid
-        swPreview.setOnCheckedChangeListener { _, b -> CrashGuard.guard { Store.previewActions = b; Store.saveSettings(this) } }
-        swGrid.setOnCheckedChangeListener { _, b -> CrashGuard.guard { Store.defaultGrid = b; Store.saveSettings(this) } }
-        v.findViewById<TextView>(R.id.version).text = "光影相册 · 原生安卓版 v${APP_VERSION}"
+        val version = v.findViewById<TextView>(R.id.version)
+        stat?.text = "共 ${photos.size} 张照片 · ${photos.map { it.album }.distinct().size} 个图集 · 回收站 ${Store.trash(this).size} 项"
+        stat?.setTextColor(s.textDim)
+        version?.text = "光影相册 · 原生安卓版 v$APP_VERSION"
+        version?.setTextColor(s.textDim)
+
+        v.findViewById<Switch>(R.id.swPreview)?.apply {
+            isChecked = Store.previewActions
+            setOnCheckedChangeListener { _, b ->
+                CrashGuard.guard { Store.previewActions = b; Store.saveSettings(this@MainActivity) }
+            }
+        }
+        v.findViewById<Switch>(R.id.swGrid)?.apply {
+            isChecked = Store.defaultGrid
+            setOnCheckedChangeListener { _, b ->
+                CrashGuard.guard { Store.defaultGrid = b; Store.saveSettings(this@MainActivity) }
+            }
+        }
+        v.findViewById<Switch>(R.id.swCardMode)?.apply {
+            isChecked = Store.cardModeMove
+            setOnCheckedChangeListener { _, b ->
+                CrashGuard.guard { Store.cardModeMove = b; Store.saveSettings(this@MainActivity) }
+            }
+        }
+
         val skinList = v.findViewById<RecyclerView>(R.id.skinList)
-        skinList.layoutManager = GridLayoutManager(this, 3)
-        skinList.adapter = SkinAdapter(
-            current = SkinNow.skin.key,
-            picked = { k -> k != SkinNow.skin.key },
-            onPick = { switchSkin(it.key) },
-        )
+        skinList?.layoutManager = GridLayoutManager(this, 3)
+        skinList?.adapter = SkinAdapter(SkinNow.skin.key) { key ->
+            CrashGuard.guard { switchSkin(key) }
+        }
+
+        v.findViewById<Button>(R.id.btnRescan)?.setOnClickListener {
+            CrashGuard.guard {
+                Thumbs.clear()
+                loadPhotos()
+                Ui.toast(this, "扫描完成")
+            }
+        }
+        styleButtons(v)
 
         val crash = CrashGuard.read(this)
         if (crash.isNotBlank()) {
-            val dim = TypedValue().let { theme.resolveAttribute(R.attr.textColorDim, it, true); it.data }
             val box = TextView(this).apply {
                 text = "最近崩溃记录（长按可复制）\n\n$crash"
                 setTextIsSelectable(true)
                 textSize = 10f
-                setTextColor(dim)
+                setTextColor(s.textDim)
                 setPadding(16, 16, 16, 16)
             }
             v.findViewById<LinearLayout>(R.id.settingsBody)?.addView(box)
         }
+    }
 
-        v.findViewById<Button>(R.id.btnRescan).setOnClickListener {
-            Thumbs.clear(); loadPhotos()
-            Ui.toast(this, "扫描完成")
+    private fun switchSkin(key: String) {
+        if (key == SkinNow.skin.key) return
+        CrashGuard.safe(this, "换肤失败") {
+            SkinNow.apply(applicationContext, key)
+            Thumbs.clear()
+            recreate()
         }
     }
 
     // ---------- 回收站
     private fun bindTrash(v: View) {
+        val s = SkinNow.skin
         val list = v.findViewById<RecyclerView>(R.id.trashList)
         val count = v.findViewById<TextView>(R.id.trashCount)
         val items = Store.trash(this).sortedByDescending { it.at }
-        count.text = "回收站 ${items.size} 项"
+        count?.text = "回收站 ${items.size} 项"
+        count?.setTextColor(s.text)
+
         trashAdapter = TrashAdapter(this) { item ->
             Ui.async(this, io = {
                 val ok = Ui.write(this, { Repo.restore(this, item) }) { e -> requestDeleteConsent(e) }
@@ -626,20 +710,33 @@ class MainActivity : ComponentActivity() {
                 loadPhotos()
             })
         }
-        list.layoutManager = LinearLayoutManager(this)
-        list.adapter = trashAdapter
+        list?.layoutManager = LinearLayoutManager(this)
+        list?.adapter = trashAdapter
         trashAdapter?.submit(items)
-        v.findViewById<Button>(R.id.btnEmpty).setOnClickListener {
+
+        v.findViewById<Button>(R.id.btnEmpty)?.setOnClickListener {
             Ui.confirm(this, "清空回收站", "将彻底删除 ${items.size} 项，无法恢复。", okText = "清空") {
                 items.forEach { runCatching { java.io.File(it.file).delete() } }
                 Store.saveTrash(this, emptyList())
                 loadPhotos()
             }
         }
+        styleButtons(v)
     }
 
     /** Android 11+ 删除他人应用媒体需要授权时，交给系统弹窗。 */
     fun requestDeleteConsent(e: RecoverableSecurityException) {
-        deleteConsent.launch(IntentSenderRequest.Builder(e.userAction.actionIntent.intentSender).build())
+        CrashGuard.guard {
+            if (Build.VERSION.SDK_INT >= 29) {
+                startIntentSenderForResult(
+                    e.userAction.actionIntent.intentSender, 2002, null, 0, 0, 0
+                )
+            }
+        }
+    }
+
+    override fun onActivityResult(code: Int, result: Int, data: Intent?) {
+        super.onActivityResult(code, result, data)
+        if (code == 2002) CrashGuard.guard { loadPhotos() }
     }
 }
