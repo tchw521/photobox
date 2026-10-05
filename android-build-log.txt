@@ -42,6 +42,7 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processReleaseManifest
 > Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
+> Task :app:processReleaseManifestForPackage
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
@@ -54,15 +55,43 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
-> Task :app:processReleaseManifestForPackage
 > Task :app:bundleReleaseResources
 > Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:44:17 Unresolved reference: SkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:47:29 Unresolved reference: Glass
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:48:16 None of the following functions can be called with the arguments supplied: 
+public open fun setTextColor(p0: ColorStateList!): Unit defined in android.widget.TextView
+public open fun setTextColor(p0: Int): Unit defined in android.widget.TextView
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:81:17 Unresolved reference: SkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:84:13 None of the following functions can be called with the arguments supplied: 
+public open fun setTextColor(p0: ColorStateList!): Unit defined in android.widget.TextView
+public open fun setTextColor(p0: Int): Unit defined in android.widget.TextView
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:85:26 Unresolved reference: Glass
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:141:17 Unresolved reference: SkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:150:33 Unresolved reference: Glass
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:188:17 Unresolved reference: SkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:197:36 Unresolved reference: Glass
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/App.kt:19:13 Unresolved reference: SkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:25:34 Unresolved reference: MainActivity
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:107:29 Unresolved reference: AlbumSheetAdapter
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:107:87 Cannot infer a type for this parameter. Please specify it explicitly.
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:46:58 Unresolved reference: MainActivity
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:93:26 Unresolved reference: MainActivity
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:743:1 Unclosed comment
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:193:1 Unclosed comment
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:26:35 Unresolved reference: Skins
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:29:19 Unresolved reference: Skins
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:31:21 Unresolved reference: Skins
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:33:35 Unresolved reference: Glass
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:35:20 None of the following functions can be called with the arguments supplied: 
+public open fun setTextColor(p0: ColorStateList!): Unit defined in android.widget.TextView
+public open fun setTextColor(p0: Int): Unit defined in android.widget.TextView
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:35:41 Unresolved reference: SkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinAdapter.kt:35:66 Unresolved reference: SkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:107:26 Unresolved reference: SkinNow
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:108:30 Unresolved reference: SkinNow
 
 FAILURE: Build failed with an exception.
 
@@ -270,5 +299,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 53s
+BUILD FAILED in 54s
 30 actionable tasks: 30 executed
