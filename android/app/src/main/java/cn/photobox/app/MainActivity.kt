@@ -387,6 +387,7 @@ class MainActivity : ComponentActivity() {
         val selBar = v.findViewById<LinearLayout>(R.id.selBar)
         val selText = v.findViewById<TextView>(R.id.selText)
         val btnRename = v.findViewById<Button>(R.id.btnRename)
+        val tip = v.findViewById<TextView>(R.id.tip)
 
         val data = visible()
         photoAdapter?.submit(data)
