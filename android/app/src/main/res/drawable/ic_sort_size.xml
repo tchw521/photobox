@@ -1,12 +1,12 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp"
     android:viewportWidth="24" android:viewportHeight="24">
-    <!-- 三根递增柱 + 基线 -->
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.55"
-        android:pathData="M3.6,13.6h3.8v5.2H3.6z"/>
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.78"
-        android:pathData="M10.1,9.6h3.8v9.2h-3.8z"/>
+    <!-- 递增柱 + 基线：按大小排序 -->
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.5"
+        android:pathData="M3.2,13.4h4v5.6h-4z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.75"
+        android:pathData="M10,9.2h4v9.8h-4z"/>
     <path android:fillColor="#FFFFFF"
-        android:pathData="M16.6,4.8h3.8v14h-3.8z"/>
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.35"
-        android:pathData="M2.4,20.4h19.2v1.6H2.4z"/>
+        android:pathData="M16.8,4.4h4v14.6h-4z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.32"
+        android:pathData="M2,20.6h20v1.5H2z"/>
 </vector>
