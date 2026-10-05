@@ -49,42 +49,50 @@
     </LinearLayout>
 
     <!-- 底部导航：三个自绘按钮，不使用 Material 组件 -->
+    <!-- 悬浮胶囊：宽度收成内容宽并居中，不再横跨整屏 -->
     <LinearLayout
         android:id="@+id/bottomNav"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:paddingTop="6dp" android:paddingBottom="6dp">
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingStart="10dp" android:paddingEnd="10dp"
+        android:paddingTop="3dp" android:paddingBottom="3dp"
+        android:layout_marginBottom="4dp">
 
         <LinearLayout android:id="@+id/navLibrary"
-            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-            android:orientation="vertical" android:gravity="center" android:padding="4dp">
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:orientation="vertical" android:gravity="center"
+            android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="2dp" android:paddingBottom="2dp">
             <ImageView android:id="@+id/navLibraryIcon"
-                android:layout_width="24dp" android:layout_height="24dp"
+                android:layout_width="20dp" android:layout_height="20dp"
                 android:contentDescription="图库"/>
             <TextView android:id="@+id/navLibraryText"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="图库" android:textSize="10sp" android:paddingTop="2dp"/>
+                android:text="图库" android:textSize="9sp"/>
         </LinearLayout>
 
         <LinearLayout android:id="@+id/navCards"
-            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-            android:orientation="vertical" android:gravity="center" android:padding="4dp">
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:orientation="vertical" android:gravity="center"
+            android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="2dp" android:paddingBottom="2dp">
             <ImageView android:id="@+id/navCardsIcon"
-                android:layout_width="24dp" android:layout_height="24dp"
+                android:layout_width="20dp" android:layout_height="20dp"
                 android:contentDescription="卡片"/>
             <TextView android:id="@+id/navCardsText"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="卡片" android:textSize="10sp" android:paddingTop="2dp"/>
+                android:text="卡片" android:textSize="9sp"/>
         </LinearLayout>
 
         <LinearLayout android:id="@+id/navSettings"
-            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-            android:orientation="vertical" android:gravity="center" android:padding="4dp">
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:orientation="vertical" android:gravity="center"
+            android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="2dp" android:paddingBottom="2dp">
             <ImageView android:id="@+id/navSettingsIcon"
-                android:layout_width="24dp" android:layout_height="24dp"
+                android:layout_width="20dp" android:layout_height="20dp"
                 android:contentDescription="设置"/>
             <TextView android:id="@+id/navSettingsText"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="设置" android:textSize="10sp" android:paddingTop="2dp"/>
+                android:text="设置" android:textSize="9sp"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
