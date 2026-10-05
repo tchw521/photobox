@@ -11,6 +11,7 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.util.TypedValue
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -57,12 +58,12 @@ class MainActivity : ComponentActivity() {
     companion object {
         val SORT_LABELS = arrayOf("日期新→旧", "日期旧→新", "名称", "大小")
         val SORT_ICONS = intArrayOf(
-            android.R.drawable.ic_menu_recent_history,
-            android.R.drawable.ic_menu_today,
-            android.R.drawable.ic_menu_sort_alphabetically,
-            android.R.drawable.ic_menu_sort_by_size,
+            R.drawable.ic_sort_time,
+            R.drawable.ic_sort_time_asc,
+            R.drawable.ic_sort_name,
+            R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.2.0"
+        const val APP_VERSION = "1.4.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -71,7 +72,12 @@ class MainActivity : ComponentActivity() {
 
     // ---------- 生命周期
     override fun onCreate(s: Bundle?) {
+        // setTheme 必须在 super.onCreate 前；此处只用 applicationContext 读偏好，
+        // 避免在 Activity 尚未完成初始化时触碰自身 Context。
+        SkinNow.load(applicationContext)
+        setTheme(Skins.style(SkinNow.skin.key))
         super.onCreate(s)
+        CrashGuard.install(applicationContext)
         setContentView(R.layout.activity_main)
         Store.loadSettings(this)
         gridView = Store.defaultGrid
@@ -92,7 +98,28 @@ class MainActivity : ComponentActivity() {
             true
         }
 
+        applyBars()
         ensurePermission { loadPhotos() }
+    }
+
+    /** 状态栏与导航栏半透明，让背景渐变透上来，形成整体通透感。 */
+    private fun applyBars() {
+        val v = TypedValue()
+        theme.resolveAttribute(R.attr.bgTopColor, v, true)
+        val top = v.data
+        theme.resolveAttribute(R.attr.bgBottomColor, v, true)
+        window.statusBarColor = top
+        window.navigationBarColor = v.data
+    }
+
+    /** 换肤：写入偏好 → 重建 Activity，主题属性自动生效。 */
+    private fun switchSkin(key: String) {
+        if (key == SkinNow.skin.key) return
+        CrashGuard.safe(this, "换肤失败") {
+            SkinNow.apply(applicationContext, key)
+            Thumbs.clear()
+            recreate()
+        }
     }
 
     private fun ensurePermission(after: () -> Unit) {
@@ -115,6 +142,10 @@ class MainActivity : ComponentActivity() {
 
     // ---------- 数据
     private fun loadPhotos() {
+        CrashGuard.safe(this, "扫描照片失败") { loadPhotosInner() }
+    }
+
+    private fun loadPhotosInner() {
         photos = Repo.scan(this)
         val blocked = Store.blocked(this)
         photos = photos.filter { it.album !in blocked }
@@ -165,6 +196,10 @@ class MainActivity : ComponentActivity() {
 
     // ---------- 页面切换
     private fun switchTab(t: Int) {
+        CrashGuard.safe(this, "页面切换失败") { switchTabInner(t) }
+    }
+
+    private fun switchTabInner(t: Int) {
         tab = t
         val holder = findViewById<android.widget.FrameLayout>(R.id.content)
         holder.removeAllViews()
@@ -251,13 +286,28 @@ class MainActivity : ComponentActivity() {
     /** 右上角两个按钮的图标随当前视图 / 排序实时变化。 */
     private fun applyToolbarIcons(v: View) {
         v.findViewById<ImageButton>(R.id.btnView).setImageResource(
-            if (gridView) android.R.drawable.ic_menu_gallery else android.R.drawable.ic_menu_agenda
+            if (gridView) R.drawable.ic_view_grid else R.drawable.ic_view_list
         )
-        v.findViewById<ImageButton>(R.id.btnSort).setImageResource(SORT_ICONS[sort])
+        v.findViewById<ImageButton>(R.id.btnSort).apply {
+            setImageResource(SORT_ICONS[sort])
+        }
+        tintIcons(v)
+    }
+
+    /** 工具栏图标按当前主题的强调色着色。 */
+    private fun tintIcons(v: View) {
+        val tv = TypedValue()
+        theme.resolveAttribute(R.attr.accentColor, tv, true)
+        v.findViewById<ImageButton>(R.id.btnView).setColorFilter(tv.data)
+        v.findViewById<ImageButton>(R.id.btnSort).setColorFilter(tv.data)
     }
 
     /** 长按单张照片弹出的操作菜单：增删改 + 进入多选。 */
     private fun showPhotoMenu(p: Photo, anchor: View) {
+        CrashGuard.safe(this, "打开菜单失败") { showPhotoMenuInner(p, anchor) }
+    }
+
+    private fun showPhotoMenuInner(p: Photo, anchor: View) {
         val fav = Store.favorites(this)
         val isFav = fav.contains(p.id.toString())
         val menu = android.widget.PopupMenu(this, anchor)
@@ -274,7 +324,7 @@ class MainActivity : ComponentActivity() {
                     Toast.makeText(this, if (isFav) "已取消收藏" else "已收藏", Toast.LENGTH_SHORT).show()
                     exitSelect()
                 }
-                2 -> { showAlbumSheet("移动「${p.name}」到相册") { a -> moveOne(p, a) } }
+                2 -> { showAlbumSheet { a -> moveOne(p, a) } }
                 3 -> renameOne(p)
                 4 -> confirmDelete(listOf(p))
                 5 -> Toast.makeText(this, "已进入多选，可继续点选更多", Toast.LENGTH_SHORT).show()
@@ -355,7 +405,7 @@ class MainActivity : ComponentActivity() {
     private fun selMove() {
         val list = selectedPhotos()
         if (list.isEmpty()) return
-        showAlbumSheet("移动 ${list.size} 张到相册") { album ->
+        showAlbumSheet { album ->
             Thread {
                 var ok = 0
                 list.forEach { if (Repo.copyToAlbum(this, it, album)) ok++ }
@@ -411,7 +461,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /** 相册选择底部弹窗。 */
-    private fun showAlbumSheet(title: String, onPick: (String) -> Unit) {
+    private fun showAlbumSheet(onPick: (String) -> Unit) {
         val dialog = BottomSheetDialog(this)
         val rv = RecyclerView(this).apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -422,7 +472,7 @@ class MainActivity : ComponentActivity() {
             override fun onCreateViewHolder(p: ViewGroup, t: Int): RecyclerView.ViewHolder {
                 val tv = TextView(this@MainActivity).apply {
                     setPadding(24, 28, 24, 28); textSize = 14f
-                    setTextColor(ContextCompat.getColor(this@MainActivity, R.color.text))
+                    setTextColor(resolveColor(this@MainActivity, R.attr.textColorMain))
                 }
                 return object : RecyclerView.ViewHolder(tv) {}
             }
@@ -441,6 +491,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun preview(p: Photo) {
+        CrashGuard.safe(this, "预览失败") { previewInner(p) }
+    }
+
+    private fun previewInner(p: Photo) {
         val fav = Store.favorites(this)
         val isFav = fav.contains(p.id.toString())
         val b = MaterialAlertDialogBuilder(this)
@@ -483,6 +537,27 @@ class MainActivity : ComponentActivity() {
         swPreview.setOnCheckedChangeListener { _, b -> Store.previewActions = b; Store.saveSettings(this) }
         swGrid.setOnCheckedChangeListener { _, b -> Store.defaultGrid = b; Store.saveSettings(this) }
         v.findViewById<TextView>(R.id.version).text = "光影相册 · 原生安卓版 v${APP_VERSION}"
+        val skinList = v.findViewById<RecyclerView>(R.id.skinList)
+        skinList.layoutManager = GridLayoutManager(this, 3)
+        skinList.adapter = SkinAdapter(
+            current = SkinNow.skin.key,
+            picked = { key != SkinNow.skin.key },
+            onPick = { switchSkin(it.key) },
+        )
+
+        val crash = CrashGuard.read(this)
+        if (crash.isNotBlank()) {
+            val dim = TypedValue().let { theme.resolveAttribute(R.attr.textColorDim, it, true); it.data }
+            val box = TextView(this).apply {
+                text = "最近崩溃记录（长按可复制）\n\n$crash"
+                setTextIsSelectable(true)
+                textSize = 10f
+                setTextColor(dim)
+                setPadding(16, 16, 16, 16)
+            }
+            v.findViewById<LinearLayout>(R.id.settingsBody)?.addView(box)
+        }
+
         v.findViewById<Button>(R.id.btnRescan).setOnClickListener {
             Thumbs.clear(); loadPhotos()
             Toast.makeText(this, "扫描完成", Toast.LENGTH_SHORT).show()
