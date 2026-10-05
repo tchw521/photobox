@@ -65,6 +65,10 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     }
 
     fun bind() {
+        CrashGuard.safe(act, "卡片页初始化失败") { bindInner() }
+    }
+
+    private fun bindInner() {
         stage = root.findViewById(R.id.stage)
         c0 = root.findViewById(R.id.card0)
         c1 = root.findViewById(R.id.card1)
@@ -107,7 +111,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
             override fun onCreateViewHolder(p: ViewGroup, t: Int): RecyclerView.ViewHolder {
                 val tv = TextView(act).apply {
                     setPadding(20, 16, 20, 16); textSize = 12f
-                    setTextColor(act.resources.getColor(R.color.text, null))
+                    setTextColor(resolveColor(act, R.attr.textColorMain))
                     background = act.getDrawable(R.drawable.bg_bubble)
                 }
                 return object : RecyclerView.ViewHolder(tv) {}
@@ -117,7 +121,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
                 val tv = h.itemView as TextView
                 if (i == 0) {
                     tv.text = "＋ 新建图集"
-                    tv.setTextColor(act.resources.getColor(R.color.accent, null))
+                    tv.setTextColor(resolveColor(act, R.attr.accentColor))
                     tv.setOnClickListener { current()?.let { newAlbum(it) } }
                 } else {
                     val n = names[i - 1]
@@ -207,7 +211,11 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     }
 
     private fun settle(dx: Float, dy: Float, wasLong: Boolean) {
-        val p = current() ?: return
+        val p = current()
+        if (p == null) {
+            Toast.makeText(act, "没有待整理的照片", Toast.LENGTH_SHORT).show()
+            return
+        }
         val far = maxOf(abs(dx), abs(dy)) >= THRESHOLD
         when {
             // 长按生效后：抬手即弹归类菜单，下滑同样触发（更容错）
@@ -263,9 +271,10 @@ class CardsPage(private val act: MainActivity, private val root: View) {
                 Thumbs.into(act, p, 480, iv)
             }
         }
-        c0.rotation = 0f
-        c1.rotation = -4f
-        c2.rotation = 4f
+        // 叠放层次：轻微旋转 + 缩放差，营造卡片堆叠的纵深
+        c0.rotation = 0f; c0.scaleX = 1f; c0.scaleY = 1f
+        c1.rotation = -4f; c1.scaleX = 0.96f; c1.scaleY = 0.96f
+        c2.rotation = 4f; c2.scaleX = 0.92f; c2.scaleY = 0.92f
         resetCard()
     }
 
@@ -344,7 +353,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
                 val tv = TextView(act).apply {
                     setPadding(24, 28, 24, 28)
                     textSize = 14f
-                    setTextColor(act.resources.getColor(R.color.text, null))
+                    setTextColor(resolveColor(act, R.attr.textColorMain))
                 }
                 return object : RecyclerView.ViewHolder(tv) {}
             }
@@ -353,7 +362,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
                 val tv = h.itemView as TextView
                 if (i == 0) {
                     tv.text = "＋ 新建图集"
-                    tv.setTextColor(act.resources.getColor(R.color.accent, null))
+                    tv.setTextColor(resolveColor(act, R.attr.accentColor))
                     tv.setOnClickListener { dialog.dismiss(); newAlbum(p) }
                 } else {
                     val n = names[i - 1]
