@@ -42,7 +42,11 @@ class CardsPage(private val act: MainActivity, private val root: View) {
 
     private var queue: MutableList<Photo> = mutableListOf()
     private var idx = 0
-    private var done = 0
+    /** 已完成数。放在 companion 里跨重建保留——否则每次操作后 loadPhotos
+     *  重建页面都会把它清零，进度永远显示 0。 */
+    private var done: Int
+        get() = sessionDone
+        set(v) { sessionDone = v }
     private var bound = false
 
     private val handler = Handler(Looper.getMainLooper())
@@ -53,7 +57,19 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     private var moved = false
 
     companion object {
-        private const val THRESHOLD = 90f
+        /** 本轮整理已完成数；离开卡片页时重置。 */
+        var sessionDone = 0
+
+        /** 结束一轮整理（切换页面或重新进入时调用）。 */
+        fun resetSession() { sessionDone = 0 }
+
+        /**
+         * 触发阈值：从 90px 降到 42px。
+         * 按屏幕比例换算（约屏宽的 11%），小屏更轻、大屏不至于误触，
+         * 轻轻一划即可响应。
+         */
+        private const val THRESHOLD_MIN = 36f
+        private const val THRESHOLD_RATIO = 0.11f
         private const val LONG_MS = 450L
         private const val TIP = "上滑上一张 · 下滑下一张 · 右滑回收 · 左滑收藏 · 长按左滑归类"
     }
@@ -76,7 +92,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         tip?.visibility = if (Store.cardHint) View.VISIBLE else View.GONE
         queue = act.cardPhotos().toMutableList()
         idx = 0
-        done = 0
+        // 不重置 done：跨重建保留进度
 
         attachGesture()
         bindAlbums()
@@ -240,12 +256,19 @@ class CardsPage(private val act: MainActivity, private val root: View) {
      *   右滑 → 回收     左滑 → 收藏
      *   长按 + 左滑 → 归类到相册
      */
+    /** 按屏宽计算的触发阈值，轻滑即可响应。 */
+    private val threshold: Float
+        get() = maxOf(
+            THRESHOLD_MIN,
+            act.resources.displayMetrics.widthPixels * THRESHOLD_RATIO
+        )
+
     private fun hint(dx: Float, dy: Float): String = when {
-        longMode && dx <= -THRESHOLD -> "松手 → 归类到相册"
-        abs(dy) > abs(dx) && dy <= -THRESHOLD -> "松手 → 上一张"
-        abs(dy) > abs(dx) && dy >= THRESHOLD -> "松手 → 下一张"
-        dx >= THRESHOLD -> "松手 → 清理到回收站"
-        dx <= -THRESHOLD -> "松手 → 收藏"
+        longMode && dx <= -threshold -> "松手 → 归类到相册"
+        abs(dy) > abs(dx) && dy <= -threshold -> "松手 → 上一张"
+        abs(dy) > abs(dx) && dy >= threshold -> "松手 → 下一张"
+        dx >= threshold -> "松手 → 清理到回收站"
+        dx <= -threshold -> "松手 → 收藏"
         else -> if (longMode) "按住并左滑 → 归类到相册" else TIP
     }
 
@@ -257,11 +280,11 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         }
         when {
             // 长按 + 左滑 → 归类；长按后直接抬手也弹菜单，容错更高
-            wasLong && (dx <= -THRESHOLD || max(abs(dx), abs(dy)) < THRESHOLD) -> showMoveSheet(p)
-            abs(dy) > abs(dx) && dy <= -THRESHOLD -> prev()
-            abs(dy) > abs(dx) && dy >= THRESHOLD -> next()
-            dx >= THRESHOLD -> dropTrash(p)
-            dx <= -THRESHOLD -> dropFav(p)
+            wasLong && (dx <= -threshold || max(abs(dx), abs(dy)) < threshold) -> showMoveSheet(p)
+            abs(dy) > abs(dx) && dy <= -threshold -> prev()
+            abs(dy) > abs(dx) && dy >= threshold -> next()
+            dx >= threshold -> dropTrash(p)
+            dx <= -threshold -> dropFav(p)
         }
     }
 
@@ -324,7 +347,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     private fun advance(removed: Photo) {
         CrashGuard.guard {
             queue.remove(removed)
-            done++
+            done++      // 内部会写回 sessionDone
             if (idx >= queue.size) idx = (queue.size - 1).coerceAtLeast(0)
             render()
         }
