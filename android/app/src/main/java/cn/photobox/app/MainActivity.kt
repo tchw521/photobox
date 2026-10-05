@@ -970,25 +970,6 @@ class MainActivity : Activity() {
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(request: Int, result: Int, data: Intent?) {
-        super.onActivityResult(request, result, data)
-        if (request == REQ_PICK_BG && result == RESULT_OK) {
-            val uri = data?.data ?: return
-            CrashGuard.guard {
-                runCatching {
-                    contentResolver.takePersistableUriPermission(
-                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    )
-                }
-                Store.bgUri = uri.toString()
-                Store.saveSettings(this)
-                applyBackground()
-                Ui.toast(this, "背景已设置")
-                if (tab == 5) switchTab(5)
-            }
-        }
-    }
 
     // ---------- 回收站
     private fun bindTrash(v: View) {
@@ -1078,5 +1059,20 @@ class MainActivity : Activity() {
     override fun onActivityResult(code: Int, result: Int, data: Intent?) {
         super.onActivityResult(code, result, data)
         if (code == 2002) CrashGuard.guard { loadPhotos() }
+        if (code == REQ_PICK_BG && result == RESULT_OK) {
+            val u = data?.data ?: return
+            CrashGuard.guard {
+                runCatching {
+                    contentResolver.takePersistableUriPermission(
+                        u, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
+                Store.bgUri = u.toString()
+                Store.saveSettings(this)
+                applyBackground()
+                Ui.toast(this, "背景已设置")
+                if (tab == 5) switchTab(5)
+            }
+        }
     }
 }
