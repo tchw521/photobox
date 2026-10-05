@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 皮肤可变色：由各皮肤 style 赋值，drawable 通过 ?attr 读取 -->
+    <!-- 背景：三段渐变 + 两处径向光晕 -->
     <attr name="bgTopColor" format="color" />
+    <attr name="bgMidColor" format="color" />
     <attr name="bgBottomColor" format="color" />
+    <attr name="glowColor" format="color" />
+    <attr name="glowColor2" format="color" />
+
+    <!-- 玻璃层：普通 / 强化 -->
     <attr name="glassColor" format="color" />
     <attr name="glassStrongColor" format="color" />
     <attr name="strokeColor" format="color" />
     <attr name="surfaceStrongColor" format="color" />
+
+    <!-- 语义色 -->
     <attr name="accentColor" format="color" />
     <attr name="accentSoftColor" format="color" />
     <attr name="textColorMain" format="color" />
