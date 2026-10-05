@@ -15,17 +15,20 @@ import kotlin.math.max
 /**
  * 卡片页：把待整理照片叠放成卡片堆，用四向手势快速处理。
  *
- * 手势（v1.2 基线）：
- * - 左滑 → 上一张
- * - 右滑 → 下一张
- * - 上滑 → 清理到回收站
- * - 下滑 → 收藏
- * - 长按后（或长按并下滑）→ 弹出相册列表归类
+ * 手势（v1.2.2 方向定义）：
+ * - 上滑 → 上一张
+ * - 下滑 → 下一张
+ * - 右滑 → 清理到回收站
+ * - 左滑 → 收藏
+ * - 长按 + 左滑 → 弹出相册列表，移动到其中任一相册
+ *
+ * 注意：长按判定在前——先按住不动 450ms 进入归类模式，再左滑；
+ * 若按住后立刻滑动（450ms 内），则视为普通左滑收藏。
  *
  * 两个关键稳定性处理：
  * 1. ACTION_DOWN 时 requestDisallowInterceptTouchEvent(true)，
  *    防止父容器在 MOVE 中抢走事件导致手势被 ACTION_CANCEL 中断。
- * 2. 长按生效后抬手即弹归类菜单，不必强求下滑，容错更高。
+ * 2. 长按生效后左滑弹归类菜单；直接抬手也弹，容错更高。
  */
 class CardsPage(private val act: MainActivity, private val root: View) {
 
@@ -52,7 +55,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     companion object {
         private const val THRESHOLD = 90f
         private const val LONG_MS = 450L
-        private const val TIP = "左滑上一张 · 右滑下一张 · 上滑回收 · 下滑收藏 · 长按归类"
+        private const val TIP = "上滑上一张 · 下滑下一张 · 右滑回收 · 左滑收藏 · 长按左滑归类"
     }
 
     fun bind() {
@@ -226,17 +229,23 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         longMode = true
         CrashGuard.guard {
             c0?.animate()?.scaleX(1.04f)?.scaleY(1.04f)?.setDuration(120)?.start()
-            tip?.text = "按住并下滑 → 归类到相册"
+            tip?.text = "按住并左滑 → 归类到相册"
         }
     }
 
+    /**
+     * 手势方向（用户指定）：
+     *   上滑 → 上一张   下滑 → 下一张
+     *   右滑 → 回收     左滑 → 收藏
+     *   长按 + 左滑 → 归类到相册
+     */
     private fun hint(dx: Float, dy: Float): String = when {
-        longMode && dy >= THRESHOLD -> "松手 → 归类到相册"
-        abs(dx) > abs(dy) && dx <= -THRESHOLD -> "松手 → 上一张"
-        abs(dx) > abs(dy) && dx >= THRESHOLD -> "松手 → 下一张"
-        dy <= -THRESHOLD -> "松手 → 清理到回收站"
-        dy >= THRESHOLD -> "松手 → 收藏"
-        else -> if (longMode) "按住并下滑 → 归类到相册" else TIP
+        longMode && dx <= -THRESHOLD -> "松手 → 归类到相册"
+        abs(dy) > abs(dx) && dy <= -THRESHOLD -> "松手 → 上一张"
+        abs(dy) > abs(dx) && dy >= THRESHOLD -> "松手 → 下一张"
+        dx >= THRESHOLD -> "松手 → 清理到回收站"
+        dx <= -THRESHOLD -> "松手 → 收藏"
+        else -> if (longMode) "按住并左滑 → 归类到相册" else TIP
     }
 
     private fun settle(dx: Float, dy: Float, wasLong: Boolean) {
@@ -246,12 +255,12 @@ class CardsPage(private val act: MainActivity, private val root: View) {
             return
         }
         when {
-            // 长按生效后：抬手即弹归类菜单（下滑同样触发，更容错）
-            wasLong -> showMoveSheet(p)
-            abs(dx) > abs(dy) && dx <= -THRESHOLD -> prev()
-            abs(dx) > abs(dy) && dx >= THRESHOLD -> next()
-            dy <= -THRESHOLD -> dropTrash(p)
-            dy >= THRESHOLD -> dropFav(p)
+            // 长按 + 左滑 → 归类；长按后直接抬手也弹菜单，容错更高
+            wasLong && (dx <= -THRESHOLD || max(abs(dx), abs(dy)) < THRESHOLD) -> showMoveSheet(p)
+            abs(dy) > abs(dx) && dy <= -THRESHOLD -> prev()
+            abs(dy) > abs(dx) && dy >= THRESHOLD -> next()
+            dx >= THRESHOLD -> dropTrash(p)
+            dx <= -THRESHOLD -> dropFav(p)
         }
     }
 
