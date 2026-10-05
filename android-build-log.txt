@@ -43,44 +43,52 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
 > Task :app:mergeReleaseArtProfile
+> Task :app:processReleaseManifestForPackage
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:generateReleaseAssets UP-TO-DATE
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
-> Task :app:processReleaseManifestForPackage
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
+> Task :app:processReleaseResources
 > Task :app:bundleReleaseResources
 > Task :app:sdkReleaseDependencyData
-> Task :app:processReleaseResources
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
 
 > Task :app:compileReleaseKotlin FAILED
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:98:26 Unresolved reference: csMode
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:99:24 Unresolved reference: csBrightness
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:100:33 Unresolved reference: csBaseFollow
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:100:53 Unresolved reference: csAccent
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:100:73 Unresolved reference: csAccent2
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:103:41 Overload resolution ambiguity: 
-public final operator fun times(other: Byte): Float defined in kotlin.Float
-public final operator fun times(other: Double): Double defined in kotlin.Float
-public final operator fun times(other: Float): Float defined in kotlin.Float
-public final operator fun times(other: Int): Float defined in kotlin.Float
-public final operator fun times(other: Long): Float defined in kotlin.Float
-public final operator fun times(other: Short): Float defined in kotlin.Float
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:103:64 Overload resolution ambiguity: 
-public final operator fun times(other: Byte): Float defined in kotlin.Float
-public final operator fun times(other: Double): Double defined in kotlin.Float
-public final operator fun times(other: Float): Float defined in kotlin.Float
-public final operator fun times(other: Int): Float defined in kotlin.Float
-public final operator fun times(other: Long): Float defined in kotlin.Float
-public final operator fun times(other: Short): Float defined in kotlin.Float
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:113:49 Unresolved reference: csAccent
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:114:51 Unresolved reference: csAccentLevel
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Skin.kt:115:46 Unresolved reference: csAccentLevel
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:57:33 Unresolved reference: KEY_ALL
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:57:64 Unresolved reference: KEY_FAV
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:58:33 Unresolved reference: KEY_TRASH
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:46:71 Unresolved reference: APP_VERSION
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:43:28 Unresolved reference: KEY_ALL
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:48:15 Conflicting declarations: public companion object, public companion object
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:70:5 Only one companion object is allowed per class
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:70:15 Conflicting declarations: public companion object, public companion object
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:263:13 Unresolved reference: KEY_ALL
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:264:13 Unresolved reference: KEY_FAV
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:285:35 Unresolved reference: KEY_ALL
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:285:101 Unresolved reference: KEY_ALL
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:286:35 Unresolved reference: KEY_FAV
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:286:97 Unresolved reference: KEY_FAV
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:290:35 Unresolved reference: KEY_TRASH
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:297:13 Unresolved reference: KEY_TRASH
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:298:13 Unresolved reference: KEY_FAV
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:298:37 Unresolved reference: KEY_FAV
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:342:60 Unresolved reference: page_skin
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:433:38 Unresolved reference: SORT_LABELS
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:463:30 Unresolved reference: SORT_ICONS
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:716:21 Unresolved reference: KEY_ALL
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:716:40 Unresolved reference: KEY_FAV
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:716:59 Unresolved reference: KEY_TRASH
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:838:49 Unresolved reference: SORT_LABELS
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:839:40 Unresolved reference: SORT_LABELS
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:911:36 Unresolved reference: APP_VERSION
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:964:54 Unresolved reference: bgLayer
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:976:5 Conflicting overloads: protected open fun onActivityResult(request: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity, protected open fun onActivityResult(code: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:1081:5 Conflicting overloads: protected open fun onActivityResult(request: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity, protected open fun onActivityResult(code: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:55:18 Unresolved reference: skinSectionBuiltin
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:55:43 Unresolved reference: skinSectionCustom
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:55:67 Unresolved reference: skinSectionBg
@@ -109,58 +117,27 @@ e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:71:40 Unresolved reference: btnApplyCustom
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:79:55 Unresolved reference: skinGrid
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:84:65 Unresolved reference: item_skin_card
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:99:48 Unresolved reference: applySkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:107:48 Unresolved reference: skinSwatch
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:113:29 Unresolved reference: accentGrid
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:114:29 Unresolved reference: accent2Grid
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:123:65 Unresolved reference: item_swatch
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:131:51 Unresolved reference: csAccent
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:131:76 Unresolved reference: csAccent2
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:135:49 Unresolved reference: csAccent
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:135:73 Unresolved reference: csAccent2
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:153:55 Unresolved reference: modeGroup
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:154:31 Unresolved reference: csMode
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:154:49 Unresolved reference: modeDark
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:154:68 Unresolved reference: modeLight
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:156:19 Unresolved reference: csMode
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:156:43 Unresolved reference: modeDark
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:159:55 Unresolved reference: baseGroup
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:160:31 Unresolved reference: csBaseFollow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:160:50 Unresolved reference: baseFollow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:160:71 Unresolved reference: baseCustom
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:162:19 Unresolved reference: csBaseFollow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:162:45 Unresolved reference: baseFollow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:168:50 Unresolved reference: seekAccentLevel
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:169:30 Unresolved reference: csAccentLevel
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:172:23 Unresolved reference: csAccentLevel
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:178:50 Unresolved reference: seekBrightness
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:179:30 Unresolved reference: csBrightness
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:182:23 Unresolved reference: csBrightness
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:188:51 Unresolved reference: seekBgDim
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:189:31 Unresolved reference: bgDim
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:192:23 Unresolved reference: bgDim
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:212:52 Unresolved reference: bgPreview
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:214:19 Unresolved reference: bgUri
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:218:60 Unresolved reference: bgUri
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:223:40 Unresolved reference: btnPickBg
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:230:61 Unresolved reference: REQ_PICK_BG
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:233:40 Unresolved reference: btnClearBg
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:235:23 Unresolved reference: bgUri
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:237:21 Unresolved reference: applyBackground
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:244:43 Unresolved reference: bgPreview
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:245:20 Unresolved reference: bgDim
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:250:40 Unresolved reference: btnApplyCustom
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:253:21 Unresolved reference: applySkinNow
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:256:40 Unresolved reference: btnResetSkin
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:258:23 Unresolved reference: csMode
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:259:23 Unresolved reference: csAccent
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:260:23 Unresolved reference: csAccent2
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:261:23 Unresolved reference: csBaseFollow
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:262:23 Unresolved reference: csBrightness
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:263:23 Unresolved reference: csAccentLevel
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:264:23 Unresolved reference: bgUri
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:265:23 Unresolved reference: bgDim
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:267:21 Unresolved reference: applySkinNow
 
 FAILURE: Build failed with an exception.
 
@@ -206,6 +183,36 @@ org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:com
 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:116)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
 Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
@@ -332,6 +339,36 @@ Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionExcept
 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:116)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
 Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilation error. See log for more details
@@ -368,5 +405,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 1m
+BUILD FAILED in 42s
 30 actionable tasks: 30 executed
