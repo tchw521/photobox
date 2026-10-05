@@ -183,6 +183,79 @@ object Ui {
         false
     }
 
+    // ------------------------------------------------------------ 滑动多选
+    /**
+     * 给 RecyclerView 装上「按住拖动划过即批量选中」。
+     *
+     * 实现要点：
+     * 1. 只在**已进入多选模式**后生效，普通点击浏览不受影响。
+     * 2. ACTION_DOWN 时锁定父容器不拦截事件，避免纵向滚动抢走触摸。
+     * 3. MOVE 时按手指落点用 findChildViewUnder 找当前项，
+     *    只**新增**不移除，因此划过的项会被逐个选中；
+     *    反向划回不会取消，符合「扫过一片」的直觉。
+     * 4. 到达列表边缘（顶部/底部 60px 内）自动滚动，便于跨屏连续选择。
+     *
+     * @param pick    把某一下标加入选中
+     * @param changed 选中集合变化后刷新界面
+     */
+    fun swipeSelect(
+        rv: RecyclerView,
+        isSelectMode: () -> Boolean,
+        pick: (Int) -> Unit,
+        changed: () -> Unit,
+    ) {
+        var swiping = false
+        var lastPos = -1
+        val autoScroll = Runnable {
+            CrashGuard.guard { /* 由外层 post 驱动 */ }
+        }
+        val touch = object : RecyclerView.OnItemTouchListener {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: android.view.MotionEvent): Boolean {
+                if (!isSelectMode()) return false
+                when (e.actionMasked) {
+                    android.view.MotionEvent.ACTION_DOWN -> {
+                        rv.parent?.requestDisallowInterceptTouchEvent(true)
+                        swiping = true
+                        lastPos = hitTest(rv, e.x, e.y)
+                        if (lastPos >= 0) { pick(lastPos); changed() }
+                    }
+                    android.view.MotionEvent.ACTION_MOVE -> {
+                        val pos = hitTest(rv, e.x, e.y)
+                        if (pos >= 0 && pos != lastPos) {
+                            lastPos = pos
+                            pick(pos)
+                            changed()
+                        }
+                        // 边缘自动滚动
+                        val h = rv.height
+                        val edge = 60
+                        when {
+                            e.y < edge -> rv.scrollBy(0, -24)
+                            e.y > h - edge -> rv.scrollBy(0, 24)
+                        }
+                    }
+                    android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
+                        swiping = false
+                        lastPos = -1
+                        rv.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                }
+                return false   // 不拦截，保证单击 / 长按仍能正常触发
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: android.view.MotionEvent) {}
+            override fun onRequestDisallowInterceptTouchEvent(b: Boolean) {}
+        }
+        rv.addOnItemTouchListener(touch)
+        autoScroll.run()
+    }
+
+    /** 按坐标反查列表项下标。 */
+    private fun hitTest(rv: RecyclerView, x: Float, y: Float): Int {
+        val v = rv.findChildViewUnder(x, y) ?: return -1
+        return rv.getChildAdapterPosition(v)
+    }
+
     // ------------------------------------------------------------ 设置行（复用）
     /**
      * 开关行。设置页所有开关统一用此方法构建，样式随皮肤，不重复写 XML。
