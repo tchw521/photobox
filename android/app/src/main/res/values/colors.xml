@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg">#FF160A26</color>
+    <!-- 皮肤色板（默认极光紫），切换皮肤时由 SkinActivity 动态覆写 -->
+    <color name="bg_top">#FF1A0B2E</color>
+    <color name="bg_bottom">#FF0D0518</color>
     <color name="surface">#FF241040</color>
-    <color name="glass">#14FFFFFF</color>
-    <color name="stroke">#18FFFFFF</color>
+    <color name="surface_strong">#E61A0B2E</color>
+    <color name="glass">#1FFFFFFF</color>
+    <color name="glass_strong">#2BFFFFFF</color>
+    <color name="stroke">#24FFFFFF</color>
     <color name="accent">#FFA855F7</color>
     <color name="accent_soft">#33A855F7</color>
     <color name="danger">#FFF43F5E</color>
+    <color name="ok">#FF34D399</color>
     <color name="text">#FFF4F0FF</color>
     <color name="dim">#FF9A8BBF</color>
-    <color name="ok">#FF34D399</color>
 </resources>
