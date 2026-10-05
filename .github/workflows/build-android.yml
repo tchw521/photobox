@@ -28,9 +28,8 @@ jobs:
           PB_KEYSTORE_B64: ${{ secrets.PB_KEYSTORE_B64 }}
         run: |
           # 密钥固定存放在仓库 Secret 中，保证每次构建签名完全一致
-          echo "$PB_KEYSTORE_B64" | base64 -d > photobox.jks
+          printf '%s' "$PB_KEYSTORE_B64" | base64 -d > photobox.jks
           ls -lh photobox.jks
-          keytool -list -keystore photobox.jks -storepass "${{ secrets.PB_STORE_PASS }}" | head -5
 
       - name: 授予 gradlew 执行权限
         run: chmod +x android/gradlew
