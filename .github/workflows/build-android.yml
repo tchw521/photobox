@@ -37,10 +37,17 @@ jobs:
         working-directory: android
         env:
           PB_KEYSTORE: ${{ github.workspace }}/photobox.jks
-          PB_STORE_PASS: photobox
-          PB_ALIAS: photobox
-          PB_KEY_PASS: photobox
+          PB_STORE_PASS: ${{ secrets.PB_STORE_PASS }}
+          PB_ALIAS: ${{ secrets.PB_ALIAS }}
+          PB_KEY_PASS: ${{ secrets.PB_KEY_PASS }}
         run: ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee ../build.log; echo "EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: 验证签名一致性
+        run: |
+          BT=$(ls -d /usr/local/lib/android/sdk/build-tools/*/ | tail -1)
+          APK=$(find android/app/build/outputs -name "app-release.apk" | head -1)
+          echo "APK: $APK"
+          "${BT}apksigner" verify --print-certs "$APK" | head -8
 
       - name: 收集 APK
         id: collect
