@@ -46,10 +46,10 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:generateReleaseAssets UP-TO-DATE
+> Task :app:processReleaseManifestForPackage
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
-> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
 > Task :app:bundleReleaseResources
 > Task :app:sdkReleaseDependencyData
@@ -76,11 +76,6 @@ e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:176:50 Unresolved reference: dupImg
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:177:50 Unresolved reference: dupFlag
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:309:61 Unresolved reference: page_dedup
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:363:16 Unresolved reference: swipeSelect
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:366:26 Cannot infer a type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:840:64 Unresolved reference: trashGuard
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:841:19 Unresolved reference: trashGuard
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:977:20 Unresolved reference: trashGuard
 
 FAILURE: Build failed with an exception.
 
@@ -288,5 +283,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 49s
+BUILD FAILED in 52s
 30 actionable tasks: 30 executed
