@@ -1,5 +1,12 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp"
-    android:viewportWidth="24" android:viewportHeight="24" android:tint="?attr/colorControlNormal">
-    <path android:fillColor="@android:color/white" android:pathData="M5,14h4v6H5v-6zM10,9h4v11h-4V9zM15,4h4v16h-4V4z" android:fillAlpha="0.9"/>
-    <path android:fillColor="@android:color/white" android:pathData="M3,20.6h18V22H3z" android:fillAlpha="0.5"/>
+    android:viewportWidth="24" android:viewportHeight="24">
+    <!-- 三根递增柱 + 基线 -->
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.55"
+        android:pathData="M3.6,13.6h3.8v5.2H3.6z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.78"
+        android:pathData="M10.1,9.6h3.8v9.2h-3.8z"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M16.6,4.8h3.8v14h-3.8z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.35"
+        android:pathData="M2.4,20.4h19.2v1.6H2.4z"/>
 </vector>
