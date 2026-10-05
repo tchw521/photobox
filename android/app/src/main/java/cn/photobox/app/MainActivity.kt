@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.7.0"
+        const val APP_VERSION = "1.8.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -70,12 +70,21 @@ class MainActivity : ComponentActivity() {
 
     // ---------- 生命周期
     override fun onCreate(s: Bundle?) {
-        // setTheme 必须在 super.onCreate 前；此处只用 applicationContext 读偏好，
-        // 避免在 Activity 尚未完成初始化时触碰自身 Context。
-        SkinNow.load(applicationContext)
-        setTheme(Skins.style(SkinNow.skin.key))
+        // setTheme 必须在 super.onCreate 之前
+        CrashGuard.result({ SkinNow.load(applicationContext); Skins.style(SkinNow.skin.key) }, R.style.Skin_Aurora).let {
+            setTheme(it)
+        }
         super.onCreate(s)
-        CrashGuard.install(applicationContext)
+        CrashGuard.install(applicationContext)      // 双保险：App 内已装一次
+
+        // 整体兜底：即便初始化失败，也要保证有界面，而不是黑屏
+        CrashGuard.guard { initUi() }
+        // 先渲染主页，界面立即可见；权限与扫描并行进行
+        CrashGuard.guard { switchTab(tab) }
+        CrashGuard.guard { ensurePermission { loadPhotos() } }
+    }
+
+    private fun initUi() {
         setContentView(R.layout.activity_main)
         Store.loadSettings(this)
         gridView = Store.defaultGrid
@@ -99,20 +108,15 @@ class MainActivity : ComponentActivity() {
         }
 
         applyBars()
-        // 关键：先渲染主页，界面立刻可见。
-        // 此前主页要等权限授予 + 扫描完成才出现，任何一环延迟都会表现为"卡在启动页"。
-        switchTab(tab)
-        ensurePermission { loadPhotos() }
     }
 
     /** 状态栏与导航栏半透明，让背景渐变透上来，形成整体通透感。 */
     private fun applyBars() {
-        val v = TypedValue()
-        theme.resolveAttribute(R.attr.bgTopColor, v, true)
-        val top = v.data
-        theme.resolveAttribute(R.attr.bgBottomColor, v, true)
-        window.statusBarColor = top
-        window.navigationBarColor = v.data
+        CrashGuard.guard {
+            val v = TypedValue()
+            if (theme.resolveAttribute(R.attr.bgTopColor, v, true)) window.statusBarColor = v.data
+            if (theme.resolveAttribute(R.attr.bgBottomColor, v, true)) window.navigationBarColor = v.data
+        }
     }
 
     /** 换肤：写入偏好 → 重建 Activity，主题属性自动生效。 */
@@ -189,6 +193,7 @@ class MainActivity : ComponentActivity() {
 
     // ---------- 侧边栏
     private fun renderSidebar() {
+        if (!::albumAdapter.isInitialized) return
         val fav = Store.favorites(this)
         val rows = ArrayList<AlbumAdapter.Row>()
         rows.add(AlbumAdapter.Row(KEY_ALL, getString(R.string.all_photos), photos.size, albumKey == KEY_ALL && tab == 0))
@@ -215,10 +220,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun switchTabInner(t: Int) {
+        // lateinit 未就绪说明界面初始化失败过，先补做一次，避免二次崩溃
+        if (!::sidebar.isInitialized || !::albumAdapter.isInitialized) initUi()
         tab = t
         val holder = findViewById<android.widget.FrameLayout>(R.id.content)
         holder.removeAllViews()
-        sidebar.visibility = if (t == 1 || t == 2) View.GONE else View.VISIBLE
+        if (::sidebar.isInitialized) {
+            sidebar.visibility = if (t == 1 || t == 2) View.GONE else View.VISIBLE
+        }
         when (t) {
             0 -> { libraryView = layoutInflater.inflate(R.layout.page_library, holder, false); holder.addView(libraryView); bindLibrary(libraryView!!) }
             1 -> { cardsView = layoutInflater.inflate(R.layout.page_cards, holder, false); holder.addView(cardsView); bindCards(cardsView!!) }
