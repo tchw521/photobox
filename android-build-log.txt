@@ -47,48 +47,20 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:generateReleaseAssets UP-TO-DATE
 > Task :app:mergeReleaseAssets
-> Task :app:processReleaseManifestForPackage
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
+> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
-> Task :app:sdkReleaseDependencyData
-> Task :app:validateSigningRelease
 > Task :app:bundleReleaseResources
-> Task :app:writeReleaseAppMetadata
+> Task :app:sdkReleaseDependencyData
 > Task :app:processReleaseResources
+> Task :app:validateSigningRelease
+> Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
 
-> Task :app:compileReleaseKotlin
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:57:33 Unresolved reference: KEY_ALL
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:57:64 Unresolved reference: KEY_FAV
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:58:33 Unresolved reference: KEY_TRASH
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CrashGuard.kt:46:71 Unresolved reference: APP_VERSION
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:43:28 Unresolved reference: KEY_ALL
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:48:15 Conflicting declarations: public companion object, public companion object
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:70:5 Only one companion object is allowed per class
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:70:15 Conflicting declarations: public companion object, public companion object
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:263:13 Unresolved reference: KEY_ALL
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:264:13 Unresolved reference: KEY_FAV
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:285:35 Unresolved reference: KEY_ALL
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:285:101 Unresolved reference: KEY_ALL
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:286:35 Unresolved reference: KEY_FAV
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:286:97 Unresolved reference: KEY_FAV
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:290:35 Unresolved reference: KEY_TRASH
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:297:13 Unresolved reference: KEY_TRASH
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:298:13 Unresolved reference: KEY_FAV
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:298:37 Unresolved reference: KEY_FAV
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:433:38 Unresolved reference: SORT_LABELS
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:463:30 Unresolved reference: SORT_ICONS
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:716:21 Unresolved reference: KEY_ALL
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:716:40 Unresolved reference: KEY_FAV
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:716:59 Unresolved reference: KEY_TRASH
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:838:49 Unresolved reference: SORT_LABELS
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:839:40 Unresolved reference: SORT_LABELS
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:911:36 Unresolved reference: APP_VERSION
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:976:5 Conflicting overloads: protected open fun onActivityResult(request: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity, protected open fun onActivityResult(code: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:1081:5 Conflicting overloads: protected open fun onActivityResult(request: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity, protected open fun onActivityResult(code: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity
-
 > Task :app:compileReleaseKotlin FAILED
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:973:5 Conflicting overloads: protected open fun onActivityResult(request: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity, protected open fun onActivityResult(code: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:1078:5 Conflicting overloads: protected open fun onActivityResult(request: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity, protected open fun onActivityResult(code: Int, result: Int, data: Intent?): Unit defined in cn.photobox.app.MainActivity
 
 FAILURE: Build failed with an exception.
 
@@ -356,5 +328,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 1m 12s
+BUILD FAILED in 57s
 30 actionable tasks: 30 executed
