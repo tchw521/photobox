@@ -110,7 +110,7 @@ object Store {
         csAccent = s.getInt("csAccent", 0xFF059669.toInt())
         csAccent2 = s.getInt("csAccent2", 0xFF0284C7.toInt())
         csBaseFollow = s.getBoolean("csBaseFollow", true)
-        csBrightness = s.getInt("csBrightness", 45)
+        csBrightness = s.getInt("csBrightness", 38)
         csAccentLevel = s.getInt("csAccentLevel", 60)
         bgUri = s.getString("bgUri", "") ?: ""
         bgDim = s.getInt("bgDim", 34)
