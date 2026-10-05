@@ -42,7 +42,6 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processReleaseManifest
 > Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
-> Task :app:processReleaseManifestForPackage
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
@@ -55,12 +54,12 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
-> Task :app:processReleaseResources
+> Task :app:processReleaseManifestForPackage
 > Task :app:bundleReleaseResources
+> Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:190:27 Type mismatch: inferred type is (Photo, Int) -> Boolean but (Photo, Int, View) -> Boolean was expected
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:190:29 Expected 3 parameters of types Photo, Int, View
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:273:22 Unresolved reference: confirmDelete
 
 FAILURE: Build failed with an exception.
 
@@ -268,5 +267,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 56s
+BUILD FAILED in 58s
 30 actionable tasks: 30 executed
