@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- 基础主题：液态玻璃质感，状态栏 / 导航栏全透明以透出渐变底 -->
+    <!-- 基础主题：状态栏 / 导航栏取皮肤底色，与背景渐变连成一体 -->
     <style name="Base.PhotoBox" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowBackground">@drawable/bg_app</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">?attr/bgTopColor</item>
+        <item name="android:navigationBarColor">?attr/bgBottomColor</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
 
         <item name="colorPrimary">?attr/accentColor</item>
         <item name="colorOnPrimary">?attr/textColorMain</item>
