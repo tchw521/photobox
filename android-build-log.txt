@@ -46,36 +46,22 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:generateReleaseAssets UP-TO-DATE
-> Task :app:processReleaseManifestForPackage
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
-> Task :app:bundleReleaseResources
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
-> Task :app:processReleaseResources
 > Task :app:writeReleaseSigningConfigVersions
+> Task :app:processReleaseManifestForPackage
+> Task :app:bundleReleaseResources
+> Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:37:42 Unresolved reference: dedupSummary
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:38:39 Unresolved reference: dedupList
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:43:40 Unresolved reference: btnRefreshDup
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:46:40 Unresolved reference: btnCleanDup
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:55:21 Unresolved reference: btnCleanDup
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:55:39 Unresolved reference: btnRefreshDup
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:55:54 Overload resolution ambiguity: 
-public inline fun <T> Iterable<TypeVariable(T)>.forEach(action: (TypeVariable(T)) -> Unit): Unit defined in kotlin.collections
-public inline fun <K, V> Map<out TypeVariable(K), TypeVariable(V)>.forEach(action: (Map.Entry<TypeVariable(K), TypeVariable(V)>) -> Unit): Unit defined in kotlin.collections
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:55:64 Cannot infer a type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:118:54 Unresolved reference: dupMeta
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:119:60 Unresolved reference: dupThumbs
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:123:63 Unresolved reference: item_dedup
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:142:69 Unresolved reference: item_dup_thumb
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:176:50 Unresolved reference: dupImg
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:177:50 Unresolved reference: dupFlag
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:309:61 Unresolved reference: page_dedup
 
 FAILURE: Build failed with an exception.
 
@@ -283,5 +269,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 52s
+BUILD FAILED in 50s
 30 actionable tasks: 30 executed
