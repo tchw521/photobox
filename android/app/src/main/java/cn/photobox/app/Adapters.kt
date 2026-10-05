@@ -1,7 +1,14 @@
 package cn.photobox.app
 
+import android.util.TypedValue
+
+/** 从当前主题取色，避免硬编码导致换肤后不跟随。 */
+private fun resolveColor(c: android.content.Context, attr: Int): Int {
+    val v = TypedValue()
+    return if (c.theme.resolveAttribute(attr, v, true)) v.data else 0
+}
+
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +49,7 @@ class AlbumAdapter(
             if (r.selected) R.drawable.bg_bubble_on else R.drawable.bg_bubble
         )
         h.name.setTextColor(
-            ContextCompat.getColor(h.itemView.context, if (r.selected) R.color.text else R.color.dim)
+            resolveColor(h.itemView.context, if (r.selected) R.attr.textColorMain else R.attr.textColorDim)
         )
         h.count.text = if (r.count > 0) r.count.toString() else ""
         h.itemView.setOnClickListener { onClick(r.key) }
@@ -72,7 +79,7 @@ class ChipAdapter(private val onClick: (String?) -> Unit) :
         val m = items[i]
         h.t.text = m
         val on = m == current
-        h.t.setTextColor(ContextCompat.getColor(h.itemView.context, if (on) R.color.accent else R.color.dim))
+        h.t.setTextColor(resolveColor(h.itemView.context, if (on) R.attr.accentColor else R.attr.textColorDim))
         h.t.setOnClickListener {
             current = if (current == m) null else m
             notifyDataSetChanged()
@@ -127,7 +134,8 @@ class PhotoAdapter(
         h.check?.visibility = if (sel && selectMode) View.VISIBLE else View.GONE
         h.mask?.visibility = if (sel && selectMode) View.VISIBLE else View.GONE
         h.rowRoot?.setBackgroundColor(
-            if (sel && selectMode) Color.parseColor("#33A855F7") else Color.parseColor("#14FFFFFF")
+            if (sel && selectMode) resolveColor(h.itemView.context, R.attr.accentSoftColor)
+            else resolveColor(h.itemView.context, R.attr.glassColor)
         )
         h.name?.text = p.name
         h.meta?.text = "${p.album} · ${p.dateText} · ${formatSize(p.size)}"
