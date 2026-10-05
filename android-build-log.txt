@@ -61,16 +61,16 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compileReleaseKotlin
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:233:24 No cast needed
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:392:22 Variable 'ok' initializer is redundant
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:143:17 Variable 'tv' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:173:34 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:174:38 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:175:43 'SYSTEM_UI_FLAG_LIGHT_STATUS_BAR: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:178:34 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:179:38 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:180:43 'SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:279:13 Variable 's' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:354:13 Variable 'selBar' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:757:26 Variable 'ok' initializer is redundant
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:144:17 Variable 'tv' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:174:34 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:175:38 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:176:43 'SYSTEM_UI_FLAG_LIGHT_STATUS_BAR: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:179:34 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:180:38 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:181:43 'SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:280:13 Variable 's' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:355:13 Variable 'selBar' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:758:26 Variable 'ok' initializer is redundant
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Repo.kt:269:20 Parameter 'c' is never used
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:217:21 Name shadowed: it
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:170:9 Parameter 'a' is never used
@@ -88,5 +88,5 @@ w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 > Task :app:createReleaseApkListingFileRedirect
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 1m 17s
+BUILD SUCCESSFUL in 1m 16s
 39 actionable tasks: 39 executed
