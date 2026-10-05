@@ -6,7 +6,7 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 
 /**
- * 皮肤：全部以代码中的颜色值定义，**不在 XML 里使用 ?attr/**。
+ * 皮肤：全部以代码中的颜色值定义，**不在 XML 里使用主题属性 ?attr**。
  *
  * 这样做的原因：ColorStateList / drawable XML 中的 `?attr/` 由资源框架解析并缓存，
  * 解析时机不受 setTheme() 控制，在部分设备上 inflate 时直接抛异常，
