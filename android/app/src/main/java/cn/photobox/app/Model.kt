@@ -77,6 +77,7 @@ object Store {
     // ---- 设置
     var previewActions = true
     var defaultGrid = true
+    var viewMode = 0                  // 0 宫格 1 列表 2 流式
     var cardModeMove = true
     var nameMarquee = true          // 相册名自动滚动
     var cardHint = true             // 卡片页显示手势提示
@@ -99,6 +100,9 @@ object Store {
         val s = sp(c)
         previewActions = s.getBoolean("previewActions", true)
         defaultGrid = s.getBoolean("defaultGrid", true)
+        // 旧版本只有宫格/列表两态，这里做一次迁移：false → 1（列表）
+        viewMode = if (s.contains("viewMode")) s.getInt("viewMode", 0).coerceIn(0, 2)
+                   else (if (s.getBoolean("defaultGrid", true)) 0 else 1)
         cardModeMove = s.getBoolean("cardModeMove", true)
         nameMarquee = s.getBoolean("nameMarquee", true)
         cardHint = s.getBoolean("cardHint", true)
@@ -120,6 +124,7 @@ object Store {
         sp(c).edit()
             .putBoolean("previewActions", previewActions)
             .putBoolean("defaultGrid", defaultGrid)
+            .putInt("viewMode", viewMode)
             .putBoolean("cardModeMove", cardModeMove)
             .putBoolean("nameMarquee", nameMarquee)
             .putBoolean("cardHint", cardHint)
