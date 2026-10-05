@@ -278,13 +278,29 @@ object Repo {
         return BitmapFactory.decodeFile(path, opt)
     }
 
+    /**
+     * @param px 目标边长；> 1440 视为高清模式，改用 ARGB_8888 保证画质，
+     *           并在 OOM 时自动降采样重试，避免直接崩溃。
+     */
     fun decodeStream(c: Context, p: Photo, px: Int): Bitmap? {
         val uri = uriOf(p)
         val head = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         c.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, head) }
+        val hd = px > 1440
+        val sample = calcSample(head.outWidth, head.outHeight, px)
+        return try {
+            decode(uriOf(p), c, sample, hd)
+        } catch (e: OutOfMemoryError) {
+            CrashGuard.log(e)
+            // 降采样一级后重试，仍失败则交给缩略图路径
+            runCatching { decode(uri, c, sample * 2, false) }.getOrNull()
+        }
+    }
+
+    private fun decode(uri: android.net.Uri, c: Context, sample: Int, hd: Boolean): Bitmap? {
         val opt = BitmapFactory.Options().apply {
-            inSampleSize = calcSample(head.outWidth, head.outHeight, px)
-            inPreferredConfig = Bitmap.Config.RGB_565
+            inSampleSize = sample.coerceIn(1, 32)
+            inPreferredConfig = if (hd) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565
         }
         return c.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opt) }
     }
