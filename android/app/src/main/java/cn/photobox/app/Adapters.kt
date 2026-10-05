@@ -17,6 +17,7 @@ import kotlin.math.roundToInt
  */
 class AlbumAdapter(
     private val onClick: (String) -> Unit,
+    private val onLongClick: ((String) -> Unit)? = null,
 ) : RecyclerView.Adapter<AlbumAdapter.H>() {
 
     data class Row(val key: String, val label: String, val count: Int, val selected: Boolean)
@@ -57,6 +58,10 @@ class AlbumAdapter(
         h.count.text = if (r.count > 0) r.count.toString() else ""
         h.count.setTextColor(s.textDim)
         h.itemView.setOnClickListener { CrashGuard.guard { onClick(r.key) } }
+        h.itemView.setOnLongClickListener {
+            onLongClick?.let { cb -> CrashGuard.guard { cb(r.key) } }
+            true
+        }
         setupMarquee(h, r.label)
     }
 
