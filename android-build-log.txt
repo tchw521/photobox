@@ -34,14 +34,15 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mapReleaseSourceSetPaths
 > Task :app:generateReleaseResources
 > Task :app:packageReleaseResources
-> Task :app:mergeReleaseResources
 > Task :app:createReleaseCompatibleScreenManifests
 > Task :app:extractDeepLinksRelease
 > Task :app:parseReleaseLocalResources
+> Task :app:mergeReleaseResources
 > Task :app:processReleaseMainManifest
 > Task :app:processReleaseManifest
 > Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
+> Task :app:processReleaseManifestForPackage
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
@@ -49,7 +50,6 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
-> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
@@ -59,6 +59,9 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:137:9 Unresolved reference: MaterialAlertDialogBuilder
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:141:43 Cannot infer a type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:141:46 Cannot infer a type for this parameter. Please specify it explicitly.
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:330:24 Unresolved reference: showAlbumSheet
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:330:41 Cannot infer a type for this parameter. Please specify it explicitly.
 
@@ -268,5 +271,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 48s
+BUILD FAILED in 56s
 30 actionable tasks: 30 executed
