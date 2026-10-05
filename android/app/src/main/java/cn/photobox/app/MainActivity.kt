@@ -78,7 +78,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.6.0"
+        const val APP_VERSION = "1.6.1"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
@@ -133,11 +133,12 @@ class MainActivity : Activity() {
         nav?.background = Glass.floating(s, 26f)
         nav?.let { v ->
             val lp = v.layoutParams as? android.widget.LinearLayout.LayoutParams
-            // 贴近底部：左右 14dp、底部仅 5dp，保留悬浮感又不过分抬高
-            lp?.setMargins(14.dp, 0, 14.dp, 5.dp)
+            // 进一步贴近底部：左右 12dp、底部 2dp
+            lp?.setMargins(12.dp, 0, 12.dp, 2.dp)
             v.layoutParams = lp
-            v.setPadding(0, 7, 0, 7)
-            v.elevation = 8f * resources.displayMetrics.density
+            v.setPadding(0, 6, 0, 6)
+            // 悬浮感靠阴影而非高度
+            v.elevation = 6f * resources.displayMetrics.density
         }
         val items = listOf(
             Triple(R.id.navLibrary, R.id.navLibraryIcon, R.id.navLibraryText) to R.drawable.ic_tab_library,
@@ -843,7 +844,7 @@ class MainActivity : Activity() {
 
         // ---- 外观
         body.addView(Ui.section(this, "外观"))
-        body.addView(Ui.actionRow(this, "皮肤", SkinNow.skin.name) { switchTab(5) })
+        // 皮肤入口只保留右上角按钮，设置列表里不再重复
         body.addView(Ui.actionRow(this, "默认视图", VIEW_LABELS[Store.viewMode].removePrefix("已切换为")) {
             Ui.listSheet(this, "默认视图", VIEW_LABELS.map { it.removePrefix("已切换为") }) { i ->
                 CrashGuard.guard {
@@ -910,6 +911,13 @@ class MainActivity : Activity() {
 
         // ---- 操作
         body.addView(Ui.section(this, "操作"))
+        body.addView(Ui.actionRow(this, "重置卡片整理进度", "${Store.cardDoneIds.size} 张已处理") {
+            CrashGuard.guard {
+                CardsPage.resetSession()
+                Store.saveSettings(this)
+                Ui.toast(this, "已重置，下次进入卡片页从头开始")
+            }
+        })
         body.addView(Ui.actionRow(this, "重新扫描照片", "") {
             Thumbs.clear(); loadPhotos(); Ui.toast(this, "扫描完成")
         })
