@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class MainActivity : ComponentActivity() {
 
@@ -54,6 +55,13 @@ class MainActivity : ComponentActivity() {
     private lateinit var cards: CardsPage
 
     companion object {
+        val SORT_LABELS = arrayOf("日期新→旧", "日期旧→新", "名称", "大小")
+        val SORT_ICONS = intArrayOf(
+            android.R.drawable.ic_menu_recent_history,
+            android.R.drawable.ic_menu_today,
+            android.R.drawable.ic_menu_sort_alphabetically,
+            android.R.drawable.ic_menu_sort_by_size,
+        )
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -187,11 +195,12 @@ class MainActivity : ComponentActivity() {
                 if (photoAdapter?.selectMode == true) { toggleSelect(p); refreshLibrary() }
                 else preview(p)
             },
-            onLongClick = { p, _ ->
+            onLongClick = { p, _, anchor ->
                 photoAdapter?.selectMode = true
                 photoAdapter?.selected?.add(p.id)
-                Toast.makeText(this, "已进入多选，可继续点选更多", Toast.LENGTH_SHORT).show()
-                refreshLibrary(); true
+                refreshLibrary()
+                showPhotoMenu(p, anchor)
+                true
             }
         )
         applyLayoutManager(list)
@@ -210,11 +219,16 @@ class MainActivity : ComponentActivity() {
             gridView = !gridView
             Store.defaultGrid = gridView; Store.saveSettings(this)
             switchTab(0)
+            Toast.makeText(this, if (gridView) "已切换为宫格" else "已切换为列表", Toast.LENGTH_SHORT).show()
         }
         v.findViewById<ImageButton>(R.id.btnSort).setOnClickListener {
-            sort = (sort + 1) % 4; refreshLibrary()
-            Toast.makeText(this, "排序：${arrayOf("日期新→旧", "日期旧→新", "名称", "大小")[sort]}", Toast.LENGTH_SHORT).show()
+            sort = (sort + 1) % 4
+            applyToolbarIcons(v)
+            refreshLibrary()
+            Toast.makeText(this, "排序：${SORT_LABELS[sort]}", Toast.LENGTH_SHORT).show()
         }
+
+        applyToolbarIcons(v)
 
         v.findViewById<Button>(R.id.btnSelAll).setOnClickListener {
             photoAdapter?.selected?.addAll(visible().map { it.id }); refreshLibrary()
@@ -226,6 +240,52 @@ class MainActivity : ComponentActivity() {
         v.findViewById<Button>(R.id.btnDelete).setOnClickListener { selDelete() }
 
         refreshLibrary()
+    }
+
+    /** 右上角两个按钮的图标随当前视图 / 排序实时变化。 */
+    private fun applyToolbarIcons(v: View) {
+        v.findViewById<ImageButton>(R.id.btnView).setImageResource(
+            if (gridView) android.R.drawable.ic_menu_gallery else android.R.drawable.ic_menu_agenda
+        )
+        v.findViewById<ImageButton>(R.id.btnSort).setImageResource(SORT_ICONS[sort])
+    }
+
+    /** 长按单张照片弹出的操作菜单：增删改 + 进入多选。 */
+    private fun showPhotoMenu(p: Photo, anchor: View) {
+        val fav = Store.favorites(this)
+        val isFav = fav.contains(p.id.toString())
+        val menu = android.widget.PopupMenu(this, anchor)
+        menu.menu.add(0, 1, 0, if (isFav) "取消收藏" else "收藏")
+        menu.menu.add(0, 2, 0, "移动到相册")
+        menu.menu.add(0, 3, 0, "重命名")
+        menu.menu.add(0, 4, 0, "删除到回收站")
+        menu.menu.add(0, 5, 0, "多选更多")
+        menu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                1 -> {
+                    if (isFav) fav.remove(p.id.toString()) else fav.add(p.id.toString())
+                    Store.setFavorites(this, fav)
+                    Toast.makeText(this, if (isFav) "已取消收藏" else "已收藏", Toast.LENGTH_SHORT).show()
+                    exitSelect()
+                }
+                2 -> { showAlbumSheet("移动「${p.name}」到相册") { a -> moveOne(p, a) } }
+                3 -> renameOne(p)
+                4 -> confirmDelete(listOf(p))
+                5 -> Toast.makeText(this, "已进入多选，可继续点选更多", Toast.LENGTH_SHORT).show()
+            }
+            true
+        }
+        menu.show()
+    }
+
+    private fun moveOne(p: Photo, album: String) {
+        Thread {
+            val ok = Repo.copyToAlbum(this, p, album)
+            runOnUiThread {
+                Toast.makeText(this, if (ok) "已移动到「$album」" else "移动失败", Toast.LENGTH_SHORT).show()
+                exitSelect(); loadPhotos()
+            }
+        }.start()
     }
 
     private fun applyLayoutManager(list: RecyclerView) {
@@ -301,10 +361,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun selRename() {
-        val p = selectedPhotos().firstOrNull() ?: return
+    private fun selRename() { renameOne(selectedPhotos().firstOrNull() ?: return) }
+
+    private fun renameOne(p: Photo) {
         val input = EditText(this).apply { setText(p.name.substringBeforeLast('.')) }
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("重命名")
             .setView(input)
             .setNegativeButton("取消", null)
@@ -321,7 +382,7 @@ class MainActivity : ComponentActivity() {
     private fun selDelete() {
         val list = selectedPhotos()
         if (list.isEmpty()) return
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("删除所选")
             .setMessage("这 ${list.size} 张会先移入回收站，可还原。")
             .setNegativeButton("取消", null)
@@ -374,7 +435,7 @@ class MainActivity : ComponentActivity() {
     private fun preview(p: Photo) {
         val fav = Store.favorites(this)
         val isFav = fav.contains(p.id.toString())
-        val b = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+        val b = MaterialAlertDialogBuilder(this)
             .setTitle(p.name)
             .setMessage("${p.album} · ${p.dateText} · ${formatSize(p.size)}")
             .setNegativeButton("关闭", null)
@@ -437,7 +498,7 @@ class MainActivity : ComponentActivity() {
         list.adapter = trashAdapter
         trashAdapter?.submit(items)
         v.findViewById<Button>(R.id.btnEmpty).setOnClickListener {
-            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle("清空回收站")
                 .setMessage("将彻底删除 ${items.size} 项，无法恢复。")
                 .setNegativeButton("取消", null)
