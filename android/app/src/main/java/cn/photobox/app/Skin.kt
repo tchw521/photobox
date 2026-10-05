@@ -39,42 +39,42 @@ object Skins {
      */
     val ALL = listOf(
         Skin("mint", "薄荷清新",
-            0xFFF2FBF7.toInt(), 0xFFE8F6EF.toInt(), 0xFFDDEFE6.toInt(),
+            0xFFE4EFE9.toInt(), 0xFFD8E7DE.toInt(), 0xFFCADCD2.toInt(),
             0x4010B981.toInt(), 0x2A6EE7B7.toInt(),
             0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E0F766E.toInt(),
             0xFF059669.toInt(), 0x3310B981.toInt(),
             0xFF12211C.toInt(), 0xFF5B7A6E.toInt(),
             0xFFDC2626.toInt(), 0xFF0F766E.toInt()),
         Skin("ocean", "深海幽蓝",
-            0xFFF1F8FD.toInt(), 0xFFE6F2FB.toInt(), 0xFFD8EAF6.toInt(),
+            0xFFE2EDF6.toInt(), 0xFFD5E4F1.toInt(), 0xFFC6D8EA.toInt(),
             0x400EA5E9.toInt(), 0x2A7DD3FC.toInt(),
             0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E0C4A6E.toInt(),
             0xFF0284C7.toInt(), 0x330EA5E9.toInt(),
             0xFF0F1E2A.toInt(), 0xFF57738A.toInt(),
             0xFFDC2626.toInt(), 0xFF0E7490.toInt()),
         Skin("grape", "葡萄紫韵",
-            0xFFF7F4FD.toInt(), 0xFFEFEAFA.toInt(), 0xFFE4DDF6.toInt(),
+            0xFFEAE4F6.toInt(), 0xFFDED7EF.toInt(), 0xFFCFC6E6.toInt(),
             0x408B5CF6.toInt(), 0x2AC4B5FD.toInt(),
             0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E4C1D95.toInt(),
             0xFF7C3AED.toInt(), 0x338B5CF6.toInt(),
             0xFF1B1533.toInt(), 0xFF6E5F92.toInt(),
             0xFFDC2626.toInt(), 0xFF6D28D9.toInt()),
         Skin("sakura", "樱花粉",
-            0xFFFDF3F8.toInt(), 0xFFFAE9F1.toInt(), 0xFFF6DEE9.toInt(),
+            0xFFF4E5EE.toInt(), 0xFFEAD8E4.toInt(), 0xFFDDC7D6.toInt(),
             0x40EC4899.toInt(), 0x2AF9A8D4.toInt(),
             0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E831843.toInt(),
             0xFFDB2777.toInt(), 0x33EC4899.toInt(),
             0xFF2A1620.toInt(), 0xFF8C6478.toInt(),
             0xFFDC2626.toInt(), 0xFFBE185D.toInt()),
         Skin("amber", "琥珀暖橙",
-            0xFFFEF8F0.toInt(), 0xFFFDF1E3.toInt(), 0xFFFAE7D2.toInt(),
+            0xFFF5EADC.toInt(), 0xFFEEDFCB.toInt(), 0xFFE1CFB7.toInt(),
             0x40F59E0B.toInt(), 0x2AFCD34D.toInt(),
             0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E78350F.toInt(),
             0xFFD97706.toInt(), 0x33F59E0B.toInt(),
             0xFF2A1E10.toInt(), 0xFF8A6C4A.toInt(),
             0xFFDC2626.toInt(), 0xFFB45309.toInt()),
         Skin("forest", "森林墨绿",
-            0xFFF0F7F2.toInt(), 0xFFE4F0E8.toInt(), 0xFFD6E6DC.toInt(),
+            0xFFE1EAE3.toInt(), 0xFFD3E0D7.toInt(), 0xFFC4D3C9.toInt(),
             0x40059669.toInt(), 0x2A34D399.toInt(),
             0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E064E3B.toInt(),
             0xFF047857.toInt(), 0x33059669.toInt(),
@@ -82,7 +82,62 @@ object Skins {
             0xFFDC2626.toInt(), 0xFF065F46.toInt()),
     )
 
-    fun of(key: String): Skin = ALL.firstOrNull { it.key == key } ?: ALL[0]
+    const val KEY_CUSTOM = "custom"
+
+    fun of(key: String): Skin =
+        if (key == KEY_CUSTOM) custom() else ALL.firstOrNull { it.key == key } ?: ALL[0]
+
+    /**
+     * 依据自定义参数生成皮肤。
+     *
+     * 背景色相取主色（或辅色，当底色未跟随主色时），
+     * 明度由「背景亮度」滑块决定：浅色模式 0.78~0.96，深色模式 0.06~0.24。
+     * 主色本身再由「主色明度」滑块单独调整。
+     */
+    fun custom(): Skin {
+        val dark = Store.csMode == 1
+        val t = (Store.csBrightness.coerceIn(0, 100)) / 100f
+        val baseHue = if (Store.csBaseFollow) Store.csAccent else Store.csAccent2
+        val hsv = FloatArray(3)
+        android.graphics.Color.colorToHSV(baseHue, hsv)
+        val l = if (dark) 0.06f + 0.18f * t else 0.78f + 0.18f * t
+        fun bg(v: Float): Int = android.graphics.Color.HSVToColor(
+            floatArrayOf(hsv[0], hsv[1] * 0.22f, v.coerceIn(0f, 1f))
+        )
+        val top = bg(l + 0.05f)
+        val mid = bg(l)
+        val bot = bg(l - 0.05f)
+
+        // 主色明度
+        val ah = FloatArray(3)
+        android.graphics.Color.colorToHSV(Store.csAccent, ah)
+        val al = if (dark) 0.55f + 0.30f * (Store.csAccentLevel / 100f)
+                 else 0.30f + 0.35f * (Store.csAccentLevel / 100f)
+        val accent = android.graphics.Color.HSVToColor(
+            floatArrayOf(ah[0], ah[1] * 0.85f, al.coerceIn(0.2f, 0.95f))
+        )
+        val accentSoft = (accent and 0x00FFFFFF) or 0x33000000
+
+        return if (dark) Skin(
+            KEY_CUSTOM, "自定义",
+            top, mid, bot,
+            (baseHue and 0x00FFFFFF) or 0x40000000,
+            (accent and 0x00FFFFFF) or 0x2A000000,
+            0x1EFFFFFF.toInt(), 0x30FFFFFF.toInt(), 0x2EFFFFFF.toInt(),
+            accent, accentSoft,
+            0xFFEDEFF2.toInt(), 0xFF9AA3AC.toInt(),
+            0xFFF87171.toInt(), 0xFF34D399.toInt(),
+        ) else Skin(
+            KEY_CUSTOM, "自定义",
+            top, mid, bot,
+            (baseHue and 0x00FFFFFF) or 0x40000000,
+            (accent and 0x00FFFFFF) or 0x2A000000,
+            0xBFFFFFFF.toInt(), 0xD9FFFFFF.toInt(), 0x33000000.toInt(),
+            accent, accentSoft,
+            0xFF16211C.toInt(), 0xFF54635C.toInt(),
+            0xFFDC2626.toInt(), 0xFF0F766E.toInt(),
+        )
+    }
 
     private const val P = "photobox"
     private const val K = "skin"
