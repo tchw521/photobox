@@ -42,7 +42,6 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processReleaseManifest
 > Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
-> Task :app:processReleaseManifestForPackage
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
@@ -50,6 +49,7 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
+> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
@@ -58,7 +58,7 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:bundleReleaseResources
 > Task :app:processReleaseResources
 
-> Task :app:compileReleaseKotlin
+> Task :app:compileReleaseKotlin FAILED
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:137:9 Unresolved reference: MaterialAlertDialogBuilder
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:141:43 Cannot infer a type for this parameter. Please specify it explicitly.
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:141:46 Cannot infer a type for this parameter. Please specify it explicitly.
@@ -67,8 +67,6 @@ e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Repo.kt:77:21 Unresolved reference: RecoverableSecurityException
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Repo.kt:95:21 Unresolved reference: RecoverableSecurityException
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Repo.kt:122:21 Unresolved reference: RecoverableSecurityException
-
-> Task :app:compileReleaseKotlin FAILED
 
 FAILURE: Build failed with an exception.
 
@@ -276,5 +274,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 59s
+BUILD FAILED in 57s
 30 actionable tasks: 30 executed
