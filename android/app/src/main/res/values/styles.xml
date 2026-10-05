@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 基础主题：液态玻璃质感，状态栏 / 导航栏全透明以透出渐变底 -->
+    <style name="Base.PhotoBox" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@drawable/bg_app</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+
+        <item name="colorPrimary">?attr/accentColor</item>
+        <item name="colorOnPrimary">?attr/textColorMain</item>
+        <item name="colorSurface">?attr/glassColor</item>
+        <item name="colorOnSurface">?attr/textColorMain</item>
+        <item name="colorControlNormal">?attr/textColorDim</item>
+        <item name="colorControlActivated">?attr/accentColor</item>
+
+        <item name="android:textColorPrimary">?attr/textColorMain</item>
+        <item name="android:textColorSecondary">?attr/textColorDim</item>
+        <item name="android:textColorHint">?attr/textColorDim</item>
+    </style>
+
+    <!-- ① 极光紫 -->
+    <style name="Skin.Aurora" parent="Base.PhotoBox">
+        <item name="bgTopColor">#FF1A0B2E</item>
+        <item name="bgBottomColor">#FF0D0518</item>
+        <item name="glassColor">#1FFFFFFF</item>
+        <item name="glassStrongColor">#2BFFFFFF</item>
+        <item name="strokeColor">#24FFFFFF</item>
+        <item name="surfaceStrongColor">#E61A0B2E</item>
+        <item name="accentColor">#FFA855F7</item>
+        <item name="accentSoftColor">#33A855F7</item>
+        <item name="textColorMain">#FFF4F0FF</item>
+        <item name="dangerColor">#FFF43F5E</item>
+        <item name="okColor">#FF34D399</item>
+        <item name="textColorDim">#FF9A8BBF</item>
+    </style>
+
+    <!-- ② 墨夜黑 -->
+    <style name="Skin.Ink" parent="Base.PhotoBox">
+        <item name="bgTopColor">#FF0E0E12</item>
+        <item name="bgBottomColor">#FF000000</item>
+        <item name="glassColor">#14FFFFFF</item>
+        <item name="glassStrongColor">#20FFFFFF</item>
+        <item name="strokeColor">#1FFFFFFF</item>
+        <item name="surfaceStrongColor">#E60E0E12</item>
+        <item name="accentColor">#FF7DD3FC</item>
+        <item name="accentSoftColor">#337DD3FC</item>
+        <item name="textColorMain">#FFE8EAED</item>
+        <item name="dangerColor">#FFF43F5E</item>
+        <item name="okColor">#FF34D399</item>
+        <item name="textColorDim">#FF8A8F98</item>
+    </style>
+
+    <!-- ③ 晨曦金 -->
+    <style name="Skin.Dawn" parent="Base.PhotoBox">
+        <item name="bgTopColor">#FF2B1A0F</item>
+        <item name="bgBottomColor">#FF140A04</item>
+        <item name="glassColor">#1FFFFFFF</item>
+        <item name="glassStrongColor">#2BFFFFFF</item>
+        <item name="strokeColor">#26FFD9A0</item>
+        <item name="surfaceStrongColor">#E62B1A0F</item>
+        <item name="accentColor">#FFFBBF24</item>
+        <item name="accentSoftColor">#33FBBF24</item>
+        <item name="textColorMain">#FFFFF6E8</item>
+        <item name="dangerColor">#FFF43F5E</item>
+        <item name="okColor">#FF34D399</item>
+        <item name="textColorDim">#FFC4A484</item>
+    </style>
+
+    <!-- ④ 冰川蓝 -->
+    <style name="Skin.Glacier" parent="Base.PhotoBox">
+        <item name="bgTopColor">#FF0A1A2E</item>
+        <item name="bgBottomColor">#FF04101C</item>
+        <item name="glassColor">#16FFFFFF</item>
+        <item name="glassStrongColor">#24FFFFFF</item>
+        <item name="strokeColor">#2293C5FD</item>
+        <item name="surfaceStrongColor">#E60A1A2E</item>
+        <item name="accentColor">#FF38BDF8</item>
+        <item name="accentSoftColor">#3338BDF8</item>
+        <item name="textColorMain">#FFEAF6FF</item>
+        <item name="dangerColor">#FFF43F5E</item>
+        <item name="okColor">#FF34D399</item>
+        <item name="textColorDim">#FF7FA3C4</item>
+    </style>
+
+    <!-- ⑤ 樱雾粉 -->
+    <style name="Skin.Sakura" parent="Base.PhotoBox">
+        <item name="bgTopColor">#FF2A1220</item>
+        <item name="bgBottomColor">#FF150710</item>
+        <item name="glassColor">#18FFFFFF</item>
+        <item name="glassStrongColor">#26FFFFFF</item>
+        <item name="strokeColor">#26F9A8D4</item>
+        <item name="surfaceStrongColor">#E62A1220</item>
+        <item name="accentColor">#FFF472B6</item>
+        <item name="accentSoftColor">#33F472B6</item>
+        <item name="textColorMain">#FFFFF0F6</item>
+        <item name="dangerColor">#FFF43F5E</item>
+        <item name="okColor">#FF34D399</item>
+        <item name="textColorDim">#FFC08CA8</item>
+    </style>
+
+    <!-- ⑥ 薄荷绿 -->
+    <style name="Skin.Mint" parent="Base.PhotoBox">
+        <item name="bgTopColor">#FF0B2119</item>
+        <item name="bgBottomColor">#FF04120C</item>
+        <item name="glassColor">#16FFFFFF</item>
+        <item name="glassStrongColor">#24FFFFFF</item>
+        <item name="strokeColor">#226EE7B7</item>
+        <item name="surfaceStrongColor">#E60B2119</item>
+        <item name="accentColor">#FF34D399</item>
+        <item name="accentSoftColor">#3334D399</item>
+        <item name="textColorMain">#FFEAFFF7</item>
+        <item name="dangerColor">#FFF43F5E</item>
+        <item name="okColor">#FF34D399</item>
+        <item name="textColorDim">#FF7FB8A4</item>
+    </style>
+
+    <!-- 底部导航选中指示 -->
+    <style name="NavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">?attr/accentSoftColor</item>
+    </style>
+</resources>
