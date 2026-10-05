@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  极简根布局：只负责结构，颜色与质感全部由代码设置。
+  布局中不使用任何 ?attr/，避免主题属性解析导致的 inflate 崩溃。
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:background="@drawable/bg_app">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent" android:layout_height="0dp"
         android:layout_weight="1" android:orientation="horizontal">
 
-        <!-- 左侧相册分类栏：宽度恒为界面 1/5 -->
+        <!-- 左侧相册栏：宽度恒为界面 1/5 -->
         <LinearLayout
             android:id="@+id/sidebar"
             android:layout_width="0dp" android:layout_height="match_parent"
             android:layout_weight="0.2" android:orientation="vertical"
-            android:background="?attr/glassColor" android:padding="5dp">
+            android:padding="5dp">
 
             <TextView
+                android:id="@+id/sidebarTitle"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="相册分类" android:textSize="11sp" android:textColor="?attr/textColorMain"
-                android:textStyle="bold" android:padding="5dp" android:gravity="center"
-                android:letterSpacing="0.05"/>
+                android:text="相册分类" android:textSize="11sp"
+                android:textStyle="bold" android:padding="5dp" android:gravity="center"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/albumList"
@@ -27,7 +31,8 @@
                 android:overScrollMode="never"/>
         </LinearLayout>
 
-        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="?attr/strokeColor"/>
+        <View android:id="@+id/divider"
+            android:layout_width="1dp" android:layout_height="match_parent"/>
 
         <FrameLayout
             android:id="@+id/content"
@@ -35,11 +40,43 @@
             android:layout_weight="0.8"/>
     </LinearLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+    <!-- 底部导航：三个自绘按钮，不使用 Material 组件 -->
+    <LinearLayout
         android:id="@+id/bottomNav"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:background="?attr/glassStrongColor"
-        app:menu="@menu/bottom_nav"
-        app:labelVisibilityMode="labeled"
-/>
+        android:orientation="horizontal" android:paddingTop="6dp" android:paddingBottom="6dp">
+
+        <LinearLayout android:id="@+id/navLibrary"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:orientation="vertical" android:gravity="center" android:padding="4dp">
+            <ImageView android:id="@+id/navLibraryIcon"
+                android:layout_width="24dp" android:layout_height="24dp"
+                android:contentDescription="图库"/>
+            <TextView android:id="@+id/navLibraryText"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="图库" android:textSize="10sp" android:paddingTop="2dp"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/navCards"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:orientation="vertical" android:gravity="center" android:padding="4dp">
+            <ImageView android:id="@+id/navCardsIcon"
+                android:layout_width="24dp" android:layout_height="24dp"
+                android:contentDescription="卡片"/>
+            <TextView android:id="@+id/navCardsText"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="卡片" android:textSize="10sp" android:paddingTop="2dp"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/navSettings"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:orientation="vertical" android:gravity="center" android:padding="4dp">
+            <ImageView android:id="@+id/navSettingsIcon"
+                android:layout_width="24dp" android:layout_height="24dp"
+                android:contentDescription="设置"/>
+            <TextView android:id="@+id/navSettingsText"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="设置" android:textSize="10sp" android:paddingTop="2dp"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>
