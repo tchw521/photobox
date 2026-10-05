@@ -131,9 +131,17 @@ class ChipAdapter(private val onClick: (String?) -> Unit) :
 }
 
 /** 照片宫格 / 列表共用适配器，靠 LayoutManager 切换形态。 */
+/**
+ * 照片适配器，支持三种视图：
+ *   0 宫格 —— 多列小图
+ *   1 列表 —— 单列行式，左缩略图右信息
+ *   2 流式 —— 单列竖排大图，按原始比例逐张排布
+ *
+ * 三种视图共用同一个 ViewHolder 与绑定逻辑，仅布局与缩略图尺寸不同。
+ */
 class PhotoAdapter(
     private val c: Context,
-    private val grid: Boolean,
+    private val mode: Int,
     private val onClick: (Photo, Int) -> Unit,
     private val onLongClick: (Photo, Int, View) -> Boolean,
 ) : RecyclerView.Adapter<PhotoAdapter.H>() {
@@ -158,11 +166,15 @@ class PhotoAdapter(
         val rowRoot: View? = v.findViewById(R.id.rowRoot)
     }
 
-    override fun getItemViewType(i: Int) = if (grid) 0 else 1
+    override fun getItemViewType(i: Int) = mode
 
     override fun onCreateViewHolder(p: ViewGroup, t: Int) = H(
         LayoutInflater.from(p.context).inflate(
-            if (t == 0) R.layout.item_photo_grid else R.layout.item_photo_list, p, false
+            when (t) {
+                0 -> R.layout.item_photo_grid
+                2 -> R.layout.item_photo_flow
+                else -> R.layout.item_photo_list
+            }, p, false
         )
     )
 
@@ -176,7 +188,12 @@ class PhotoAdapter(
     private fun bindPhoto(h: H, i: Int) {
         val p = data[i]
         val s = SkinNow.skin
-        val px = if (grid) 220 else 110
+        // 缩略图尺寸按视图区分：流式需要大图才不糊
+        val px = when (mode) {
+            0 -> 220      // 宫格
+            2 -> 720      // 流式：接近全宽
+            else -> 110   // 列表
+        }
         h.thumb?.let { Thumbs.into(c, p, px, it) }
         val sel = selected.contains(p.id)
         h.check?.visibility = if (sel && selectMode) View.VISIBLE else View.GONE
