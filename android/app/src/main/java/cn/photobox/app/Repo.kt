@@ -21,37 +21,54 @@ object Repo {
 
     fun uriOf(p: Photo) = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, p.id)
 
+    /**
+     * 扫描全部图片。
+     *
+     * 要点：
+     * - 一律用 getColumnIndex（返回 -1）而非 getColumnIndexOrThrow（抛异常）。
+     *   BUCKET_DISPLAY_NAME 在部分系统 / OEM 上可能不在结果集中，
+     *   用 OrThrow 版本会直接抛出并导致启动崩溃。
+     * - 整体包 try/catch，任何异常都降级为空列表，绝不把异常抛给 UI。
+     */
     fun scan(c: Context): List<Photo> {
         val out = ArrayList<Photo>(512)
-        val proj = arrayOf(
-            MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DISPLAY_NAME,
-            MediaStore.Images.Media.SIZE,
-            MediaStore.Images.Media.DATE_MODIFIED,
-            MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
-        )
-        c.contentResolver.query(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null,
-            MediaStore.Images.Media.DATE_MODIFIED + " DESC"
-        )?.use { cur ->
-            val iId = cur.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val iName = cur.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-            val iSize = cur.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
-            val iDate = cur.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)
-            val iBucket = cur.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
-            while (cur.moveToNext()) {
-                val album = cur.getString(iBucket) ?: continue
-                out.add(
-                    Photo(
-                        id = cur.getLong(iId),
-                        name = cur.getString(iName) ?: "",
-                        album = album,
-                        size = cur.getLong(iSize),
-                        dateSec = cur.getLong(iDate),
-                        path = "",
+        try {
+            val proj = arrayOf(
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.SIZE,
+                MediaStore.Images.Media.DATE_MODIFIED,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+            )
+            c.contentResolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null,
+                MediaStore.Images.Media.DATE_MODIFIED + " DESC"
+            )?.use { cur ->
+                val iId = cur.getColumnIndex(MediaStore.Images.Media._ID)
+                val iName = cur.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME)
+                val iSize = cur.getColumnIndex(MediaStore.Images.Media.SIZE)
+                val iDate = cur.getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)
+                val iBucket = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+                if (iId < 0) return out                      // 关键列缺失，直接返回空
+                while (cur.moveToNext()) {
+                    val id = cur.getLong(iId)
+                    if (id <= 0L) continue
+                    // bucket 列缺失或为空时回退为「未分类」，不再 continue 丢照片
+                    val album = if (iBucket >= 0) (cur.getString(iBucket) ?: "") else ""
+                    out.add(
+                        Photo(
+                            id = id,
+                            name = if (iName >= 0) (cur.getString(iName) ?: "") else "",
+                            album = album.ifBlank { "未分类" },
+                            size = if (iSize >= 0) cur.getLong(iSize) else 0L,
+                            dateSec = if (iDate >= 0) cur.getLong(iDate) else 0L,
+                            path = "",
+                        )
                     )
-                )
+                }
             }
+        } catch (e: Throwable) {
+            CrashGuard.log(e)
         }
         return out
     }
