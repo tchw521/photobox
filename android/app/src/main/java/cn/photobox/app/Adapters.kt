@@ -1,14 +1,7 @@
 package cn.photobox.app
 
-import android.util.TypedValue
-
-/** 从当前主题取色，避免硬编码导致换肤后不跟随。 */
-private fun resolveColor(c: android.content.Context, attr: Int): Int {
-    val v = TypedValue()
-    return if (c.theme.resolveAttribute(attr, v, true)) v.data else 0
-}
-
 import android.content.Context
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
