@@ -1,5 +1,8 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp"
     android:viewportWidth="24" android:viewportHeight="24">
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.32"
-        android:pathData="M12,2.8l2.86,5.9 6.44,0.94 -4.66,4.54 1.1,6.42L12,17.5l-5.74,3.1 1.1,-6.42L2.7,9.64l6.44,-0.94z"/>
+    <!-- 空心星：描边式，用两条 path 拼出轮廓 -->
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.3"
+        android:pathData="M12,2.6l2.94,6.04 6.66,0.97 -4.82,4.7 1.14,6.63L12,17.86l-5.92,3.11 1.14,-6.63L2.4,9.61l6.66,-0.97z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.001"
+        android:pathData="M12,5.3l2.2,4.5 4.95,0.72 -3.58,3.5 0.85,4.93L12,16.83l-4.42,2.32 0.85,-4.93L4.85,10.52l4.95,-0.72z"/>
 </vector>
