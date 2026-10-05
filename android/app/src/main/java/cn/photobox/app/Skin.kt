@@ -25,17 +25,17 @@ data class Skin(
 object Skins {
     val ALL = listOf(
         Skin("aurora", "极光紫", R.style.Skin_Aurora,
-            0xFF1A0B2E.toInt(), 0xFFA855F7.toInt(), 0xFF0D0518.toInt()),
+            0xFF1E0B38.toInt(), 0xFFC084FC.toInt(), 0xFF0A0416.toInt()),
         Skin("ink", "墨夜黑", R.style.Skin_Ink,
-            0xFF0E0E12.toInt(), 0xFF7DD3FC.toInt(), 0xFF000000.toInt()),
+            0xFF1A1A1E.toInt(), 0xFFE8E8EC.toInt(), 0xFF08080A.toInt()),
         Skin("dawn", "晨曦金", R.style.Skin_Dawn,
-            0xFF2B1A0F.toInt(), 0xFFFBBF24.toInt(), 0xFF140A04.toInt()),
+            0xFF3A2210.toInt(), 0xFFFCD34D.toInt(), 0xFF160C06.toInt()),
         Skin("glacier", "冰川蓝", R.style.Skin_Glacier,
-            0xFF0A1A2E.toInt(), 0xFF38BDF8.toInt(), 0xFF04101C.toInt()),
+            0xFF0E2A44.toInt(), 0xFF7DD3FC.toInt(), 0xFF050F1A.toInt()),
         Skin("sakura", "樱雾粉", R.style.Skin_Sakura,
-            0xFF2A1220.toInt(), 0xFFF472B6.toInt(), 0xFF150710.toInt()),
+            0xFF3B1428.toInt(), 0xFFF9A8D4.toInt(), 0xFF15070F.toInt()),
         Skin("mint", "薄荷绿", R.style.Skin_Mint,
-            0xFF0B2119.toInt(), 0xFF34D399.toInt(), 0xFF04120C.toInt()),
+            0xFF0E2B22.toInt(), 0xFF6EE7B7.toInt(), 0xFF05100C.toInt()),
     )
 
     fun of(key: String): Skin = ALL.firstOrNull { it.key == key } ?: ALL[0]
