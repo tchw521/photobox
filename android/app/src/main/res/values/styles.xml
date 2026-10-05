@@ -122,8 +122,4 @@
     </style>
 
     <!-- 底部导航选中指示 -->
-    <style name="NavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
-        <item name="android:color">?attr/accentSoftColor</item>
-        <item name="colorSurface">#FF0F2A20</item>
-    </style>
 </resources>
