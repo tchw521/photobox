@@ -1,7 +1,6 @@
 package cn.photobox.app
 
 import android.content.Context
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +38,7 @@ class AlbumAdapter(
         h.name.isSelected = true                      // 触发跑马灯
         h.name.background = ContextCompat.getDrawable(
             h.itemView.context,
-            if (r.selected) R.drawable.bg_bubble_on else R.drawable.bg_bubble
+            if (r.selected) R.drawable.glass_bubble_on else R.drawable.glass_bubble
         )
         h.name.setTextColor(
             resolveColor(h.itemView.context, if (r.selected) R.attr.textColorMain else R.attr.textColorDim)
