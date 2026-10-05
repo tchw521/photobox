@@ -20,7 +20,6 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Switch
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
@@ -70,7 +69,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.2.2"
+        const val APP_VERSION = "1.2.3"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_TRASH = "\u0000trash"
@@ -83,6 +82,7 @@ class MainActivity : Activity() {
         SkinNow.load(applicationContext)
         Store.loadSettings(this)
         gridView = Store.defaultGrid
+        sort = Store.sortDefault
 
         CrashGuard.guard { initUi() }
         // 先渲染主页，界面立即可见；权限与扫描并行进行
@@ -190,6 +190,7 @@ class MainActivity : Activity() {
             val list = CrashGuard.result({ Repo.scan(this@MainActivity) }, emptyList())
             val blocked = Store.blocked(this@MainActivity)
             val keep = CrashGuard.result({ list.filter { it.album !in blocked } }, list)
+            cleanTrashIfNeeded()
             Ui.main {
                 CrashGuard.guard {
                     if (!isFinishing) {
@@ -198,6 +199,21 @@ class MainActivity : Activity() {
                     }
                 }
             }
+        }
+    }
+
+    /** 回收站超期自动清理：开启后，超过 30 天的项目及其文件一并删除。 */
+    private fun cleanTrashIfNeeded() {
+        if (!Store.autoCleanTrash) return
+        CrashGuard.guard {
+            val all = Store.trash(this)
+            val deadline = System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000
+            val keep = all.filter { it.at >= deadline }
+            if (keep.size == all.size) return
+            all.filter { it.at < deadline }.forEach {
+                runCatching { java.io.File(it.file).delete() }
+            }
+            Store.saveTrash(this, keep)
         }
     }
 
@@ -391,7 +407,7 @@ class MainActivity : Activity() {
         val s = SkinNow.skin
         val ids = listOf(
             R.id.btnSelAll, R.id.btnSelExit, R.id.btnFav, R.id.btnMove,
-            R.id.btnRename, R.id.btnDelete, R.id.btnRescan, R.id.btnEmpty, R.id.restore,
+            R.id.btnRename, R.id.btnDelete, R.id.btnEmpty, R.id.restore,
         )
         ids.forEach { id ->
             val b = v.findViewById<Button>(id)
@@ -623,59 +639,120 @@ class MainActivity : Activity() {
     }
 
     // ---------- 设置页
+    /**
+     * 设置页全部由代码构建：顶栏右上角一个皮肤按钮，点开弹列表选皮肤；
+     * 下方分组列出开关与操作项，全部复用 Ui.switchRow / Ui.actionRow。
+     */
     private fun bindSettings(v: View) {
         val s = SkinNow.skin
-        val stat = v.findViewById<TextView>(R.id.stat)
-        val version = v.findViewById<TextView>(R.id.version)
-        stat?.text = "共 ${photos.size} 张照片 · ${photos.map { it.album }.distinct().size} 个图集 · 回收站 ${Store.trash(this).size} 项"
-        stat?.setTextColor(s.textDim)
-        version?.text = "光影相册 · 原生安卓版 v$APP_VERSION"
-        version?.setTextColor(s.textDim)
+        val body = v.findViewById<LinearLayout>(R.id.settingsRoot) ?: return
 
-        v.findViewById<Switch>(R.id.swPreview)?.apply {
-            isChecked = Store.previewActions
-            setOnCheckedChangeListener { _, b ->
-                CrashGuard.guard { Store.previewActions = b; Store.saveSettings(this@MainActivity) }
-            }
-        }
-        v.findViewById<Switch>(R.id.swGrid)?.apply {
-            isChecked = Store.defaultGrid
-            setOnCheckedChangeListener { _, b ->
-                CrashGuard.guard { Store.defaultGrid = b; Store.saveSettings(this@MainActivity) }
-            }
-        }
-        v.findViewById<Switch>(R.id.swCardMode)?.apply {
-            isChecked = Store.cardModeMove
-            setOnCheckedChangeListener { _, b ->
-                CrashGuard.guard { Store.cardModeMove = b; Store.saveSettings(this@MainActivity) }
-            }
+        // 右上角皮肤按钮
+        v.findViewById<ImageButton>(R.id.btnSkin)?.apply {
+            setImageResource(R.drawable.ic_palette)
+            setColorFilter(s.accent)
+            setOnClickListener { CrashGuard.guard { showSkinPicker() } }
         }
 
-        val skinList = v.findViewById<RecyclerView>(R.id.skinList)
-        skinList?.layoutManager = GridLayoutManager(this, 3)
-        skinList?.adapter = SkinAdapter(SkinNow.skin.key) { key ->
-            CrashGuard.guard { switchSkin(key) }
-        }
+        body.removeAllViews()
 
-        v.findViewById<Button>(R.id.btnRescan)?.setOnClickListener {
-            CrashGuard.guard {
-                Thumbs.clear()
-                loadPhotos()
-                Ui.toast(this, "扫描完成")
+        // ---- 外观
+        body.addView(Ui.section(this, "外观"))
+        body.addView(Ui.actionRow(this, "皮肤", SkinNow.skin.name) { showSkinPicker() })
+        body.addView(Ui.switchRow(this, "默认宫格视图", Store.defaultGrid) {
+            Store.defaultGrid = it; Store.saveSettings(this); gridView = it
+        })
+        body.addView(Ui.actionRow(this, "默认排序", SORT_LABELS[Store.sortDefault]) {
+            Ui.listSheet(this, "默认排序", SORT_LABELS.toList()) {
+                Store.sortDefault = it
+                Store.saveSettings(this)
+                sort = it
+                recreate()
             }
-        }
-        styleButtons(v)
+        })
+        body.addView(Ui.switchRow(this, "相册名自动滚动（10 秒一轮）", Store.nameMarquee) {
+            Store.nameMarquee = it; Store.saveSettings(this); renderSidebar()
+        })
 
-        val crash = CrashGuard.read(this)
-        if (crash.isNotBlank()) {
-            val box = TextView(this).apply {
-                text = "最近崩溃记录（长按可复制）\n\n$crash"
-                setTextIsSelectable(true)
-                textSize = 10f
-                setTextColor(s.textDim)
-                setPadding(16, 16, 16, 16)
+        // ---- 图库
+        body.addView(Ui.section(this, "图库"))
+        body.addView(Ui.switchRow(this, "预览弹窗显示快捷操作", Store.previewActions) {
+            Store.previewActions = it; Store.saveSettings(this)
+        })
+        body.addView(Ui.switchRow(this, "长按直接进入多选", Store.longPressSelect) {
+            Store.longPressSelect = it; Store.saveSettings(this)
+        })
+
+        // ---- 卡片页
+        body.addView(Ui.section(this, "卡片页"))
+        body.addView(Ui.switchRow(this, "归档用移动（关闭则复制）", Store.cardModeMove) {
+            Store.cardModeMove = it; Store.saveSettings(this)
+        })
+        body.addView(Ui.switchRow(this, "显示手势提示", Store.cardHint) {
+            Store.cardHint = it; Store.saveSettings(this)
+        })
+
+        // ---- 回收站
+        body.addView(Ui.section(this, "回收站"))
+        body.addView(Ui.switchRow(this, "自动清理超 30 天的项目", Store.autoCleanTrash) {
+            Store.autoCleanTrash = it; Store.saveSettings(this)
+        })
+
+        // ---- 操作
+        body.addView(Ui.section(this, "操作"))
+        body.addView(Ui.actionRow(this, "重新扫描照片", "") {
+            Thumbs.clear(); loadPhotos(); Ui.toast(this, "扫描完成")
+        })
+        body.addView(Ui.actionRow(this, "清除缩略图缓存", "") {
+            Thumbs.clear(); Ui.toast(this, "缓存已清除")
+        })
+        body.addView(Ui.actionRow(this, "查看崩溃记录", if (CrashGuard.read(this).isBlank()) "无" else "有记录") {
+            showCrashLog()
+        })
+
+        // ---- 关于
+        body.addView(Ui.section(this, "关于"))
+        val stat = TextView(this).apply {
+            text = "共 ${photos.size} 张照片 · ${photos.map { it.album }.distinct().size} 个图集 · 回收站 ${Store.trash(this@MainActivity).size} 项"
+            textSize = 11f; setTextColor(s.textDim); setPadding(0, 8, 0, 4)
+        }
+        body.addView(stat)
+        val ver = TextView(this).apply {
+            text = "光影相册 · 原生安卓版 v$APP_VERSION"
+            textSize = 11f; setTextColor(s.textDim); setPadding(0, 4, 0, 8)
+        }
+        body.addView(ver)
+    }
+
+    /** 皮肤选择：收纳在设置页右上角按钮内，点开弹列表。 */
+    private fun showSkinPicker() {
+        Ui.listSheet(this, "选择皮肤", Skins.ALL.map { it.name }) { i ->
+            CrashGuard.guard { switchSkin(Skins.ALL[i].key) }
+        }
+    }
+
+    /** 崩溃记录：可长按复制。 */
+    private fun showCrashLog() {
+        val log = CrashGuard.read(this)
+        if (log.isBlank()) {
+            Ui.toast(this, "暂无崩溃记录")
+            return
+        }
+        val tv = TextView(this).apply {
+            text = log
+            textSize = 10f
+            setTextColor(SkinNow.skin.textDim)
+            setTextIsSelectable(true)
+            setPadding(20, 20, 20, 20)
+        }
+        val sv = android.widget.ScrollView(this).apply { addView(tv) }
+        Ui.dialog(this) {
+            setTitle("崩溃记录")
+            setView(sv)
+            setNegativeButton("关闭", null)
+            setPositiveButton("清空") { _: android.content.DialogInterface, _: Int ->
+                CrashGuard.clear(this@MainActivity)
             }
-            v.findViewById<LinearLayout>(R.id.settingsBody)?.addView(box)
         }
     }
 
