@@ -34,9 +34,9 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mapReleaseSourceSetPaths
 > Task :app:generateReleaseResources
 > Task :app:packageReleaseResources
-> Task :app:mergeReleaseResources
 > Task :app:createReleaseCompatibleScreenManifests
 > Task :app:extractDeepLinksRelease
+> Task :app:mergeReleaseResources
 > Task :app:parseReleaseLocalResources
 > Task :app:processReleaseMainManifest
 > Task :app:processReleaseManifest
@@ -59,15 +59,15 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:295:22 Variable 'ok' initializer is redundant
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:221:13 Variable 'selBar' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:222:13 Variable 'tip' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:345:22 Variable 'ok' initializer is redundant
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:371:13 Variable 'list' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:290:22 Variable 'ok' initializer is redundant
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:219:13 Variable 'selBar' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:220:13 Variable 'tip' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:343:22 Variable 'ok' initializer is redundant
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:369:13 Variable 'list' is never used
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Repo.kt:179:20 Parameter 'c' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:84:32 Parameter 'danger' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:155:42 Unchecked cast: T? to T
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:169:9 Parameter 'a' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:70:32 Parameter 'danger' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:141:42 Unchecked cast: T? to T
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:155:9 Parameter 'a' is never used
 
 > Task :app:compileReleaseJavaWithJavac NO-SOURCE
 > Task :app:mergeReleaseGeneratedProguardFiles
@@ -81,5 +81,5 @@ w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 > Task :app:createReleaseApkListingFileRedirect
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 1m 19s
+BUILD SUCCESSFUL in 1m 44s
 39 actionable tasks: 39 executed
