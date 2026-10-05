@@ -28,9 +28,9 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
 > Task :app:buildKotlinToolingMetadata
 > Task :app:checkKotlinGradlePluginConfigurationErrors
-> Task :app:checkReleaseDuplicateClasses
 > Task :app:generateReleaseResValues
 > Task :app:checkReleaseAarMetadata
+> Task :app:checkReleaseDuplicateClasses
 > Task :app:mapReleaseSourceSetPaths
 > Task :app:generateReleaseResources
 > Task :app:packageReleaseResources
@@ -43,6 +43,7 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
 > Task :app:mergeReleaseArtProfile
+> Task :app:processReleaseManifestForPackage
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:generateReleaseAssets UP-TO-DATE
@@ -51,18 +52,32 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
 > Task :app:bundleReleaseResources
+> Task :app:processReleaseResources
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
-> Task :app:processReleaseManifestForPackage
-> Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:37:42 Unresolved reference: dedupSummary
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:38:39 Unresolved reference: dedupList
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:43:40 Unresolved reference: btnRefreshDup
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:46:40 Unresolved reference: btnCleanDup
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:55:21 Unresolved reference: btnCleanDup
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:55:39 Unresolved reference: btnRefreshDup
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:55:54 Overload resolution ambiguity: 
+public inline fun <T> Iterable<TypeVariable(T)>.forEach(action: (TypeVariable(T)) -> Unit): Unit defined in kotlin.collections
+public inline fun <K, V> Map<out TypeVariable(K), TypeVariable(V)>.forEach(action: (Map.Entry<TypeVariable(K), TypeVariable(V)>) -> Unit): Unit defined in kotlin.collections
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:55:64 Cannot infer a type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:118:54 Unresolved reference: dupMeta
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:119:60 Unresolved reference: dupThumbs
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:123:63 Unresolved reference: item_dedup
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:142:69 Unresolved reference: item_dup_thumb
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:176:50 Unresolved reference: dupImg
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/DedupPage.kt:177:50 Unresolved reference: dupFlag
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:109:13 Cannot find a parameter with this name: onLongClick
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:109:29 Cannot infer a type for this parameter. Please specify it explicitly.
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:309:61 Unresolved reference: page_dedup
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:311:17 Unresolved reference: DedupPage
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:363:16 Unresolved reference: swipeSelect
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:366:26 Cannot infer a type for this parameter. Please specify it explicitly.
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:840:64 Unresolved reference: trashGuard
@@ -275,5 +290,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 54s
+BUILD FAILED in 56s
 30 actionable tasks: 30 executed
