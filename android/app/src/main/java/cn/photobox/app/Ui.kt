@@ -272,8 +272,9 @@ object Ui {
         }
         val tv = TextView(a).apply {
             this.text = text
-            textSize = 12f
+            textSize = 15f
             setTextColor(s.text)
+            setPadding(0, 14, 0, 14)
             layoutParams = android.widget.LinearLayout.LayoutParams(
                 0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f
             )
@@ -293,7 +294,7 @@ object Ui {
         val s = SkinNow.skin
         val row = android.widget.LinearLayout(a).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
-            setPadding(4, 14, 4, 14)
+            setPadding(4, 18, 4, 18)
             layoutParams = android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
                 android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
@@ -302,7 +303,7 @@ object Ui {
         }
         val tv = TextView(a).apply {
             this.text = text
-            textSize = 12f
+            textSize = 15f
             setTextColor(s.text)
             layoutParams = android.widget.LinearLayout.LayoutParams(
                 0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f
@@ -310,7 +311,7 @@ object Ui {
         }
         val vv = TextView(a).apply {
             this.text = value
-            textSize = 12f
+            textSize = 14f
             setTextColor(s.accent)
         }
         row.addView(tv); row.addView(vv)
@@ -320,7 +321,7 @@ object Ui {
     /** 分组标题。 */
     fun section(a: Activity, text: String): View = TextView(a).apply {
         this.text = text
-        textSize = 13f
+        textSize = 16f
         setTextColor(SkinNow.skin.accent)
         setTypeface(typeface, android.graphics.Typeface.BOLD)
         setPadding(0, 20, 0, 8)
