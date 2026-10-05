@@ -183,6 +183,76 @@ object Ui {
         false
     }
 
+    // ------------------------------------------------------------ 设置行（复用）
+    /**
+     * 开关行。设置页所有开关统一用此方法构建，样式随皮肤，不重复写 XML。
+     */
+    fun switchRow(a: Activity, text: String, checked: Boolean, onChange: (Boolean) -> Unit): View {
+        val s = SkinNow.skin
+        val row = android.widget.LinearLayout(a).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            setPadding(4, 4, 4, 4)
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        val tv = TextView(a).apply {
+            this.text = text
+            textSize = 12f
+            setTextColor(s.text)
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+            )
+        }
+        val sw = android.widget.Switch(a).apply {
+            isChecked = checked
+            setOnCheckedChangeListener { _, b -> run { onChange(b) } }
+        }
+        row.addView(tv); row.addView(sw)
+        return row
+    }
+
+    /**
+     * 可点击行（右侧显示当前值）。设置页所有选择项统一用此方法构建。
+     */
+    fun actionRow(a: Activity, text: String, value: String, onClick: () -> Unit): View {
+        val s = SkinNow.skin
+        val row = android.widget.LinearLayout(a).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            setPadding(4, 14, 4, 14)
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setOnClickListener { run(onClick) }
+        }
+        val tv = TextView(a).apply {
+            this.text = text
+            textSize = 12f
+            setTextColor(s.text)
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+            )
+        }
+        val vv = TextView(a).apply {
+            this.text = value
+            textSize = 12f
+            setTextColor(s.accent)
+        }
+        row.addView(tv); row.addView(vv)
+        return row
+    }
+
+    /** 分组标题。 */
+    fun section(a: Activity, text: String): View = TextView(a).apply {
+        this.text = text
+        textSize = 13f
+        setTextColor(SkinNow.skin.accent)
+        setTypeface(typeface, android.graphics.Typeface.BOLD)
+        setPadding(0, 20, 0, 8)
+    }
+
     // ------------------------------------------------------------ 小工具
     /** 通用列表行（弹窗内复用）。 */
     fun row(a: Activity, text: String, color: Int, onClick: View.OnClickListener): TextView =
