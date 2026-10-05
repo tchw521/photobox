@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 查重分组：组内照片横向排列，第一张标为保留 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="8dp" android:layout_marginBottom="6dp">
+
+    <TextView android:id="@+id/dupMeta"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textSize="11sp" android:paddingBottom="6dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/dupThumbs"
+        android:layout_width="match_parent" android:layout_height="72dp"
+        android:overScrollMode="never"/>
+</LinearLayout>
