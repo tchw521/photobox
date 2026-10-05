@@ -12,7 +12,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.util.TypedValue
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -28,7 +27,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class MainActivity : ComponentActivity() {
@@ -63,7 +61,7 @@ class MainActivity : ComponentActivity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.4.0"
+        const val APP_VERSION = "1.5.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -231,15 +229,19 @@ class MainActivity : ComponentActivity() {
                 if (photoAdapter?.selectMode == true) { toggleSelect(p); refreshLibrary() }
                 else preview(p)
             },
-            onLongClick = { p, pos, anchor ->
-                // 关键：不能在长按回调里同步刷新。notifyDataSetChanged 会重建
-                // ViewHolder，使 anchor 失效、并把长按事件掐断，菜单就弹不出来。
+            onLongClick = { p, _, anchor ->
+                // 不能在长按回调里同步刷新：notifyDataSetChanged 会重建 ViewHolder
+                // 使 anchor 失效并掐断长按事件，菜单就弹不出来。延后一帧再处理。
                 photoAdapter?.selectMode = true
                 photoAdapter?.selected?.add(p.id)
                 anchor.post {
-                    photoAdapter?.notifyItemChanged(pos)
                     refreshLibrary()
-                    anchor.post { showPhotoMenu(p, anchor) }
+                    // 再延一帧，并确认视图仍附着、Activity 仍存活，避免 BadTokenException
+                    anchor.post {
+                        if (anchor.isAttachedToWindow && !isFinishing && !isDestroyed) {
+                            showPhotoMenu(p, anchor)
+                        }
+                    }
                 }
                 true
             }
@@ -308,6 +310,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showPhotoMenuInner(p: Photo, anchor: View) {
+        if (isFinishing || isDestroyed || !anchor.isAttachedToWindow) return
         val fav = Store.favorites(this)
         val isFav = fav.contains(p.id.toString())
         val menu = android.widget.PopupMenu(this, anchor)
@@ -335,13 +338,20 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun moveOne(p: Photo, album: String) {
-        Thread {
-            val ok = Repo.copyToAlbum(this, p, album)
-            runOnUiThread {
-                Toast.makeText(this, if (ok) "已移动到「$album」" else "移动失败", Toast.LENGTH_SHORT).show()
-                exitSelect(); loadPhotos()
+        Ui.async(this, io = {
+            val move = Store.cardModeMove
+            var ok = false
+            if (move) {
+                ok = Ui.write(this, { Repo.moveToAlbum(this, p, album) }) { e -> requestDeleteConsent(e) }
+                if (!ok) ok = Repo.copyToAlbum(this, p, album)
+            } else {
+                ok = Repo.copyToAlbum(this, p, album)
             }
-        }.start()
+            ok
+        }, ui = { ok ->
+            Ui.toast(this, if (ok) "已移动到「$album」" else "移动失败")
+            exitSelect(); loadPhotos()
+        })
     }
 
     private fun applyLayoutManager(list: RecyclerView) {
@@ -405,15 +415,17 @@ class MainActivity : ComponentActivity() {
     private fun selMove() {
         val list = selectedPhotos()
         if (list.isEmpty()) return
-        showAlbumSheet { album ->
-            Thread {
+        Ui.albumSheet(this, allAlbumNames()) { album ->
+            Ui.async(this, io = {
                 var ok = 0
-                list.forEach { if (Repo.copyToAlbum(this, it, album)) ok++ }
-                runOnUiThread {
-                    Toast.makeText(this, "已移动 $ok 张到「$album」", Toast.LENGTH_SHORT).show()
-                    loadPhotos(); exitSelect()
+                list.forEach {
+                    if (Ui.write(this, { Repo.copyToAlbum(this, it, album) }) { e -> requestDeleteConsent(e) }) ok++
                 }
-            }.start()
+                ok
+            }, ui = { ok ->
+                Ui.toast(this, "已移动 $ok 张到「$album」")
+                loadPhotos(); exitSelect()
+            })
         }
     }
 
@@ -430,8 +442,11 @@ class MainActivity : ComponentActivity() {
                 if (new.isBlank()) return@setPositiveButton
                 val ext = p.name.substringAfterLast('.', "")
                 val cv = ContentValues().apply { put(MediaStore.Images.Media.DISPLAY_NAME, "$new.$ext") }
-                contentResolver.update(Repo.uriOf(p), cv, null, null)
-                exitSelect(); loadPhotos()
+                val ok = Ui.write(this, {
+                    contentResolver.update(Repo.uriOf(p), cv, null, null) > 0
+                }) { e -> requestDeleteConsent(e) }
+                Ui.toast(this, if (ok) "已重命名" else "重命名失败，可能无权修改该文件")
+                if (ok) { exitSelect(); loadPhotos() }
             }.show()
     }
 
@@ -440,54 +455,28 @@ class MainActivity : ComponentActivity() {
     /** 删除确认：单张与批量共用，先入回收站。 */
     private fun confirmDelete(list: List<Photo>) {
         if (list.isEmpty()) return
-        MaterialAlertDialogBuilder(this)
-            .setTitle("删除")
-            .setMessage("这 ${list.size} 张会先移入回收站，可还原。")
-            .setNegativeButton("取消", null)
-            .setPositiveButton("删除") { _, _ -> trashPhotos(list) }
-            .show()
+        Ui.confirm(this, "删除", "这 ${list.size} 张会先移入回收站，可还原。", okText = "删除") {
+            trashPhotos(list)
+        }
     }
 
     private fun trashPhotos(list: List<Photo>) {
-        Thread {
+        if (list.isEmpty()) return
+        Ui.async(this, io = {
             val items = Store.trash(this).toMutableList()
-            list.forEach { p -> Repo.moveToTrash(this, p) { e -> runOnUiThread { requestDeleteConsent(e) } }?.let { items.add(it) } }
+            var n = 0
+            list.forEach { p ->
+                Ui.write(this, {
+                    Repo.moveToTrash(this, p) { e -> Ui.main { requestDeleteConsent(e) } }?.let { items.add(it); n++ }
+                    true
+                }) { e -> Ui.main { requestDeleteConsent(e) } }
+            }
             Store.saveTrash(this, items)
-            runOnUiThread {
-                Toast.makeText(this, "已清理 ${list.size} 张到回收站", Toast.LENGTH_SHORT).show()
-                exitSelect(); loadPhotos()
-            }
-        }.start()
-    }
-
-    /** 相册选择底部弹窗。 */
-    private fun showAlbumSheet(onPick: (String) -> Unit) {
-        val dialog = BottomSheetDialog(this)
-        val rv = RecyclerView(this).apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            setPadding(12, 12, 12, 12)
-        }
-        val names = allAlbumNames()
-        val adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-            override fun onCreateViewHolder(p: ViewGroup, t: Int): RecyclerView.ViewHolder {
-                val tv = TextView(this@MainActivity).apply {
-                    setPadding(24, 28, 24, 28); textSize = 14f
-                    setTextColor(resolveColor(this@MainActivity, R.attr.textColorMain))
-                }
-                return object : RecyclerView.ViewHolder(tv) {}
-            }
-
-            override fun onBindViewHolder(h: RecyclerView.ViewHolder, i: Int) {
-                val n = names[i]
-                (h.itemView as TextView).text = "📁 $n"
-                h.itemView.setOnClickListener { dialog.dismiss(); onPick(n) }
-            }
-
-            override fun getItemCount() = names.size
-        }
-        rv.adapter = adapter
-        dialog.setContentView(rv)
-        dialog.show()
+            n
+        }, ui = { n ->
+            Ui.toast(this, "已清理 $n 张到回收站")
+            exitSelect(); loadPhotos()
+        })
     }
 
     private fun preview(p: Photo) {
@@ -497,18 +486,18 @@ class MainActivity : ComponentActivity() {
     private fun previewInner(p: Photo) {
         val fav = Store.favorites(this)
         val isFav = fav.contains(p.id.toString())
-        val b = MaterialAlertDialogBuilder(this)
-            .setTitle(p.name)
-            .setMessage("${p.album} · ${p.dateText} · ${formatSize(p.size)}")
-            .setNegativeButton("关闭", null)
-        if (Store.previewActions) {
-            b.setNeutralButton(if (isFav) "取消收藏" else "收藏") { _, _ ->
-                if (isFav) fav.remove(p.id.toString()) else fav.add(p.id.toString())
-                Store.setFavorites(this, fav); renderSidebar()
+        Ui.dialog(this) {
+            setTitle(p.name)
+            setMessage("${p.album} · ${p.dateText} · ${formatSize(p.size)}")
+            setNegativeButton("关闭", null)
+            if (Store.previewActions) {
+                setNeutralButton(if (isFav) "取消收藏" else "收藏") { _, _ ->
+                    if (isFav) fav.remove(p.id.toString()) else fav.add(p.id.toString())
+                    Store.setFavorites(this@MainActivity, fav); renderSidebar()
+                }
+                setPositiveButton("清理") { _, _ -> trashPhotos(listOf(p)) }
             }
-            b.setPositiveButton("清理") { _, _ -> trashPhotos(listOf(p)) }
         }
-        b.show()
     }
 
     // ---------- 卡片页
@@ -571,29 +560,27 @@ class MainActivity : ComponentActivity() {
         val items = Store.trash(this).sortedByDescending { it.at }
         count.text = "回收站 ${items.size} 项"
         trashAdapter = TrashAdapter(this) { item ->
-            Thread {
-                val ok = Repo.restore(this, item)
-                val left = Store.trash(this).toMutableList().apply { removeAll { it.id == item.id } }
-                Store.saveTrash(this, left)
-                runOnUiThread {
-                    Toast.makeText(this, if (ok) "已还原" else "还原失败", Toast.LENGTH_SHORT).show()
-                    loadPhotos()
+            Ui.async(this, io = {
+                val ok = Ui.write(this, { Repo.restore(this, item) }) { e -> requestDeleteConsent(e) }
+                if (ok) {
+                    val left = Store.trash(this).toMutableList().apply { removeAll { it.id == item.id } }
+                    Store.saveTrash(this, left)
                 }
-            }.start()
+                ok
+            }, ui = { ok ->
+                Ui.toast(this, if (ok) "已还原" else "还原失败")
+                loadPhotos()
+            })
         }
         list.layoutManager = LinearLayoutManager(this)
         list.adapter = trashAdapter
         trashAdapter?.submit(items)
         v.findViewById<Button>(R.id.btnEmpty).setOnClickListener {
-            MaterialAlertDialogBuilder(this)
-                .setTitle("清空回收站")
-                .setMessage("将彻底删除 ${items.size} 项，无法恢复。")
-                .setNegativeButton("取消", null)
-                .setPositiveButton("清空") { _, _ ->
-                    items.forEach { java.io.File(it.file).delete() }
-                    Store.saveTrash(this, emptyList())
-                    loadPhotos()
-                }.show()
+            Ui.confirm(this, "清空回收站", "将彻底删除 ${items.size} 项，无法恢复。", okText = "清空") {
+                items.forEach { runCatching { java.io.File(it.file).delete() } }
+                Store.saveTrash(this, emptyList())
+                loadPhotos()
+            }
         }
     }
 
