@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
         android:largeHeap="false"
-        android:theme="@style/Skin.Aurora">
+        android:theme="@android:style/Theme.Material.NoActionBar">
 
         <activity
             android:name=".MainActivity"
