@@ -7,8 +7,10 @@
         android:orientation="horizontal" android:gravity="center_vertical">
         <EditText android:id="@+id/search" android:layout_width="0dp" android:layout_height="36dp"
             android:layout_weight="1" android:hint="搜索照片 / 图集" android:textSize="12sp"
-            android:textColor="@color/text" android:textColorHint="@color/dim"
+            android:textColor="?attr/textColorMain" android:textColorHint="?attr/textColorDim"
             android:background="@drawable/bg_bubble" android:paddingStart="10dp" android:paddingEnd="10dp"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="6dp"
             android:inputType="text" android:imeOptions="actionSearch" android:singleLine="true"/>
         <ImageButton android:id="@+id/btnView" android:layout_width="36dp" android:layout_height="36dp"
             android:src="@android:drawable/ic_menu_gallery" android:background="@drawable/bg_bubble"
@@ -23,7 +25,7 @@
         android:layout_marginTop="6dp" android:overScrollMode="never"/>
 
     <TextView android:id="@+id/tip" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="长按照片可多选" android:textSize="10sp" android:textColor="@color/dim"
+        android:text="长按照片可多选" android:textSize="10sp" android:textColor="?attr/textColorDim"
         android:padding="4dp" android:gravity="center"/>
 
     <androidx.recyclerview.widget.RecyclerView android:id="@+id/photos"
@@ -36,7 +38,7 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical">
             <TextView android:id="@+id/selText" android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:textSize="12sp" android:textColor="@color/accent"/>
+                android:layout_weight="1" android:textSize="12sp" android:textColor="?attr/accentColor"/>
             <Button android:id="@+id/btnSelAll" style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content" android:layout_height="32dp" android:text="全选" android:textSize="11sp"/>
             <Button android:id="@+id/btnSelExit" style="?android:attr/buttonBarButtonStyle"
@@ -52,7 +54,7 @@
                 android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1" android:text="重命名" android:textSize="11sp"/>
             <Button android:id="@+id/btnDelete" style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1" android:text="删除" android:textSize="11sp"
-                android:textColor="@color/danger"/>
+                android:textColor="?attr/dangerColor"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
