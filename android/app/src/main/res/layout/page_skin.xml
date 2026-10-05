@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  皮肤设置页：内置方案九宫格 + 自定义配色 + 背景设置。
+  复刻参考界面，全部控件由代码配色，布局只定义结构。
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView android:id="@+id/skinSectionBuiltin"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="内置方案" android:textSize="16sp" android:textStyle="bold"/>
+
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/skinGrid"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:paddingTop="8dp" android:overScrollMode="never"/>
+
+        <TextView android:id="@+id/skinSectionCustom"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="自定义配色" android:textSize="16sp" android:textStyle="bold"
+            android:paddingTop="18dp"/>
+
+        <!-- 主色 / 辅色 -->
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:paddingTop="10dp">
+
+            <TextView android:id="@+id/lblAccent"
+                android:layout_width="58dp" android:layout_height="wrap_content"
+                android:text="主色" android:textSize="14sp"/>
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/accentGrid"
+                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:overScrollMode="never"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:paddingTop="8dp">
+
+            <TextView android:id="@+id/lblAccent2"
+                android:layout_width="58dp" android:layout_height="wrap_content"
+                android:text="辅色" android:textSize="14sp"/>
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/accent2Grid"
+                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:overScrollMode="never"/>
+        </LinearLayout>
+
+        <!-- 明暗模式 -->
+        <TextView android:id="@+id/lblMode"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="明暗模式" android:textSize="14sp" android:paddingTop="12dp"/>
+        <RadioGroup android:id="@+id/modeGroup"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:paddingTop="6dp">
+            <RadioButton android:id="@+id/modeLight"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="浅色" android:textSize="14sp"/>
+            <RadioButton android:id="@+id/modeDark"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="深色" android:textSize="14sp" android:layout_marginStart="18dp"/>
+        </RadioGroup>
+
+        <!-- 底色 -->
+        <TextView android:id="@+id/lblBase"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="底色" android:textSize="14sp" android:paddingTop="12dp"/>
+        <RadioGroup android:id="@+id/baseGroup"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:paddingTop="6dp">
+            <RadioButton android:id="@+id/baseFollow"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="跟随主色" android:textSize="14sp"/>
+            <RadioButton android:id="@+id/baseCustom"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="跟随辅色" android:textSize="14sp" android:layout_marginStart="18dp"/>
+        </RadioGroup>
+
+        <!-- 主色明度 -->
+        <TextView android:id="@+id/lblAccentLevel"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="主色明度" android:textSize="14sp" android:paddingTop="12dp"/>
+        <SeekBar android:id="@+id/seekAccentLevel"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:max="100" android:paddingTop="4dp"/>
+
+        <!-- 背景亮度 -->
+        <TextView android:id="@+id/lblBrightness"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="背景亮度" android:textSize="14sp" android:paddingTop="12dp"/>
+        <SeekBar android:id="@+id/seekBrightness"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:max="100" android:paddingTop="4dp"/>
+
+        <!-- 背景设置 -->
+        <TextView android:id="@+id/skinSectionBg"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="背景设置" android:textSize="16sp" android:textStyle="bold"
+            android:paddingTop="18dp"/>
+
+        <ImageView android:id="@+id/bgPreview"
+            android:layout_width="match_parent" android:layout_height="96dp"
+            android:scaleType="centerCrop" android:paddingTop="8dp"
+            android:contentDescription="背景预览"/>
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:paddingTop="10dp">
+
+            <Button android:id="@+id/btnPickBg"
+                android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                android:text="从相册选图" android:textSize="13sp" android:minWidth="0dp"/>
+            <Button android:id="@+id/btnClearBg"
+                android:layout_width="0dp" android:layout_height="38dp" android:layout_weight="1"
+                android:text="清除背景" android:textSize="13sp" android:minWidth="0dp"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <TextView android:id="@+id/lblBgDim"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="图片浓度遮罩" android:textSize="14sp" android:paddingTop="12dp"/>
+        <SeekBar android:id="@+id/seekBgDim"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:max="100" android:paddingTop="4dp"/>
+
+        <!-- 应用 / 恢复 -->
+        <Button android:id="@+id/btnApplyCustom"
+            android:layout_width="match_parent" android:layout_height="42dp"
+            android:text="应用自定义皮肤" android:textSize="14sp"
+            android:layout_marginTop="18dp"/>
+
+        <Button android:id="@+id/btnResetSkin"
+            android:layout_width="match_parent" android:layout_height="42dp"
+            android:text="恢复默认薄荷清新" android:textSize="14sp"
+            android:layout_marginTop="8dp" android:layout_marginBottom="16dp"/>
+    </LinearLayout>
+</ScrollView>
