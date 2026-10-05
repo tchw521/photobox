@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 内置方案卡片：色块 + 名称 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:gravity="center" android:padding="5dp">
+
+    <View android:id="@+id/skinSwatch"
+        android:layout_width="match_parent" android:layout_height="34dp"/>
+    <TextView android:id="@+id/skinName"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center" android:textSize="11sp" android:paddingTop="4dp"
+        android:singleLine="true"/>
+</LinearLayout>
