@@ -30,49 +30,56 @@ data class Skin(
 )
 
 object Skins {
+    /**
+     * 六套**浅色**皮肤。
+     *
+     * 浅色玻璃的做法与深色相反：玻璃层用**白色半透明**叠在浅色渐变背景上，
+     * 描边用低透明度深色勾边（而非白色），文字统一深色。
+     * 这样既能保持通透的液态观感，又不会在亮背景下糊成一片。
+     */
     val ALL = listOf(
-        Skin("aurora", "极光紫",
-            0xFF241041.toInt(), 0xFF1A0B33.toInt(), 0xFF0C0619.toInt(),
-            0x5EC084FC.toInt(), 0x3A6366F1.toInt(),
-            0x2AFFFFFF.toInt(), 0x3DFFFFFF.toInt(), 0x3EFFFFFF.toInt(),
-            0xFFD8B4FE.toInt(), 0x4DC084FC.toInt(),
-            0xFFFBF8FF.toInt(), 0xFFB3A2D6.toInt(),
-            0xFFFB7185.toInt(), 0xFF4ADE80.toInt()),
-        Skin("ink", "墨夜黑",
-            0xFF202024.toInt(), 0xFF16161A.toInt(), 0xFF0A0A0C.toInt(),
-            0x3664E3E3.toInt(), 0x248B7FD4.toInt(),
-            0x24FFFFFF.toInt(), 0x36FFFFFF.toInt(), 0x38FFFFFF.toInt(),
-            0xFFF5F5F7.toInt(), 0x40F5F5F7.toInt(),
-            0xFFFAFAFC.toInt(), 0xFFA8A8B0.toInt(),
-            0xFFF87171.toInt(), 0xFF34D399.toInt()),
-        Skin("dawn", "晨曦金",
-            0xFF422813.toInt(), 0xFF2E1B0D.toInt(), 0xFF180E07.toInt(),
-            0x5EFBBF24.toInt(), 0x3AE0559F.toInt(),
-            0x2CFFFFFF.toInt(), 0x3EFFFFFF.toInt(), 0x40FFFFFF.toInt(),
-            0xFFFDE68A.toInt(), 0x4DFBBF24.toInt(),
-            0xFFFFFBF4.toInt(), 0xFFD4B894.toInt(),
-            0xFFFCA5A5.toInt(), 0xFFA7F3D0.toInt()),
-        Skin("glacier", "冰川蓝",
-            0xFF123050.toInt(), 0xFF0D2338.toInt(), 0xFF07121E.toInt(),
-            0x5E38BDF8.toInt(), 0x3A22D3EE.toInt(),
-            0x2AFFFFFF.toInt(), 0x3DFFFFFF.toInt(), 0x3EFFFFFF.toInt(),
-            0xFFBAE6FD.toInt(), 0x4D38BDF8.toInt(),
-            0xFFF8FCFF.toInt(), 0xFF9DBBD4.toInt(),
-            0xFFFDA4AF.toInt(), 0xFF6EE7B7.toInt()),
-        Skin("sakura", "樱雾粉",
-            0xFF44182F.toInt(), 0xFF301122.toInt(), 0xFF180811.toInt(),
-            0x5EF472B6.toInt(), 0x3AC084FC.toInt(),
-            0x2CFFFFFF.toInt(), 0x3EFFFFFF.toInt(), 0x40FFFFFF.toInt(),
-            0xFFFBCFE8.toInt(), 0x4DF472B6.toInt(),
-            0xFFFFF8FB.toInt(), 0xFFD4A3BC.toInt(),
-            0xFFFDA4AF.toInt(), 0xFFA7F3D0.toInt()),
-        Skin("mint", "薄荷绿",
-            0xFF123228.toInt(), 0xFF0D241C.toInt(), 0xFF07140E.toInt(),
-            0x5E34D399.toInt(), 0x3A14B8A6.toInt(),
-            0x2AFFFFFF.toInt(), 0x3DFFFFFF.toInt(), 0x3EFFFFFF.toInt(),
-            0xFFA7F3D0.toInt(), 0x4D34D399.toInt(),
-            0xFFF7FFFA.toInt(), 0xFF97C3B0.toInt(),
-            0xFFFDA4AF.toInt(), 0xFF86EFAC.toInt()),
+        Skin("mint", "薄荷清新",
+            0xFFF2FBF7.toInt(), 0xFFE8F6EF.toInt(), 0xFFDDEFE6.toInt(),
+            0x4010B981.toInt(), 0x2A6EE7B7.toInt(),
+            0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E0F766E.toInt(),
+            0xFF059669.toInt(), 0x3310B981.toInt(),
+            0xFF12211C.toInt(), 0xFF5B7A6E.toInt(),
+            0xFFDC2626.toInt(), 0xFF0F766E.toInt()),
+        Skin("ocean", "深海幽蓝",
+            0xFFF1F8FD.toInt(), 0xFFE6F2FB.toInt(), 0xFFD8EAF6.toInt(),
+            0x400EA5E9.toInt(), 0x2A7DD3FC.toInt(),
+            0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E0C4A6E.toInt(),
+            0xFF0284C7.toInt(), 0x330EA5E9.toInt(),
+            0xFF0F1E2A.toInt(), 0xFF57738A.toInt(),
+            0xFFDC2626.toInt(), 0xFF0E7490.toInt()),
+        Skin("grape", "葡萄紫韵",
+            0xFFF7F4FD.toInt(), 0xFFEFEAFA.toInt(), 0xFFE4DDF6.toInt(),
+            0x408B5CF6.toInt(), 0x2AC4B5FD.toInt(),
+            0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E4C1D95.toInt(),
+            0xFF7C3AED.toInt(), 0x338B5CF6.toInt(),
+            0xFF1B1533.toInt(), 0xFF6E5F92.toInt(),
+            0xFFDC2626.toInt(), 0xFF6D28D9.toInt()),
+        Skin("sakura", "樱花粉",
+            0xFFFDF3F8.toInt(), 0xFFFAE9F1.toInt(), 0xFFF6DEE9.toInt(),
+            0x40EC4899.toInt(), 0x2AF9A8D4.toInt(),
+            0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E831843.toInt(),
+            0xFFDB2777.toInt(), 0x33EC4899.toInt(),
+            0xFF2A1620.toInt(), 0xFF8C6478.toInt(),
+            0xFFDC2626.toInt(), 0xFFBE185D.toInt()),
+        Skin("amber", "琥珀暖橙",
+            0xFFFEF8F0.toInt(), 0xFFFDF1E3.toInt(), 0xFFFAE7D2.toInt(),
+            0x40F59E0B.toInt(), 0x2AFCD34D.toInt(),
+            0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E78350F.toInt(),
+            0xFFD97706.toInt(), 0x33F59E0B.toInt(),
+            0xFF2A1E10.toInt(), 0xFF8A6C4A.toInt(),
+            0xFFDC2626.toInt(), 0xFFB45309.toInt()),
+        Skin("forest", "森林墨绿",
+            0xFFF0F7F2.toInt(), 0xFFE4F0E8.toInt(), 0xFFD6E6DC.toInt(),
+            0x40059669.toInt(), 0x2A34D399.toInt(),
+            0xCCFFFFFF.toInt(), 0xE8FFFFFF.toInt(), 0x2E064E3B.toInt(),
+            0xFF047857.toInt(), 0x33059669.toInt(),
+            0xFF0E1F18.toInt(), 0xFF567A68.toInt(),
+            0xFFDC2626.toInt(), 0xFF065F46.toInt()),
     )
 
     fun of(key: String): Skin = ALL.firstOrNull { it.key == key } ?: ALL[0]
@@ -81,7 +88,7 @@ object Skins {
     private const val K = "skin"
 
     fun currentKey(c: Context): String =
-        c.getSharedPreferences(P, Context.MODE_PRIVATE).getString(K, "aurora") ?: "aurora"
+        c.getSharedPreferences(P, Context.MODE_PRIVATE).getString(K, "mint") ?: "mint"
 
     fun save(c: Context, key: String) {
         c.getSharedPreferences(P, Context.MODE_PRIVATE).edit().putString(K, key).apply()
@@ -147,7 +154,7 @@ object Glass {
         // 顶部高光：模拟玻璃上沿折射
         val gloss = GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(0x3AFFFFFF, 0x10FFFFFF, 0x00FFFFFF)
+            intArrayOf(0x66FFFFFF, 0x1AFFFFFF, 0x00FFFFFF)
         ).apply { cornerRadius = radius }
         // 底部反光：模拟环境反射，制造厚度感
         val bottom = GradientDrawable(
@@ -216,7 +223,7 @@ object Glass {
     }
 
     fun block(s: Skin, tone: Int, selected: Boolean): Drawable {
-        val fill = if (selected) (tone and 0x00FFFFFF) or 0x33000000 else s.glass
+        val fill = if (selected) (tone and 0x00FFFFFF) or 0x20000000 else s.glass
         val body = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 10f
