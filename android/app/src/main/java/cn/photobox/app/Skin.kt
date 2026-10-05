@@ -260,19 +260,20 @@ object Glass {
      * 相比普通卡片加重底部反光，视觉上像一片浮在内容之上的玻璃。
      */
     fun floating(s: Skin, radius: Float): Drawable {
+        // 底栏悬浮层：填充比普通玻璃更透，靠高光与反光体现玻璃厚度
         val body = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = radius
-            setColor(s.glassStrong)
-            setStroke(1, s.stroke)
+            setColor((s.glassStrong and 0x00FFFFFF) or 0xB0000000.toInt())
+            setStroke(1, (s.stroke and 0x00FFFFFF) or 0x55000000)
         }
         val gloss = GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(0x33FFFFFF, 0x12FFFFFF, 0x00FFFFFF)
+            intArrayOf(0x5AFFFFFF, 0x1EFFFFFF, 0x00FFFFFF)
         ).apply { cornerRadius = radius }
         val bottom = GradientDrawable(
             GradientDrawable.Orientation.BOTTOM_TOP,
-            intArrayOf(0x2AFFFFFF, 0x00FFFFFF)
+            intArrayOf(0x3CFFFFFF, 0x00FFFFFF)
         ).apply { cornerRadius = radius }
         return LayerDrawable(arrayOf(body, gloss, bottom))
     }
