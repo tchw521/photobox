@@ -83,6 +83,7 @@ object Store {
     var autoCleanTrash = false      // 回收站超期自动清理
     var sortDefault = 0             // 默认排序
     var longPressSelect = true      // 长按直接进入多选
+    var trashGuard = true           // 清空回收站需二次确认
 
     fun loadSettings(c: Context) {
         val s = sp(c)
@@ -94,6 +95,7 @@ object Store {
         autoCleanTrash = s.getBoolean("autoCleanTrash", false)
         sortDefault = s.getInt("sortDefault", 0).coerceIn(0, 3)
         longPressSelect = s.getBoolean("longPressSelect", true)
+        trashGuard = s.getBoolean("trashGuard", true)
     }
 
     fun saveSettings(c: Context) {
@@ -106,6 +108,7 @@ object Store {
             .putBoolean("autoCleanTrash", autoCleanTrash)
             .putInt("sortDefault", sortDefault)
             .putBoolean("longPressSelect", longPressSelect)
+            .putBoolean("trashGuard", trashGuard)
             .apply()
     }
 }
