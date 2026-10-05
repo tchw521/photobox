@@ -44,7 +44,8 @@ class MainActivity : Activity() {
     private var month: String? = null
     private var query = ""
     private var sort = 0                 // 0 日期新→旧 1 旧→新 2 名称 3 大小
-    private var gridView = true
+    /** 图库视图：0 宫格 / 1 列表 / 2 流式（单列竖排大图）。 */
+    private var viewMode = 0
     private var tab = 0                  // 0 图库 1 卡片 2 设置 3 回收站 4 查重
 
     private var root: View? = null
@@ -65,13 +66,19 @@ class MainActivity : Activity() {
 
     companion object {
         val SORT_LABELS = arrayOf("日期新→旧", "日期旧→新", "名称", "大小")
+        val VIEW_LABELS = arrayOf("已切换为宫格", "已切换为列表", "已切换为流式")
+        val VIEW_ICONS = intArrayOf(
+            R.drawable.ic_view_grid,
+            R.drawable.ic_view_list,
+            R.drawable.ic_view_flow,
+        )
         val SORT_ICONS = intArrayOf(
             R.drawable.ic_sort_time,
             R.drawable.ic_sort_time_asc,
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.5.1"
+        const val APP_VERSION = "1.6.0"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
@@ -84,7 +91,7 @@ class MainActivity : Activity() {
         CrashGuard.install(applicationContext)
         SkinNow.load(applicationContext)
         Store.loadSettings(this)
-        gridView = Store.defaultGrid
+        viewMode = Store.viewMode
         sort = Store.sortDefault
 
         CrashGuard.guard { initUi() }
@@ -364,7 +371,7 @@ class MainActivity : Activity() {
         months?.adapter = chipAdapter
 
         photoAdapter = PhotoAdapter(
-            this, gridView,
+            this, viewMode,
             onClick = { p, _ ->
                 CrashGuard.guard {
                     if (photoAdapter?.selectMode == true) { toggleSelect(p); refreshLibrary() }
@@ -416,11 +423,14 @@ class MainActivity : Activity() {
 
         v.findViewById<ImageButton>(R.id.btnView)?.setOnClickListener {
             CrashGuard.guard {
-                gridView = !gridView
-                Store.defaultGrid = gridView
+                viewMode = (viewMode + 1) % 3
+                Store.viewMode = viewMode
                 Store.saveSettings(this)
-                switchTab(0)
-                Ui.toast(this, if (gridView) "已切换为宫格" else "已切换为列表")
+                applyToolbarIcons(v)
+                applyLayoutManager(list)
+                photoAdapter?.let { list?.adapter = null; list?.adapter = it }
+                refreshLibrary()
+                Ui.toast(this, VIEW_LABELS[viewMode])
             }
         }
         v.findViewById<ImageButton>(R.id.btnSort)?.setOnClickListener {
@@ -454,7 +464,7 @@ class MainActivity : Activity() {
     private fun applyToolbarIcons(v: View) {
         val s = SkinNow.skin
         v.findViewById<ImageButton>(R.id.btnView)?.apply {
-            setImageResource(if (gridView) R.drawable.ic_view_grid else R.drawable.ic_view_list)
+            setImageResource(VIEW_ICONS[viewMode])
             setColorFilter(s.accent)
         }
         v.findViewById<ImageButton>(R.id.btnSort)?.apply {
@@ -480,11 +490,15 @@ class MainActivity : Activity() {
     }
 
     private fun applyLayoutManager(list: RecyclerView?) {
-        list?.layoutManager = if (gridView) {
-            val w = resources.displayMetrics.widthPixels
-            val span = (w * 0.8f / 104.dp).toInt().coerceIn(3, 6)
-            GridLayoutManager(this, span)
-        } else LinearLayoutManager(this)
+        list?.layoutManager = when (viewMode) {
+            0 -> {
+                // 宫格：列数按内容区实际宽度（扣除侧栏 1/5）推算
+                val w = resources.displayMetrics.widthPixels
+                val span = (w * 0.8f / 104.dp).toInt().coerceIn(3, 6)
+                GridLayoutManager(this, span)
+            }
+            else -> LinearLayoutManager(this)   // 列表与流式都是单列
+        }
     }
 
     private val Int.dp get() = (this * resources.displayMetrics.density).toInt()
@@ -830,8 +844,16 @@ class MainActivity : Activity() {
         // ---- 外观
         body.addView(Ui.section(this, "外观"))
         body.addView(Ui.actionRow(this, "皮肤", SkinNow.skin.name) { switchTab(5) })
-        body.addView(Ui.switchRow(this, "默认宫格视图", Store.defaultGrid) {
-            Store.defaultGrid = it; Store.saveSettings(this); gridView = it
+        body.addView(Ui.actionRow(this, "默认视图", VIEW_LABELS[Store.viewMode].removePrefix("已切换为")) {
+            Ui.listSheet(this, "默认视图", VIEW_LABELS.map { it.removePrefix("已切换为") }) { i ->
+                CrashGuard.guard {
+                    Store.viewMode = i
+                    Store.defaultGrid = (i == 0)
+                    Store.saveSettings(this)
+                    viewMode = i
+                    Ui.toast(this, VIEW_LABELS[i])
+                }
+            }
         })
         body.addView(Ui.actionRow(this, "默认排序", SORT_LABELS[Store.sortDefault]) {
             Ui.listSheet(this, "默认排序", SORT_LABELS.toList()) {
