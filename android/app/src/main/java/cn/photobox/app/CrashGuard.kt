@@ -31,6 +31,7 @@ object CrashGuard {
         }
     }
 
+    @PublishedApi
     internal fun write(c: Context, t: Thread, e: Throwable) {
         val time = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
         val sb = StringBuilder()
