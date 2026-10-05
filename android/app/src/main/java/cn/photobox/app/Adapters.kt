@@ -1,15 +1,12 @@
 package cn.photobox.app
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.math.roundToInt
 
 /**
  * 侧边栏相册项：气泡包裹，只露前两字，超长跑马灯滚动。
@@ -31,12 +28,6 @@ class AlbumAdapter(
     class H(v: View) : RecyclerView.ViewHolder(v) {
         val name: TextView = v.findViewById(R.id.albumName)
         val count: TextView = v.findViewById(R.id.albumCount)
-        /** 跑马灯动画，随 ViewHolder 复用而重建，回收时必须取消。 */
-        var marquee: ValueAnimator? = null
-    }
-
-    override fun onViewRecycled(h: H) {
-        CrashGuard.guard { h.marquee?.cancel(); h.marquee = null; h.name.scrollTo(0, 0) }
     }
 
     override fun onCreateViewHolder(p: ViewGroup, t: Int) =
@@ -49,63 +40,53 @@ class AlbumAdapter(
         CrashGuard.guard { bind(h, i) }
     }
 
+    /**
+     * 默认显示名称前 4 个字，超出以「…」收尾。
+     * 相比自动滚动，静态截断更易读：一眼能扫完整排图集名。
+     * 长名称可在长按时通过菜单操作识别。
+     */
+    private fun shortName(name: String): String =
+        if (!Store.nameMarquee || name.length <= 4) name else name.take(4) + "…"
+
+    /**
+     * 每个相册分配稳定的专属色。
+     * 用 hashCode 取模映射到一组预设色，同一相册每次启动颜色一致，
+     * 便于在长列表中靠颜色快速定位。
+     */
+    private fun albumColor(key: String): Int {
+        if (key == KEY_ALL || key == KEY_FAV) return SkinNow.skin.accent
+        if (key == KEY_TRASH) return SkinNow.skin.danger
+        return PALETTE[(key.hashCode() and 0x7FFFFFFF) % PALETTE.size]
+    }
+
+    companion object {
+        /** 相册配色池：与六套皮肤解耦，保证任何皮肤下都可辨识。 */
+        private val PALETTE = intArrayOf(
+            0xFFA855F7.toInt(), 0xFF38BDF8.toInt(), 0xFF34D399.toInt(),
+            0xFFFBBF24.toInt(), 0xFFFB7185.toInt(), 0xFF818CF8.toInt(),
+            0xFF2DD4BF.toInt(), 0xFFF472B6.toInt(), 0xFF4ADE80.toInt(),
+        )
+    }
+
     private fun bind(h: H, i: Int) {
         val r = rows[i]
         val s = SkinNow.skin
-        h.name.text = r.label
-        h.name.background = Glass.bubble(s, r.selected)
-        h.name.setTextColor(if (r.selected) s.accent else s.text)
+        h.name.text = shortName(r.label)
+        // 气泡改为方框并撑满侧栏宽度；每个相册用专属色描边与着色
+        val tone = albumColor(r.key)
+        h.name.background = Glass.block(s, tone, r.selected)
+        h.name.setTextColor(if (r.selected) tone else s.text)
         h.count.text = if (r.count > 0) r.count.toString() else ""
-        h.count.setTextColor(s.textDim)
+        h.count.setTextColor(if (r.selected) tone else s.textDim)
         h.itemView.setOnClickListener { CrashGuard.guard { onClick(r.key) } }
         h.itemView.setOnLongClickListener {
             onLongClick?.let { cb -> CrashGuard.guard { cb(r.key) } }
             true
         }
-        setupMarquee(h, r.label)
+        // 长按可看全名（Toast 提示）
+        h.itemView.setOnTouchListener { _, _ -> false }
     }
 
-    /**
-     * 相册名跑马灯：**每 10 秒完成一轮**。
-     *
-     * 系统自带的 ellipsize=marquee 无法控制周期，因此改为代码驱动：
-     * 一轮 10s 内分四段——
-     *   0 ~ 15%  停在开头（1.5s）
-     *   15% ~ 50% 滚到末尾（3.5s）
-     *   50% ~ 65% 停在末尾（1.5s）
-     *   65% ~ 100% 滚回开头（3.5s）
-     * 循环执行。文字未超出可视宽度时不启动动画。
-     */
-    private fun setupMarquee(h: H, text: String) {
-        h.marquee?.cancel()
-        h.marquee = null
-        h.name.scrollTo(0, 0)
-        if (!Store.nameMarquee) return
-        h.name.post {
-            CrashGuard.guard {
-                val max = (h.name.paint.measureText(text) - h.name.width).toInt()
-                if (max <= 0) return@post
-                val a = ValueAnimator.ofFloat(0f, 1f).apply {
-                    duration = 10_000L
-                    repeatCount = ValueAnimator.INFINITE
-                    repeatMode = ValueAnimator.RESTART
-                    interpolator = LinearInterpolator()
-                    addUpdateListener { an ->
-                        val t = an.animatedFraction
-                        val pos = when {
-                            t < 0.15f -> 0f
-                            t < 0.50f -> (t - 0.15f) / 0.35f
-                            t < 0.65f -> 1f
-                            else -> 1f - (t - 0.65f) / 0.35f
-                        }
-                        h.name.scrollTo((pos * max).roundToInt(), 0)
-                    }
-                }
-                h.marquee = a
-                a.start()
-            }
-        }
-    }
 }
 
 /** 月份筛选 chip。 */
