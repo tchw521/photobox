@@ -1,60 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 图库页：搜索栏 + 月份筛选 + 照片列表 + 多选操作条 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:padding="6dp">
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="horizontal" android:gravity="center_vertical">
-        <EditText android:id="@+id/search" android:layout_width="0dp" android:layout_height="36dp"
-            android:layout_weight="1" android:hint="搜索照片 / 图集" android:textSize="12sp"
-            android:textColor="?attr/textColorMain" android:textColorHint="?attr/textColorDim"
-            android:background="@drawable/glass_bubble" android:paddingStart="10dp" android:paddingEnd="10dp"
-            android:drawableStart="@drawable/ic_search"
-            android:drawablePadding="6dp"
-            android:inputType="text" android:imeOptions="actionSearch" android:singleLine="true"/>
-        <ImageButton android:id="@+id/btnView" android:layout_width="36dp" android:layout_height="36dp"
-            android:src="@android:drawable/ic_menu_gallery" android:background="@drawable/glass_bubble"
-            android:contentDescription="切换视图" android:layout_marginStart="6dp"/>
-        <ImageButton android:id="@+id/btnSort" android:layout_width="36dp" android:layout_height="36dp"
-            android:src="@android:drawable/ic_menu_sort_alphabetically" android:background="@drawable/glass_bubble"
-            android:contentDescription="排序" android:layout_marginStart="4dp"/>
+
+        <EditText android:id="@+id/search"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:hint="搜索" android:textSize="12sp" android:singleLine="true"
+            android:paddingTop="8dp" android:paddingBottom="8dp" android:paddingStart="12dp"
+            android:background="@null"/>
+
+        <ImageButton android:id="@+id/btnView"
+            android:layout_width="36dp" android:layout_height="36dp"
+            android:background="@null" android:contentDescription="切换视图" android:padding="6dp"/>
+
+        <ImageButton android:id="@+id/btnSort"
+            android:layout_width="36dp" android:layout_height="36dp"
+            android:background="@null" android:contentDescription="切换排序" android:padding="6dp"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView android:id="@+id/months"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="6dp" android:overScrollMode="never"/>
+        android:paddingTop="4dp" android:paddingBottom="4dp" android:overScrollMode="never"/>
 
-    <TextView android:id="@+id/tip" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="长按照片可多选" android:textSize="10sp" android:textColor="?attr/textColorDim"
-        android:padding="4dp" android:gravity="center"/>
+    <TextView android:id="@+id/tip"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textSize="10sp" android:paddingStart="4dp" android:paddingBottom="4dp"/>
 
     <androidx.recyclerview.widget.RecyclerView android:id="@+id/photos"
-        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-        android:paddingBottom="8dp" android:clipToPadding="false"/>
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
 
-    <!-- 多选操作条 -->
-    <LinearLayout android:id="@+id/selBar" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:visibility="gone">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:id="@+id/selText" android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:textSize="12sp" android:textColor="?attr/accentColor"/>
-            <Button android:id="@+id/btnSelAll" style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="wrap_content" android:layout_height="32dp" android:text="全选" android:textSize="11sp"/>
-            <Button android:id="@+id/btnSelExit" style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="wrap_content" android:layout_height="32dp" android:text="取消" android:textSize="11sp"/>
-        </LinearLayout>
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <Button android:id="@+id/btnFav" style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1" android:text="收藏" android:textSize="11sp"/>
-            <Button android:id="@+id/btnMove" style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1" android:text="移动" android:textSize="11sp"/>
-            <Button android:id="@+id/btnRename" style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1" android:text="重命名" android:textSize="11sp"/>
-            <Button android:id="@+id/btnDelete" style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dp" android:layout_height="34dp" android:layout_weight="1" android:text="删除" android:textSize="11sp"
-                android:textColor="?attr/dangerColor"/>
-        </LinearLayout>
+    <LinearLayout android:id="@+id/selBar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:visibility="gone" android:paddingTop="4dp">
+
+        <TextView android:id="@+id/selText"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="11sp" android:paddingStart="4dp" android:paddingEnd="8dp"
+            android:gravity="center_vertical"/>
+
+        <Button android:id="@+id/btnSelAll"
+            android:layout_width="wrap_content" android:layout_height="32dp"
+            android:text="全选" android:textSize="10sp" android:minWidth="0dp" android:paddingStart="8dp" android:paddingEnd="8dp"/>
+        <Button android:id="@+id/btnFav"
+            android:layout_width="wrap_content" android:layout_height="32dp"
+            android:text="收藏" android:textSize="10sp" android:minWidth="0dp" android:paddingStart="8dp" android:paddingEnd="8dp"/>
+        <Button android:id="@+id/btnMove"
+            android:layout_width="wrap_content" android:layout_height="32dp"
+            android:text="移动" android:textSize="10sp" android:minWidth="0dp" android:paddingStart="8dp" android:paddingEnd="8dp"/>
+        <Button android:id="@+id/btnRename"
+            android:layout_width="wrap_content" android:layout_height="32dp"
+            android:text="重命名" android:textSize="10sp" android:minWidth="0dp" android:paddingStart="8dp" android:paddingEnd="8dp"/>
+        <Button android:id="@+id/btnDelete"
+            android:layout_width="wrap_content" android:layout_height="32dp"
+            android:text="删除" android:textSize="10sp" android:minWidth="0dp" android:paddingStart="8dp" android:paddingEnd="8dp"/>
+        <Button android:id="@+id/btnSelExit"
+            android:layout_width="wrap_content" android:layout_height="32dp"
+            android:text="退出" android:textSize="10sp" android:minWidth="0dp" android:paddingStart="8dp" android:paddingEnd="8dp"/>
     </LinearLayout>
 </LinearLayout>
