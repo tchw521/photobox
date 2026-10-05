@@ -45,7 +45,7 @@ class MainActivity : Activity() {
     private var query = ""
     private var sort = 0                 // 0 日期新→旧 1 旧→新 2 名称 3 大小
     private var gridView = true
-    private var tab = 0                  // 0 图库 1 卡片 2 设置 3 回收站
+    private var tab = 0                  // 0 图库 1 卡片 2 设置 3 回收站 4 查重
 
     private var root: View? = null
     private var sidebar: View? = null
@@ -53,6 +53,7 @@ class MainActivity : Activity() {
     private var cardsView: View? = null
     private var settingsView: View? = null
     private var trashView: View? = null
+    private var dedupView: View? = null
 
     private var albumAdapter: AlbumAdapter? = null
     private var chipAdapter: ChipAdapter? = null
@@ -69,7 +70,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.2.3"
+        const val APP_VERSION = "1.3.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_TRASH = "\u0000trash"
@@ -103,7 +104,10 @@ class MainActivity : Activity() {
         }
 
         val albumList = findViewById<RecyclerView>(R.id.albumList)
-        albumAdapter = AlbumAdapter { key -> CrashGuard.guard { onPickAlbum(key) } }
+        albumAdapter = AlbumAdapter(
+            onClick = { key -> CrashGuard.guard { onPickAlbum(key) } },
+            onLongClick = { key -> CrashGuard.guard { albumActions(key) } },
+        )
         albumList?.layoutManager = LinearLayoutManager(this)
         albumList?.adapter = albumAdapter
 
@@ -159,9 +163,18 @@ class MainActivity : Activity() {
 
     // ---------- 权限
     private fun ensurePermission(after: () -> Unit) {
+        // N4 兼容：Android 13+ 用 READ_MEDIA_IMAGES，12 及以下用 READ_EXTERNAL_STORAGE
         val need = if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_IMAGES
         else Manifest.permission.READ_EXTERNAL_STORAGE
-        if (ContextCompat.checkSelfPermission(this, need) == PackageManager.PERMISSION_GRANTED) {
+        // Android 14 起支持"部分授权"（用户只勾选部分照片），此时也视为可用，
+        // 只是扫描结果会少一些，不应阻断进入主页。
+        val partial = Build.VERSION.SDK_INT >= 34 &&
+            ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+            ) == PackageManager.PERMISSION_GRANTED
+        if (partial ||
+            ContextCompat.checkSelfPermission(this, need) == PackageManager.PERMISSION_GRANTED
+        ) {
             CrashGuard.guard(after)
         } else {
             CrashGuard.guard {
@@ -270,7 +283,7 @@ class MainActivity : Activity() {
         val holder = findViewById<FrameLayout>(R.id.content) ?: return
         holder.removeAllViews()
         // 卡片页与设置页不显示侧栏
-        sidebar?.visibility = if (t == 1 || t == 2) View.GONE else View.VISIBLE
+        sidebar?.visibility = if (t == 1 || t == 2 || t == 4) View.GONE else View.VISIBLE
         when (t) {
             0 -> {
                 libraryView = layoutInflater.inflate(R.layout.page_library, holder, false)
@@ -291,6 +304,11 @@ class MainActivity : Activity() {
                 trashView = layoutInflater.inflate(R.layout.page_trash, holder, false)
                 holder.addView(trashView)
                 bindTrash(trashView!!)
+            }
+            4 -> {
+                dedupView = layoutInflater.inflate(R.layout.page_dedup, holder, false)
+                holder.addView(dedupView)
+                DedupPage(this, dedupView!!).bind()
             }
         }
         renderSidebar()
@@ -340,6 +358,18 @@ class MainActivity : Activity() {
         )
         applyLayoutManager(list)
         list?.adapter = photoAdapter
+        // 滑动多选：已进入多选模式后，按住划过即可批量选中
+        list?.let { rv ->
+            Ui.swipeSelect(
+                rv,
+                isSelectMode = { photoAdapter?.selectMode == true },
+                pick = { i ->
+                    val p = photoAdapter?.item(i)
+                    if (p != null) photoAdapter?.selected?.add(p.id)
+                },
+                changed = { refreshSelectionOnly() }
+            )
+        }
         list?.setHasFixedSize(true)
         list?.setItemViewCacheSize(12)
         list?.recycledViewPool?.setMaxRecycledViews(0, 24)
@@ -453,6 +483,32 @@ class MainActivity : Activity() {
         }
     }
 
+    /**
+     * 滑动多选过程中的轻量刷新：只更新选中标记与计数。
+     * 不走 notifyDataSetChanged，避免连续划过时列表跳动与卡顿。
+     */
+    private fun refreshSelectionOnly() {
+        val v = libraryView ?: return
+        val rv = v.findViewById<RecyclerView>(R.id.photos) ?: return
+        val sel = photoAdapter?.selected ?: return
+        for (i in 0 until rv.childCount) {
+            val child = rv.getChildAt(i)
+            val pos = rv.getChildAdapterPosition(child)
+            val p = CrashGuard.result({ photoAdapter?.item(pos) }, null) ?: continue
+            val on = sel.contains(p.id)
+            child.findViewById<View>(R.id.mask)?.visibility =
+                if (on) View.VISIBLE else View.GONE
+            child.findViewById<View>(R.id.check)?.visibility =
+                if (on) View.VISIBLE else View.GONE
+        }
+        val n = sel.size
+        v.findViewById<LinearLayout>(R.id.selBar)?.visibility =
+            if (photoAdapter?.selectMode == true && n > 0) View.VISIBLE else View.GONE
+        v.findViewById<TextView>(R.id.selText)?.text = "已选 $n 项"
+        v.findViewById<Button>(R.id.btnRename)?.visibility =
+            if (n == 1) View.VISIBLE else View.GONE
+    }
+
     private fun toggleSelect(p: Photo) {
         val s = photoAdapter?.selected ?: return
         if (!s.add(p.id)) s.remove(p.id)
@@ -532,7 +588,12 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun trashPhotos(list: List<Photo>) {
+    /** 供查重页复用：批量清理并在真正完成后回调数量。 */
+    fun trashPhotosPublic(list: List<Photo>, done: ((Int) -> Unit)? = null) {
+        CrashGuard.guard { trashPhotos(list, done) }
+    }
+
+    private fun trashPhotos(list: List<Photo>, done: ((Int) -> Unit)? = null) {
         if (list.isEmpty()) return
         Ui.async(this, io = {
             val items = Store.trash(this).toMutableList()
@@ -548,6 +609,7 @@ class MainActivity : Activity() {
         }, ui = { n ->
             Ui.toast(this, "已清理 $n 张到回收站")
             exitSelect(); loadPhotos()
+            done?.let { CrashGuard.guard { it(n) } }
         })
     }
 
@@ -558,6 +620,7 @@ class MainActivity : Activity() {
         val actions = arrayOf(
             if (isFav) "取消收藏" else "收藏",
             "移动到相册", "重命名", "删除到回收站", "多选更多",
+            "批量整理「${p.album}」", "相似照片查重",
         )
         Ui.dialog(this) {
             setTitle(p.name)
@@ -574,10 +637,87 @@ class MainActivity : Activity() {
                         2 -> renameOne(p)
                         3 -> confirmDelete(listOf(p))
                         4 -> Ui.toast(this@MainActivity, "已进入多选，可继续点选更多")
+                        5 -> batchArrange(p.album)
+                        6 -> switchTab(4)
                     }
                 }
             }
             setNegativeButton("取消", null)
+        }
+    }
+
+    /**
+     * 按图集批量整理：把某图集内全部照片整组移到目标图集。
+     * 一次处理几十上百张，免去逐张过卡片的繁琐。
+     */
+    private fun batchArrange(from: String) {
+        val count = photos.count { it.album == from }
+        if (count == 0) {
+            Ui.toast(this, "该图集没有照片")
+            return
+        }
+        Ui.albumSheet(this, allAlbumNames().filter { it != from }) { to ->
+            Ui.confirm(
+                this, "批量整理",
+                "把「$from」的 $count 张整组移动到「$to」，移动后原图集将空出。",
+                okText = "开始"
+            ) {
+                Ui.async(this, io = {
+                    CrashGuard.result({ Repo.moveAlbum(this, from, to) }, intArrayOf(0, 0, 0))
+                }, ui = { r ->
+                    val moved = r.getOrNull(0) ?: 0
+                    val copied = r.getOrNull(1) ?: 0
+                    Ui.toast(this, "已移动 $moved 张${if (copied > 0) "，另有 $copied 张以复制方式完成" else ""}")
+                    exitSelect()
+                    loadPhotos()
+                })
+            }
+        }
+    }
+
+    /**
+     * 图集操作：重命名 / 合并到其他图集 / 删除整个图集。
+     * 侧栏长按图集时触发。
+     */
+    private fun albumActions(name: String) {
+        if (name == KEY_ALL || name == KEY_FAV || name == KEY_TRASH) return
+        val count = photos.count { it.album == name }
+        val others = allAlbumNames().filter { it != name }
+        val actions = mutableListOf("重命名图集", "合并到其他图集", "批量整理到其他图集")
+        if (others.isNotEmpty()) actions.add("删除整个图集（$count 张入回收站）")
+        Ui.dialog(this) {
+            setTitle("图集：$name")
+            setItems(actions.toTypedArray()) { _, which ->
+                CrashGuard.guard {
+                    when (which) {
+                        0 -> Ui.input(this@MainActivity, "重命名图集", name) { newName ->
+                            RenameAlbumTask(newName).run(name)
+                        }
+                        1 -> Ui.listSheet(this@MainActivity, "合并到", others) { i ->
+                            RenameAlbumTask(others[i]).run(name)
+                        }
+                        2 -> batchArrange(name)
+                        3 -> confirmDelete(photos.filter { it.album == name })
+                    }
+                }
+            }
+            setNegativeButton("取消", null)
+        }
+    }
+
+    /** 图集改名 / 合并的执行体，复用同一段逻辑。 */
+    private inner class RenameAlbumTask(private val to: String) {
+        fun run(from: String) {
+            if (to.isBlank() || to == from) return
+            Ui.async(this@MainActivity, io = {
+                CrashGuard.result({ Repo.renameAlbum(this@MainActivity, from, to) }, 0)
+            }, ui = { n ->
+                Ui.toast(
+                    this@MainActivity,
+                    if (allAlbumNames().contains(from)) "已处理 $n 张，改为「$to」" else "已处理 $n 张"
+                )
+                loadPhotos()
+            })
         }
     }
 
@@ -697,6 +837,23 @@ class MainActivity : Activity() {
         body.addView(Ui.switchRow(this, "自动清理超 30 天的项目", Store.autoCleanTrash) {
             Store.autoCleanTrash = it; Store.saveSettings(this)
         })
+        body.addView(Ui.switchRow(this, "清空时输入「删除」二次确认", Store.trashGuard) {
+            Store.trashGuard = it; Store.saveSettings(this)
+        })
+
+        // ---- 工具
+        body.addView(Ui.section(this, "工具"))
+        body.addView(Ui.actionRow(this, "相似照片查重", "检测重复并清理") { switchTab(4) })
+        body.addView(Ui.actionRow(this, "按图集批量整理", "整组移动") {
+            Ui.listSheet(this, "选择要整理的图集", allAlbumNames()) { i ->
+                CrashGuard.guard { batchArrange(allAlbumNames()[i]) }
+            }
+        })
+        body.addView(Ui.actionRow(this, "图集重命名 / 合并", "") {
+            Ui.listSheet(this, "选择图集", allAlbumNames()) { i ->
+                CrashGuard.guard { albumActions(allAlbumNames()[i]) }
+            }
+        })
 
         // ---- 操作
         body.addView(Ui.section(this, "操作"))
@@ -789,16 +946,54 @@ class MainActivity : Activity() {
         }
         list?.layoutManager = LinearLayoutManager(this)
         list?.adapter = trashAdapter
+        // N3：复用池与缓存尺寸，避免长列表滚动时频繁创建 ViewHolder
+        list?.setHasFixedSize(false)
+        list?.setItemViewCacheSize(8)
+        list?.recycledViewPool?.setMaxRecycledViews(0, 16)
         trashAdapter?.submit(items)
 
         v.findViewById<Button>(R.id.btnEmpty)?.setOnClickListener {
-            Ui.confirm(this, "清空回收站", "将彻底删除 ${items.size} 项，无法恢复。", okText = "清空") {
-                items.forEach { runCatching { java.io.File(it.file).delete() } }
-                Store.saveTrash(this, emptyList())
-                loadPhotos()
-            }
+            CrashGuard.guard { confirmEmptyTrash(items) }
         }
         styleButtons(v)
+    }
+
+    /**
+     * 清空回收站的双重保护：
+     * 第一层常规确认，第二层要求手动输入「删除」二字才能执行。
+     * 开启 trashGuard 时生效，避免误触造成不可恢复的丢失。
+     */
+    private fun confirmEmptyTrash(items: List<TrashItem>) {
+        if (items.isEmpty()) {
+            Ui.toast(this, "回收站是空的")
+            return
+        }
+        val doDelete = {
+            items.forEach { runCatching { java.io.File(it.file).delete() } }
+            Store.saveTrash(this, emptyList())
+            Ui.toast(this, "已清空 ${items.size} 项")
+            loadPhotos()
+        }
+        if (!Store.trashGuard) {
+            Ui.confirm(this, "清空回收站", "将彻底删除 ${items.size} 项，无法恢复。", okText = "清空", onOk = doDelete)
+            return
+        }
+        // 第二层：输入确认
+        val input = android.widget.EditText(this).apply {
+            hint = "输入「删除」以确认"
+            setTextColor(SkinNow.skin.text)
+            setHintTextColor(SkinNow.skin.textDim)
+        }
+        Ui.dialog(this) {
+            setTitle("清空回收站")
+            setMessage("将彻底删除 ${items.size} 项，无法恢复。请输入「删除」确认。")
+            setView(input)
+            setNegativeButton("取消", null)
+            setPositiveButton("清空") { _: android.content.DialogInterface, _: Int ->
+                if (input.text.toString().trim() == "删除") doDelete()
+                else Ui.toast(this@MainActivity, "输入不匹配，已取消")
+            }
+        }
     }
 
     /** Android 11+ 删除他人应用媒体需要授权时，交给系统弹窗。 */
