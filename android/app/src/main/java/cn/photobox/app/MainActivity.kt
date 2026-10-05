@@ -45,6 +45,10 @@ class MainActivity : Activity() {
     private var query = ""
     private var sort = 0                 // 0 日期新→旧 1 旧→新 2 名称 3 大小
     private var gridView = true
+    companion object {
+        const val REQ_PICK_BG = 9011
+    }
+
     private var tab = 0                  // 0 图库 1 卡片 2 设置 3 回收站 4 查重
 
     private var root: View? = null
@@ -54,6 +58,7 @@ class MainActivity : Activity() {
     private var settingsView: View? = null
     private var trashView: View? = null
     private var dedupView: View? = null
+    private var skinView: View? = null
 
     private var albumAdapter: AlbumAdapter? = null
     private var chipAdapter: ChipAdapter? = null
@@ -70,7 +75,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.4.1"
+        const val APP_VERSION = "1.5.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_TRASH = "\u0000trash"
@@ -86,6 +91,7 @@ class MainActivity : Activity() {
         sort = Store.sortDefault
 
         CrashGuard.guard { initUi() }
+        CrashGuard.guard { applyBackground() }
         // 先渲染主页，界面立即可见；权限与扫描并行进行
         CrashGuard.guard { switchTab(tab) }
         CrashGuard.guard { ensurePermission { loadPhotos() } }
@@ -305,7 +311,7 @@ class MainActivity : Activity() {
         val holder = findViewById<FrameLayout>(R.id.content) ?: return
         holder.removeAllViews()
         // 卡片页与设置页不显示侧栏
-        sidebar?.visibility = if (t == 1 || t == 2 || t == 4) View.GONE else View.VISIBLE
+        sidebar?.visibility = if (t == 1 || t == 2 || t == 4 || t == 5) View.GONE else View.VISIBLE
         when (t) {
             0 -> {
                 libraryView = layoutInflater.inflate(R.layout.page_library, holder, false)
@@ -331,6 +337,11 @@ class MainActivity : Activity() {
                 dedupView = layoutInflater.inflate(R.layout.page_dedup, holder, false)
                 holder.addView(dedupView)
                 DedupPage(this, dedupView!!).bind()
+            }
+            5 -> {
+                skinView = layoutInflater.inflate(R.layout.page_skin, holder, false)
+                holder.addView(skinView)
+                SkinPage(this, skinView!!).bind()
             }
         }
         renderSidebar()
@@ -813,14 +824,14 @@ class MainActivity : Activity() {
         v.findViewById<ImageButton>(R.id.btnSkin)?.apply {
             setImageResource(R.drawable.ic_palette)
             setColorFilter(s.accent)
-            setOnClickListener { CrashGuard.guard { showSkinPicker() } }
+            setOnClickListener { CrashGuard.guard { switchTab(5) } }
         }
 
         body.removeAllViews()
 
         // ---- 外观
         body.addView(Ui.section(this, "外观"))
-        body.addView(Ui.actionRow(this, "皮肤", SkinNow.skin.name) { showSkinPicker() })
+        body.addView(Ui.actionRow(this, "皮肤", SkinNow.skin.name) { switchTab(5) })
         body.addView(Ui.switchRow(this, "默认宫格视图", Store.defaultGrid) {
             Store.defaultGrid = it; Store.saveSettings(this); gridView = it
         })
@@ -933,12 +944,52 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun switchSkin(key: String) {
-        if (key == SkinNow.skin.key) return
+    /** 应用皮肤：保存 → 刷新 → 重建界面，立即生效。 */
+    fun applySkinNow(key: String) {
         CrashGuard.safe(this, "换肤失败") {
             SkinNow.apply(applicationContext, key)
             Thumbs.clear()
+            applyBackground()
             recreate()
+        }
+    }
+
+    private fun switchSkin(key: String) {
+        applySkinNow(key)
+    }
+
+    /** 渲染自定义背景图片层，透明度按「图片浓度遮罩」。 */
+    fun applyBackground() {
+        CrashGuard.guard {
+            val layer = findViewById<ImageView>(R.id.bgLayer) ?: return
+            if (Store.bgUri.isBlank()) {
+                layer.setImageDrawable(null)
+                return
+            }
+            CrashGuard.guard {
+                layer.setImageURI(android.net.Uri.parse(Store.bgUri))
+                layer.imageAlpha = (Store.bgDim.coerceIn(0, 100) * 255 / 100)
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(request: Int, result: Int, data: Intent?) {
+        super.onActivityResult(request, result, data)
+        if (request == REQ_PICK_BG && result == RESULT_OK) {
+            val uri = data?.data ?: return
+            CrashGuard.guard {
+                runCatching {
+                    contentResolver.takePersistableUriPermission(
+                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
+                Store.bgUri = uri.toString()
+                Store.saveSettings(this)
+                applyBackground()
+                Ui.toast(this, "背景已设置")
+                if (tab == 5) switchTab(5)
+            }
         }
     }
 
