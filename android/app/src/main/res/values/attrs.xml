@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 皮肤可变色：由各皮肤 style 赋值，drawable 通过 ?attr 读取 -->
+    <attr name="bgTopColor" format="color" />
+    <attr name="bgBottomColor" format="color" />
+    <attr name="glassColor" format="color" />
+    <attr name="glassStrongColor" format="color" />
+    <attr name="strokeColor" format="color" />
+    <attr name="surfaceStrongColor" format="color" />
+    <attr name="accentColor" format="color" />
+    <attr name="accentSoftColor" format="color" />
+    <attr name="textColorMain" format="color" />
+    <attr name="textColorDim" format="color" />
+    <attr name="dangerColor" format="color" />
+    <attr name="okColor" format="color" />
+</resources>
