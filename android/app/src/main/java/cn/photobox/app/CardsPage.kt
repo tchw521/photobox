@@ -73,6 +73,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         albumBar = root.findViewById(R.id.albumBar)
 
         applySkin()
+        tip?.visibility = if (Store.cardHint) View.VISIBLE else View.GONE
         queue = act.cardPhotos().toMutableList()
         idx = 0
         done = 0
@@ -265,6 +266,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     }
 
     private fun resetCard() {
+        tip?.visibility = if (Store.cardHint) View.VISIBLE else View.GONE
         c0?.translationX = 0f
         c0?.translationY = 0f
         c0?.alpha = 1f
