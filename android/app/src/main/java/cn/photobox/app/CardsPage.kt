@@ -91,6 +91,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         root.findViewById<Button>(R.id.btnTrash).setOnClickListener { current()?.let { dropTrash(it) } }
 
         tip.text = TIP
+        c0.isClickable = true          // 保证 ImageView 稳定接收触摸序列
         bindAlbums()
         attachGesture()
         render()
@@ -99,7 +100,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     // ------------------------------------------------------------ 底部相册栏
     private fun bindAlbums() {
         albumList.layoutManager = LinearLayoutManager(act, LinearLayoutManager.HORIZONTAL, false)
-        val names = act.cardPhotos().map { it.album }.distinct().sorted()
+        val names = act.allAlbumNames()
         // 第 0 项为「新建图集」
         val total = names.size + 1
         albumList.adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -148,6 +149,8 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         c0.setOnTouchListener { _, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    // 防止父容器把后续 MOVE 抢走，导致滑动中途收到 ACTION_CANCEL
+                    c0.parent?.requestDisallowInterceptTouchEvent(true)
                     startX = e.rawX
                     startY = e.rawY
                     dragging = true
@@ -159,7 +162,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
                 MotionEvent.ACTION_MOVE -> {
                     val dx = e.rawX - startX
                     val dy = e.rawY - startY
-                    if (abs(dx) > 8 || abs(dy) > 8) {
+                    if (abs(dx) > 12 || abs(dy) > 12) {
                         if (!moved) {
                             moved = true
                             handler.removeCallbacks(longRunnable)
@@ -181,9 +184,12 @@ class CardsPage(private val act: MainActivity, private val root: View) {
                     val dx = e.rawX - startX
                     val dy = e.rawY - startY
                     val up = e.actionMasked == MotionEvent.ACTION_UP
+                    val wasLong = longMode
                     dragging = false
+                    longMode = false
+                    moved = false
                     resetCard()
-                    if (up) settle(dx, dy)
+                    if (up) settle(dx, dy, wasLong)
                     true
                 }
                 else -> false
@@ -200,14 +206,17 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         else -> if (longMode) "按住并下滑 → 归类到相册" else TIP
     }
 
-    private fun settle(dx: Float, dy: Float) {
+    private fun settle(dx: Float, dy: Float, wasLong: Boolean) {
         val p = current() ?: return
+        val far = maxOf(abs(dx), abs(dy)) >= THRESHOLD
         when {
-            longMode && dy >= THRESHOLD -> showMoveSheet(p)
+            // 长按生效后：抬手即弹归类菜单，下滑同样触发（更容错）
+            wasLong -> showMoveSheet(p)
             abs(dx) > abs(dy) && dx <= -THRESHOLD -> prev()
             abs(dx) > abs(dy) && dx >= THRESHOLD -> next()
             dy <= -THRESHOLD -> dropTrash(p)
             dy >= THRESHOLD -> dropFav(p)
+            !far -> Unit
         }
     }
 
@@ -300,17 +309,22 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     }
 
     private fun classify(p: Photo, album: String) {
+        val move = Store.cardModeMove
         Thread {
-            val ok = Repo.copyToAlbum(act, p, album)
-            if (ok && Store.cardModeMove) {
-                val items = Store.trash(act).toMutableList()
-                Repo.moveToTrash(act, p) { e -> act.runOnUiThread { act.requestDeleteConsent(e) } }
-                    ?.let { items.add(it) }
-                Store.saveTrash(act, items)
+            var ok = false
+            if (move) {
+                ok = Repo.moveToAlbum(act, p, album)
+                if (!ok) ok = Repo.copyToAlbum(act, p, album)   // 低版本退回复制
+            } else {
+                ok = Repo.copyToAlbum(act, p, album)
             }
             act.runOnUiThread {
-                Toast.makeText(act, "已归类到「$album」", Toast.LENGTH_SHORT).show()
-                advance(p)
+                Toast.makeText(
+                    act,
+                    if (ok) "已${if (move) "移动" else "复制"}到「$album」" else "操作失败",
+                    Toast.LENGTH_SHORT
+                ).show()
+                if (ok) advance(p)
                 act.afterCardAction()
                 bindAlbums()
             }
@@ -319,7 +333,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
 
     // ------------------------------------------------------------ 归类弹窗
     private fun showMoveSheet(p: Photo) {
-        val names = act.cardPhotos().map { it.album }.distinct().sorted()
+        val names = act.allAlbumNames()
         val dialog = BottomSheetDialog(act)
         val rv = RecyclerView(act).apply {
             layoutManager = LinearLayoutManager(act)
