@@ -1,12 +1,13 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp"
     android:viewportWidth="24" android:viewportHeight="24">
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.5"
-        android:pathData="M10.4,5.2h9.4c0.5,0 0.9,0.4 0.9,0.9s-0.4,0.9 -0.9,0.9h-9.4c-0.5,0 -0.9,-0.4 -0.9,-0.9s0.4,-0.9 0.9,-0.9z"/>
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.5"
-        android:pathData="M10.4,11.1h9.4c0.5,0 0.9,0.4 0.9,0.9s-0.4,0.9 -0.9,0.9h-9.4c-0.5,0 -0.9,-0.4 -0.9,-0.9s0.4,-0.9 0.9,-0.9z"/>
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.5"
-        android:pathData="M10.4,17h9.4c0.5,0 0.9,0.4 0.9,0.9s-0.4,0.9 -0.9,0.9h-9.4c-0.5,0 -0.9,-0.4 -0.9,-0.9s0.4,-0.9 0.9,-0.9z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M4,4.6h4.4v3.4H4z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M4,10.2h4.4v3.4H4z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M4,15.8h4.4v3.4H4z"/>
+    <!-- 列表：左侧缩略块 + 右侧文本行 -->
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.62"
+        android:pathData="M10.2,5h9.6c0.44,0 0.8,0.36 0.8,0.8s-0.36,0.8 -0.8,0.8h-9.6c-0.44,0 -0.8,-0.36 -0.8,-0.8S9.76,5 10.2,5z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.62"
+        android:pathData="M10.2,11h9.6c0.44,0 0.8,0.36 0.8,0.8s-0.36,0.8 -0.8,0.8h-9.6c-0.44,0 -0.8,-0.36 -0.8,-0.8S9.76,11 10.2,11z"/>
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.62"
+        android:pathData="M10.2,17h9.6c0.44,0 0.8,0.36 0.8,0.8s-0.36,0.8 -0.8,0.8h-9.6c-0.44,0 -0.8,-0.36 -0.8,-0.8S9.76,17 10.2,17z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M3.4,3.8h5.4v4.4H3.4z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M3.4,9.8h5.4v4.4H3.4z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M3.4,15.8h5.4v4.4H3.4z"/>
 </vector>
