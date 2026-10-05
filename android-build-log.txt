@@ -41,7 +41,6 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processReleaseMainManifest
 > Task :app:processReleaseManifest
 > Task :app:javaPreCompileRelease
-> Task :app:processReleaseManifestForPackage
 > Task :app:extractProguardFiles
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseShaders
@@ -51,6 +50,7 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
+> Task :app:processReleaseManifestForPackage
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
@@ -77,5 +77,5 @@ w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 > Task :app:createReleaseApkListingFileRedirect
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 1m 16s
+BUILD SUCCESSFUL in 1m 23s
 39 actionable tasks: 39 executed
