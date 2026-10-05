@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.6.0"
+        const val APP_VERSION = "1.7.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -99,6 +99,9 @@ class MainActivity : ComponentActivity() {
         }
 
         applyBars()
+        // 关键：先渲染主页，界面立刻可见。
+        // 此前主页要等权限授予 + 扫描完成才出现，任何一环延迟都会表现为"卡在启动页"。
+        switchTab(tab)
         ensurePermission { loadPhotos() }
     }
 
@@ -132,8 +135,12 @@ class MainActivity : ComponentActivity() {
     private val permLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { res ->
+        // 拒绝也要进主页，不能停在空白页
         if (res.values.any { it }) loadPhotos()
-        else Toast.makeText(this, R.string.need_permission, Toast.LENGTH_LONG).show()
+        else {
+            Ui.toast(this, getString(R.string.need_permission))
+            loadPhotos()
+        }
     }
 
     private val deleteConsent = registerForActivityResult(
@@ -141,15 +148,23 @@ class MainActivity : ComponentActivity() {
     ) { loadPhotos() }
 
     // ---------- 数据
+    /** 扫描：后台线程执行，主线程只做赋值与刷新，避免上万张时 ANR。 */
     private fun loadPhotos() {
-        CrashGuard.safe(this, "扫描照片失败") { loadPhotosInner() }
-    }
-
-    private fun loadPhotosInner() {
-        photos = Repo.scan(this)
-        val blocked = Store.blocked(this)
-        photos = photos.filter { it.album !in blocked }
-        switchTab(tab)
+        Ui.io.execute {
+            val list = CrashGuard.result({ Repo.scan(this@MainActivity) }, emptyList())
+            val blocked = Store.blocked(this@MainActivity)
+            val keep = try {
+                list.filter { it.album !in blocked }
+            } catch (e: Throwable) {
+                CrashGuard.log(e); list
+            }
+            Ui.main {
+                if (!isFinishing && !isDestroyed) {
+                    photos = keep
+                    switchTab(tab)
+                }
+            }
+        }
     }
 
     private fun visible(): List<Photo> {
@@ -376,6 +391,11 @@ class MainActivity : ComponentActivity() {
         val data = visible()
         photoAdapter?.submit(data)
         photoAdapter?.notifyDataSetChanged()
+        tip.text = when {
+            photos.isEmpty() -> "暂无照片，点右上角设置 → 重新扫描，或先授予照片权限"
+            data.isEmpty() -> "当前筛选下没有照片"
+            else -> "${data.size} 张"
+        }
 
         chipAdapter.submit(data.map { it.month }.distinct().sortedDescending(), month)
 
