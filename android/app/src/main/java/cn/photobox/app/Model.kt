@@ -78,6 +78,10 @@ object Store {
     var previewActions = true
     var defaultGrid = true
     var viewMode = 0                  // 0 宫格 1 列表 2 流式
+
+    // ---- 卡片页本轮进度：用「已处理 ID 集合」而非计数，重建后不会丢失
+    var cardDoneIds: Set<String> = emptySet()
+    var cardTotal = 0
     var cardModeMove = true
     var nameMarquee = true          // 相册名自动滚动
     var cardHint = true             // 卡片页显示手势提示
@@ -118,6 +122,8 @@ object Store {
         csAccentLevel = s.getInt("csAccentLevel", 60)
         bgUri = s.getString("bgUri", "") ?: ""
         bgDim = s.getInt("bgDim", 34)
+        cardDoneIds = s.getStringSet("cardDoneIds", emptySet()) ?: emptySet()
+        cardTotal = s.getInt("cardTotal", 0)
     }
 
     fun saveSettings(c: Context) {
@@ -140,6 +146,8 @@ object Store {
             .putInt("csAccentLevel", csAccentLevel)
             .putString("bgUri", bgUri)
             .putInt("bgDim", bgDim)
+            .putStringSet("cardDoneIds", cardDoneIds)
+            .putInt("cardTotal", cardTotal)
             .apply()
     }
 }
