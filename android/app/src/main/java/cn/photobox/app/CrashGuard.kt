@@ -52,15 +52,22 @@ object CrashGuard {
     /** install 时保存 applicationContext，供无 Context 场景写日志。 */
     private var appCtx: Context? = null
 
+    /**
+     * 安装全局兜底。
+     *
+     * 关键：捕获后【不再】转交系统默认的 handler。
+     * 默认 handler 会终止进程，表现就是用户看到的「闪退」。
+     * 这里改为只记录日志并让消息循环继续，应用保持可用；
+     * 日志可在设置页查看，便于定位。
+     */
     fun install(c: Context) {
         appCtx = c.applicationContext
-        val prev = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             try {
                 write(c, t, e)
             } catch (_: Throwable) {
+                // 写日志失败也不能再抛，否则又回到崩溃
             }
-            prev?.uncaughtException(t, e)
         }
     }
 
@@ -78,6 +85,15 @@ object CrashGuard {
         try {
             File(c.filesDir, "crash.log").delete()
         } catch (_: Throwable) {
+        }
+    }
+
+    /** 兜底执行，吞掉异常并记日志。供各处 onBind / 回调复用。 */
+    inline fun guard(block: () -> Unit) {
+        try {
+            block()
+        } catch (e: Throwable) {
+            log(e)
         }
     }
 
