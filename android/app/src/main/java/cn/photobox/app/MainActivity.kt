@@ -45,10 +45,6 @@ class MainActivity : Activity() {
     private var query = ""
     private var sort = 0                 // 0 日期新→旧 1 旧→新 2 名称 3 大小
     private var gridView = true
-    companion object {
-        const val REQ_PICK_BG = 9011
-    }
-
     private var tab = 0                  // 0 图库 1 卡片 2 设置 3 回收站 4 查重
 
     private var root: View? = null
@@ -76,6 +72,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_size,
         )
         const val APP_VERSION = "1.5.0"
+        const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_TRASH = "\u0000trash"
