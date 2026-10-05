@@ -264,16 +264,16 @@ object Glass {
         val body = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = radius
-            setColor((s.glassStrong and 0x00FFFFFF) or 0xB0000000.toInt())
-            setStroke(1, (s.stroke and 0x00FFFFFF) or 0x55000000)
+            setColor((s.glassStrong and 0x00FFFFFF) or 0x8C000000.toInt())
+            setStroke(1, (s.stroke and 0x00FFFFFF) or 0x48000000)
         }
         val gloss = GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(0x5AFFFFFF, 0x1EFFFFFF, 0x00FFFFFF)
+            intArrayOf(0x70FFFFFF, 0x24FFFFFF, 0x00FFFFFF)
         ).apply { cornerRadius = radius }
         val bottom = GradientDrawable(
             GradientDrawable.Orientation.BOTTOM_TOP,
-            intArrayOf(0x3CFFFFFF, 0x00FFFFFF)
+            intArrayOf(0x4AFFFFFF, 0x00FFFFFF)
         ).apply { cornerRadius = radius }
         return LayerDrawable(arrayOf(body, gloss, bottom))
     }
