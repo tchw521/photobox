@@ -53,7 +53,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
      * 写进 Store 持久化，重建后照常恢复。
      */
     private var done: Int
-        get() = Store.cardDoneIds.size
+        get() = act.cardDoneCount()
         set(_) = Unit
     private var bound = false
 
@@ -69,13 +69,6 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         fun resetSession() {
             Store.cardDoneIds = emptySet()
             Store.cardTotal = 0
-        }
-
-        /** 标记一张已处理。 */
-        fun markDone(id: Long) {
-            val set = Store.cardDoneIds.toMutableSet()
-            set.add(id.toString())
-            Store.cardDoneIds = set
         }
 
         /**
@@ -109,11 +102,12 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         applySkin()
         tip?.visibility = if (Store.cardHint) View.VISIBLE else View.GONE
         // 排除本轮已处理的照片，队列重建后也不会重复出现
-        val doneIds = Store.cardDoneIds
-        queue = act.cardPhotos().filter { it.id.toString() !in doneIds }.toMutableList()
+        // 用 Activity 上的已处理集合过滤，页面重建后不会重复出现
+        val doneIds = act.cardDoneIds()
+        queue = act.cardPhotos().filter { it.id !in doneIds }.toMutableList()
         idx = 0
-        // 总数 = 当前队列 + 已处理；首次进入时初始化
-        if (Store.cardTotal <= 0) Store.cardTotal = queue.size
+        // 总数 = 已处理 + 当前队列
+        Store.cardTotal = act.cardTotal()
 
         attachGesture()
         bindAlbums()
@@ -351,7 +345,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
 
     private fun render() {
         CrashGuard.guard {
-            progress?.text = "$done / ${Store.cardTotal.coerceAtLeast(queue.size + done)}"
+            progress?.text = "$done / ${maxOf(act.cardTotal(), queue.size + done)}"
             val p = current()
             if (p == null) {
                 c0?.setImageDrawable(null)
@@ -375,8 +369,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     private fun advance(removed: Photo) {
         CrashGuard.guard {
             queue.remove(removed)
-            markDone(removed.id)
-            Store.saveSettings(act)
+            act.markCardDone(removed.id)
             if (idx >= queue.size) idx = (queue.size - 1).coerceAtLeast(0)
             render()
         }
