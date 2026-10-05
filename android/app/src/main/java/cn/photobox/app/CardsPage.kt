@@ -5,9 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -100,49 +98,17 @@ class CardsPage(private val act: MainActivity, private val root: View) {
     }
 
     // ------------------------------------------------------------ 底部相册栏
+    /** 底部相册栏：复用 Ui.albumSheet 的同款适配器，保证两处交互一致。 */
     private fun bindAlbums() {
         albumList.layoutManager = LinearLayoutManager(act, LinearLayoutManager.HORIZONTAL, false)
-        val names = act.allAlbumNames()
-        // 第 0 项为「新建图集」
-        val total = names.size + 1
-        albumList.adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-            override fun onCreateViewHolder(p: ViewGroup, t: Int): RecyclerView.ViewHolder {
-                val tv = TextView(act).apply {
-                    setPadding(20, 16, 20, 16); textSize = 12f
-                    setTextColor(resolveColor(act, R.attr.textColorMain))
-                    background = act.getDrawable(R.drawable.glass_bubble)
-                }
-                return object : RecyclerView.ViewHolder(tv) {}
+        albumList.adapter = AlbumSheetAdapter(act, act.allAlbumNames(), true, true) { name ->
+            val p = current()
+            if (p == null) {
+                Toast.makeText(act, "没有待整理的照片", Toast.LENGTH_SHORT).show()
+                return@AlbumSheetAdapter
             }
-
-            override fun onBindViewHolder(h: RecyclerView.ViewHolder, i: Int) {
-                val tv = h.itemView as TextView
-                if (i == 0) {
-                    tv.text = "＋ 新建图集"
-                    tv.setTextColor(resolveColor(act, R.attr.accentColor))
-                    tv.setOnClickListener { current()?.let { newAlbum(it) } }
-                } else {
-                    val n = names[i - 1]
-                    tv.text = "📁 $n"
-                    tv.setOnClickListener { current()?.let { classify(it, n) } }
-                }
-            }
-
-            override fun getItemCount() = total
+            classify(p, name)
         }
-    }
-
-    private fun newAlbum(p: Photo) {
-        val input = EditText(act).apply { hint = "图集名称" }
-        MaterialAlertDialogBuilder(act)
-            .setTitle("新建图集")
-            .setView(input)
-            .setNegativeButton("取消", null)
-            .setPositiveButton("创建并归类") { _, _ ->
-                val n = input.text.toString().trim()
-                if (n.isBlank()) return@setPositiveButton
-                classify(p, n)
-            }.show()
     }
 
     // ------------------------------------------------------------ 手势
