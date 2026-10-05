@@ -1,17 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  液态玻璃卡片：四层
+  1. 底色（半透明玻璃）
+  2. 顶部高光渐变（模拟玻璃上沿折射）
+  3. 底部微反光（模拟环境反射）
+  4. 细描边（勾勒轮廓）
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
             <solid android:color="?attr/glassColor"/>
-            <stroke android:width="1dp" android:color="?attr/strokeColor"/>
-            <corners android:radius="16dp"/>
+            <corners android:radius="18dp"/>
         </shape>
     </item>
-    <item android:top="0.8dp" android:left="0.8dp" android:right="0.8dp">
+    <item android:top="0dp" android:left="0dp" android:right="0dp" android:bottom="0dp">
         <shape android:shape="rectangle">
             <gradient android:type="linear" android:angle="270"
-                android:startColor="#16FFFFFF" android:endColor="#00FFFFFF"/>
-            <corners android:radius="16dp"/>
+                android:startColor="#26FFFFFF"
+                android:centerColor="#0AFFFFFF"
+                android:endColor="#00FFFFFF"/>
+            <corners android:radius="18dp"/>
+        </shape>
+    </item>
+    <item android:top="0dp" android:left="0dp" android:right="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="90"
+                android:startColor="#00FFFFFF"
+                android:centerColor="#00FFFFFF"
+                android:endColor="#14FFFFFF"/>
+            <corners android:radius="18dp"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <stroke android:width="1dp" android:color="?attr/strokeColor"/>
+            <corners android:radius="18dp"/>
         </shape>
     </item>
 </layer-list>
