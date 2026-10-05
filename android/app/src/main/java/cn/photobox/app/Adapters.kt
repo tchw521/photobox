@@ -33,6 +33,11 @@ class AlbumAdapter(
     override fun getItemCount() = rows.size
 
     override fun onBindViewHolder(h: H, i: Int) {
+        if (i !in rows.indices) return
+        CrashGuard.guard { bind(h, i) }
+    }
+
+    private fun bind(h: H, i: Int) {
         val r = rows[i]
         h.name.text = r.label
         h.name.isSelected = true                      // 触发跑马灯
@@ -68,6 +73,11 @@ class ChipAdapter(private val onClick: (String?) -> Unit) :
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(h: H, i: Int) {
+        if (i !in items.indices) return
+        CrashGuard.guard { bindChip(h, i) }
+    }
+
+    private fun bindChip(h: H, i: Int) {
         val m = items[i]
         h.t.text = m
         val on = m == current
@@ -119,6 +129,11 @@ class PhotoAdapter(
     override fun getItemCount() = data.size
 
     override fun onBindViewHolder(h: H, i: Int) {
+        if (i !in data.indices) return
+        CrashGuard.guard { bindPhoto(h, i) }
+    }
+
+    private fun bindPhoto(h: H, i: Int) {
         val p = data[i]
         val px = if (grid) 220 else 110
         h.thumb?.let { Thumbs.into(c, p, px, it) }
@@ -158,6 +173,11 @@ class TrashAdapter(
     override fun getItemCount() = data.size
 
     override fun onBindViewHolder(h: H, i: Int) {
+        if (i !in data.indices) return
+        CrashGuard.guard { bindTrash(h, i) }
+    }
+
+    private fun bindTrash(h: H, i: Int) {
         val item = data[i]
         Thumbs.file(item.file, 120, h.thumb)
         h.name.text = item.name
