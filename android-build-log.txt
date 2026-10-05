@@ -40,8 +40,8 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:parseReleaseLocalResources
 > Task :app:processReleaseMainManifest
 > Task :app:processReleaseManifest
-> Task :app:javaPreCompileRelease
 > Task :app:extractProguardFiles
+> Task :app:javaPreCompileRelease
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseShaders
 > Task :app:compileReleaseShaders NO-SOURCE
@@ -49,10 +49,10 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
-> Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
+> Task :app:processReleaseManifestForPackage
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
 > Task :app:bundleReleaseResources FAILED
@@ -616,5 +616,5 @@ ERROR: /home/runner/work/photobox/photobox/android/app/src/main/res/layout/page_
 
 ==============================================================================
 
-BUILD FAILED in 39s
+BUILD FAILED in 52s
 29 actionable tasks: 29 executed
