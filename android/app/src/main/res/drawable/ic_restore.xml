@@ -1,8 +1,6 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp"
     android:viewportWidth="24" android:viewportHeight="24">
-    <!-- 逆时针回退箭头 -->
+    <!-- 逆时针回退：箭头 + 弧线 -->
     <path android:fillColor="#FFFFFF"
-        android:pathData="M12,4.4V1.8L6.9,6.9 12,12V9.2a5.4,5.4 0 1,1 -5.4,5.4H4.9a7.1,7.1 0 1,0 7.1,-10.2z"/>
-    <path android:fillColor="#FFFFFF" android:fillAlpha="0.35"
-        android:pathData="M12,1.8v2.6V1.8z"/>
+        android:pathData="M11.8,4.2V1.5L6.6,6.7 11.8,11.9V9.1a5.55,5.55 0 1,1 -5.55,5.55H4.55a7.25,7.25 0 1,0 7.25,-10.45z"/>
 </vector>
