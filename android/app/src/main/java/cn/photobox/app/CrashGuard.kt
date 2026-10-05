@@ -31,7 +31,7 @@ object CrashGuard {
         }
     }
 
-    private fun write(c: Context, t: Thread, e: Throwable) {
+    internal fun write(c: Context, t: Thread, e: Throwable) {
         val time = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
         val sb = StringBuilder()
         sb.append("=== $time | thread=${t.name} | v${MainActivity.APP_VERSION} ===\n")
