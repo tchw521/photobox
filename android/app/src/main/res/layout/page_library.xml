@@ -8,15 +8,15 @@
         <EditText android:id="@+id/search" android:layout_width="0dp" android:layout_height="36dp"
             android:layout_weight="1" android:hint="搜索照片 / 图集" android:textSize="12sp"
             android:textColor="?attr/textColorMain" android:textColorHint="?attr/textColorDim"
-            android:background="@drawable/bg_bubble" android:paddingStart="10dp" android:paddingEnd="10dp"
+            android:background="@drawable/glass_bubble" android:paddingStart="10dp" android:paddingEnd="10dp"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="6dp"
             android:inputType="text" android:imeOptions="actionSearch" android:singleLine="true"/>
         <ImageButton android:id="@+id/btnView" android:layout_width="36dp" android:layout_height="36dp"
-            android:src="@android:drawable/ic_menu_gallery" android:background="@drawable/bg_bubble"
+            android:src="@android:drawable/ic_menu_gallery" android:background="@drawable/glass_bubble"
             android:contentDescription="切换视图" android:layout_marginStart="6dp"/>
         <ImageButton android:id="@+id/btnSort" android:layout_width="36dp" android:layout_height="36dp"
-            android:src="@android:drawable/ic_menu_sort_alphabetically" android:background="@drawable/bg_bubble"
+            android:src="@android:drawable/ic_menu_sort_alphabetically" android:background="@drawable/glass_bubble"
             android:contentDescription="排序" android:layout_marginStart="4dp"/>
     </LinearLayout>
 
