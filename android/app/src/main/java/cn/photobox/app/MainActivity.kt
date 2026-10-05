@@ -541,7 +541,7 @@ class MainActivity : ComponentActivity() {
         skinList.layoutManager = GridLayoutManager(this, 3)
         skinList.adapter = SkinAdapter(
             current = SkinNow.skin.key,
-            picked = { key != SkinNow.skin.key },
+            picked = { k -> k != SkinNow.skin.key },
             onPick = { switchSkin(it.key) },
         )
 
