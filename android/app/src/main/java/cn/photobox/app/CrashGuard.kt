@@ -97,6 +97,14 @@ object CrashGuard {
         }
     }
 
+    /** 带返回值的兜底：异常时返回默认值而不抛出。 */
+    inline fun <T> result(block: () -> T, fallback: T): T = try {
+        block()
+    } catch (e: Throwable) {
+        log(e)
+        fallback
+    }
+
     /** 单处失败降级：不抛出，只提示。 */
     inline fun safe(a: android.app.Activity, msg: String = "操作失败", block: () -> Unit) {
         try {
