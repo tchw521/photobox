@@ -85,6 +85,16 @@ object Store {
     var longPressSelect = true      // 长按直接进入多选
     var trashGuard = true           // 清空回收站需二次确认
 
+    // ---- 自定义皮肤
+    var csMode = 0                  // 0 浅色 1 深色
+    var csAccent = 0xFF059669.toInt()
+    var csAccent2 = 0xFF0284C7.toInt()
+    var csBaseFollow = true         // 底色跟随主色（关闭则用辅色）
+    var csBrightness = 45           // 背景亮度 0~100
+    var csAccentLevel = 60          // 主色明度 0~100
+    var bgUri = ""                  // 背景图片
+    var bgDim = 34                  // 图片浓度遮罩 0~100
+
     fun loadSettings(c: Context) {
         val s = sp(c)
         previewActions = s.getBoolean("previewActions", true)
@@ -96,6 +106,14 @@ object Store {
         sortDefault = s.getInt("sortDefault", 0).coerceIn(0, 3)
         longPressSelect = s.getBoolean("longPressSelect", true)
         trashGuard = s.getBoolean("trashGuard", true)
+        csMode = s.getInt("csMode", 0)
+        csAccent = s.getInt("csAccent", 0xFF059669.toInt())
+        csAccent2 = s.getInt("csAccent2", 0xFF0284C7.toInt())
+        csBaseFollow = s.getBoolean("csBaseFollow", true)
+        csBrightness = s.getInt("csBrightness", 45)
+        csAccentLevel = s.getInt("csAccentLevel", 60)
+        bgUri = s.getString("bgUri", "") ?: ""
+        bgDim = s.getInt("bgDim", 34)
     }
 
     fun saveSettings(c: Context) {
@@ -109,6 +127,14 @@ object Store {
             .putInt("sortDefault", sortDefault)
             .putBoolean("longPressSelect", longPressSelect)
             .putBoolean("trashGuard", trashGuard)
+            .putInt("csMode", csMode)
+            .putInt("csAccent", csAccent)
+            .putInt("csAccent2", csAccent2)
+            .putBoolean("csBaseFollow", csBaseFollow)
+            .putInt("csBrightness", csBrightness)
+            .putInt("csAccentLevel", csAccentLevel)
+            .putString("bgUri", bgUri)
+            .putInt("bgDim", bgDim)
             .apply()
     }
 }
