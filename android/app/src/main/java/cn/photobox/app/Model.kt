@@ -1,6 +1,7 @@
 package cn.photobox.app
 
 import android.content.Context
+import android.util.TypedValue
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -42,7 +43,14 @@ data class TrashItem(
     }
 }
 
-fun formatSize(n: Long): String =
+
+/** 从当前主题取色，避免硬编码导致换肤后不跟随。全项目复用此函数。 */
+fun resolveColor(c: android.content.Context, attr: Int): Int {
+    val v = TypedValue()
+    return if (c.theme.resolveAttribute(attr, v, true)) v.data else 0
+}
+
+fun formatSize(n: Long): String ==
     if (n >= 1024 * 1024) String.format(Locale.getDefault(), "%.1f MB", n / 1048576.0)
     else "${(n / 1024).coerceAtLeast(1)} KB"
 
