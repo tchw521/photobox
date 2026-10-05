@@ -1,31 +1,32 @@
 package cn.photobox.app
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 
 /**
  * 皮肤设置页：内置方案 + 自定义配色 + 背景设置。
  *
  * 结构对应参考界面：
- *   内置方案（九宫格）→ 自定义配色（主色 / 辅色 / 明暗 / 底色 / 主色明度 / 背景亮度）
+ *   内置方案（网格）→ 自定义配色（主色 / 辅色 / 明暗 / 底色 / 主色明度 / 背景亮度）
  *   → 背景设置（选图 / 清除 / 浓度遮罩）→ 应用 / 恢复默认
  *
- * 所有颜色控件由代码着色，复用 Glass 与 SkinNow，不引入额外资源。
+ * 【重要】本页外层是 ScrollView，**不使用 RecyclerView**：
+ * 嵌套 RecyclerView 且高度 wrap_content 时，部分设备上测量结果恒为 0，
+ * 表现为九宫格与色板「整片不显示」。改用 LinearLayout 手工分行可彻底规避。
+ *
+ * 所有配色由代码完成，复用 Glass 与 SkinNow，不引入额外资源。
  */
 class SkinPage(private val act: MainActivity, private val root: View) {
 
-    /** 内置方案色板：取各自主色做展示。 */
+    /** 内置方案。 */
     private val builtin = Skins.ALL
 
     /** 自定义色板：12 个常用色。 */
@@ -36,12 +37,11 @@ class SkinPage(private val act: MainActivity, private val root: View) {
         0xFF16A34A.toInt(), 0xFFCA8A04.toInt(), 0xFF9333EA.toInt(),
     )
 
-    private var pickAccent = true
-
     fun bind() {
         CrashGuard.guard {
             bindBuiltin()
-            bindPalette()
+            bindSwatchGrid(R.id.accentGrid, true)
+            bindSwatchGrid(R.id.accent2Grid, false)
             bindControls()
             bindBackground()
             bindButtons()
@@ -49,19 +49,15 @@ class SkinPage(private val act: MainActivity, private val root: View) {
         }
     }
 
+    /** 统一着色：标题用强调色，标签用正文色，按钮复用 Glass。 */
     private fun styleAll() {
         val s = SkinNow.skin
-        listOf(
-            R.id.skinSectionBuiltin, R.id.skinSectionCustom, R.id.skinSectionBg
-        ).forEach { id ->
-            root.findViewById<TextView>(id)?.setTextColor(s.accent)
-        }
+        listOf(R.id.skinSectionBuiltin, R.id.skinSectionCustom, R.id.skinSectionBg)
+            .forEach { id -> root.findViewById<TextView>(id)?.setTextColor(s.accent) }
         listOf(
             R.id.lblAccent, R.id.lblAccent2, R.id.lblMode, R.id.lblBase,
             R.id.lblAccentLevel, R.id.lblBrightness, R.id.lblBgDim
-        ).forEach { id ->
-            root.findViewById<TextView>(id)?.setTextColor(s.text)
-        }
+        ).forEach { id -> root.findViewById<TextView>(id)?.setTextColor(s.text) }
         listOf(R.id.btnPickBg, R.id.btnClearBg, R.id.btnResetSkin).forEach { id ->
             root.findViewById<Button>(id)?.apply {
                 setTextColor(s.text)
@@ -76,75 +72,73 @@ class SkinPage(private val act: MainActivity, private val root: View) {
 
     // ------------------------------------------------------------ 内置方案
     private fun bindBuiltin() {
-        val rv = root.findViewById<RecyclerView>(R.id.skinGrid) ?: return
-        rv.layoutManager = GridLayoutManager(act, 3)
-        rv.isNestedScrollingEnabled = false
-        rv.adapter = object : RecyclerView.Adapter<BuiltinVH>() {
-            override fun onCreateViewHolder(p: ViewGroup, t: Int) = BuiltinVH(
-                LayoutInflater.from(p.context).inflate(R.layout.item_skin_card, p, false)
-            )
-
-            override fun getItemCount() = builtin.size
-
-            override fun onBindViewHolder(h: BuiltinVH, i: Int) {
-                CrashGuard.guard {
-                    val sk = builtin[i]
-                    val cur = SkinNow.skin.key == sk.key
-                    h.swatch.background = Glass.block(sk, sk.accent, cur)
-                    h.name.text = sk.name
-                    h.name.setTextColor(sk.text)
-                    h.itemView.background = Glass.card(sk, 14f)
-                    // 点击即生效：不再有预览区与确认按钮
-                    h.itemView.setOnClickListener {
-                        CrashGuard.guard { act.applySkinNow(sk.key) }
-                    }
+        val box = root.findViewById<LinearLayout>(R.id.skinGrid) ?: return
+        box.removeAllViews()
+        val cols = 3
+        var row: LinearLayout? = null
+        builtin.forEachIndexed { i, sk ->
+            if (i % cols == 0) {
+                row = LinearLayout(act).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
                 }
+                box.addView(row)
             }
+            val cell = LayoutInflater.from(act).inflate(R.layout.item_skin_card, row, false)
+            cell.layoutParams = LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+            )
+            val cur = SkinNow.skin.key == sk.key
+            cell.findViewById<View>(R.id.skinSwatch).background =
+                Glass.block(sk, sk.accent, cur)
+            cell.findViewById<TextView>(R.id.skinName).apply {
+                text = sk.name
+                setTextColor(sk.text)
+            }
+            cell.background = Glass.card(sk, 14f)
+            // 点击即生效
+            cell.setOnClickListener { CrashGuard.guard { act.applySkinNow(sk.key) } }
+            row?.addView(cell)
         }
-    }
-
-    private class BuiltinVH(v: View) : RecyclerView.ViewHolder(v) {
-        val swatch: View = v.findViewById(R.id.skinSwatch)
-        val name: TextView = v.findViewById(R.id.skinName)
     }
 
     // ------------------------------------------------------------ 色板
-    private fun bindPalette() {
-        bindSwatchGrid(R.id.accentGrid, true)
-        bindSwatchGrid(R.id.accent2Grid, false)
-    }
-
     private fun bindSwatchGrid(id: Int, isAccent: Boolean) {
-        val rv = root.findViewById<RecyclerView>(id) ?: return
-        rv.layoutManager = GridLayoutManager(act, 6)
-        rv.isNestedScrollingEnabled = false
-        rv.adapter = object : RecyclerView.Adapter<SwatchVH>() {
-            override fun onCreateViewHolder(p: ViewGroup, t: Int) = SwatchVH(
-                LayoutInflater.from(p.context).inflate(R.layout.item_swatch, p, false)
+        val box = root.findViewById<LinearLayout>(id) ?: return
+        box.removeAllViews()
+        val cols = 6
+        var row: LinearLayout? = null
+        palette.forEachIndexed { i, c ->
+            if (i % cols == 0) {
+                row = LinearLayout(act).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                }
+                box.addView(row)
+            }
+            val cell = LayoutInflater.from(act).inflate(R.layout.item_swatch, row, false)
+            cell.layoutParams = LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
             )
-
-            override fun getItemCount() = palette.size
-
-            override fun onBindViewHolder(h: SwatchVH, i: Int) {
+            val sw = cell.findViewById<View>(R.id.swatch)
+            val sel = if (isAccent) Store.csAccent == c else Store.csAccent2 == c
+            sw.background = Glass.block(SkinNow.skin, c, sel)
+            sw.setOnClickListener {
                 CrashGuard.guard {
-                    val c = palette[i]
-                    val sel = if (isAccent) Store.csAccent == c else Store.csAccent2 == c
-                    h.swatch.background = Glass.block(SkinNow.skin, c, sel)
-                    h.swatch.setOnClickListener {
-                        CrashGuard.guard {
-                            if (isAccent) Store.csAccent = c else Store.csAccent2 = c
-                            Store.saveSettings(act)
-                            rv.adapter?.notifyDataSetChanged()
-                            pickAccent = isAccent
-                        }
-                    }
+                    if (isAccent) Store.csAccent = c else Store.csAccent2 = c
+                    Store.saveSettings(act)
+                    bindSwatchGrid(R.id.accentGrid, true)
+                    bindSwatchGrid(R.id.accent2Grid, false)
                 }
             }
+            row?.addView(cell)
         }
-    }
-
-    private class SwatchVH(root: View) : RecyclerView.ViewHolder(root) {
-        val swatch: View = root.findViewById(R.id.swatch)
     }
 
     // ------------------------------------------------------------ 控件
@@ -164,36 +158,36 @@ class SkinPage(private val act: MainActivity, private val root: View) {
         }
         tintRadio(mode, s)
         tintRadio(base, s)
+        tintSeek(R.id.seekAccentLevel, R.id.lblAccentLevel, "主色明度") { Store.csAccentLevel = it }
+        tintSeek(R.id.seekBrightness, R.id.lblBrightness, "背景亮度") { Store.csBrightness = it }
+        tintSeek(R.id.seekBgDim, R.id.lblBgDim, "图片浓度遮罩") {
+            Store.bgDim = it
+            applyBgPreviewAlpha()
+        }
+    }
 
-        val al = root.findViewById<SeekBar>(R.id.seekAccentLevel)
-        al?.progress = Store.csAccentLevel
-        al?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(sb: SeekBar, v: Int, f: Boolean) {
-                Store.csAccentLevel = v
+    /** 滑块统一：着色 + 初值 + 拖动时把数值显示在标签右侧。 */
+    private fun tintSeek(seekId: Int, labelId: Int, title: String, onValue: (Int) -> Unit) {
+        val s = SkinNow.skin
+        val sb = root.findViewById<SeekBar>(seekId) ?: return
+        val lb = root.findViewById<TextView>(labelId)
+        val init = when (seekId) {
+            R.id.seekAccentLevel -> Store.csAccentLevel
+            R.id.seekBrightness -> Store.csBrightness
+            else -> Store.bgDim
+        }
+        sb.progress = init
+        lb?.text = "$title  $init%"
+        lb?.setTextColor(s.text)
+        sb.thumbTintList = android.content.res.ColorStateList.valueOf(s.accent)
+        sb.progressTintList = android.content.res.ColorStateList.valueOf(s.accent)
+        sb.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(x: SeekBar, v: Int, f: Boolean) {
+                onValue(v)
+                lb?.text = "$title  $v%"
             }
-            override fun onStartTrackingTouch(sb: SeekBar) {}
-            override fun onStopTrackingTouch(sb: SeekBar) { Store.saveSettings(act) }
-        })
-
-        val br = root.findViewById<SeekBar>(R.id.seekBrightness)
-        br?.progress = Store.csBrightness
-        br?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(sb: SeekBar, v: Int, f: Boolean) {
-                Store.csBrightness = v
-            }
-            override fun onStartTrackingTouch(sb: SeekBar) {}
-            override fun onStopTrackingTouch(sb: SeekBar) { Store.saveSettings(act) }
-        })
-
-        val dim = root.findViewById<SeekBar>(R.id.seekBgDim)
-        dim?.progress = Store.bgDim
-        dim?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(sb: SeekBar, v: Int, f: Boolean) {
-                Store.bgDim = v
-                applyBgPreviewAlpha()
-            }
-            override fun onStartTrackingTouch(sb: SeekBar) {}
-            override fun onStopTrackingTouch(sb: SeekBar) { Store.saveSettings(act) }
+            override fun onStartTrackingTouch(x: SeekBar) {}
+            override fun onStopTrackingTouch(x: SeekBar) { Store.saveSettings(act) }
         })
     }
 
@@ -214,9 +208,7 @@ class SkinPage(private val act: MainActivity, private val root: View) {
         if (Store.bgUri.isBlank()) {
             pv.setImageDrawable(null)
         } else {
-            CrashGuard.guard {
-                pv.setImageURI(android.net.Uri.parse(Store.bgUri))
-            }
+            CrashGuard.guard { pv.setImageURI(android.net.Uri.parse(Store.bgUri)) }
         }
         applyBgPreviewAlpha()
 
@@ -259,7 +251,7 @@ class SkinPage(private val act: MainActivity, private val root: View) {
                 Store.csAccent = 0xFF059669.toInt()
                 Store.csAccent2 = 0xFF0284C7.toInt()
                 Store.csBaseFollow = true
-                Store.csBrightness = 45
+                Store.csBrightness = 40
                 Store.csAccentLevel = 60
                 Store.bgUri = ""
                 Store.bgDim = 34
