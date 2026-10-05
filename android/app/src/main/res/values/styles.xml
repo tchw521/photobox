@@ -12,7 +12,6 @@
 
         <item name="colorPrimary">?attr/accentColor</item>
         <item name="colorOnPrimary">?attr/textColorMain</item>
-        <item name="colorSurface">?attr/glassColor</item>
         <item name="colorOnSurface">?attr/textColorMain</item>
         <item name="colorControlNormal">?attr/textColorDim</item>
         <item name="colorControlActivated">?attr/accentColor</item>
@@ -36,6 +35,7 @@
         <item name="dangerColor">#FFF43F5E</item>
         <item name="okColor">#FF34D399</item>
         <item name="textColorDim">#FF9A8BBF</item>
+        <item name="colorSurface">#FF241040</item>
     </style>
 
     <!-- ② 墨夜黑 -->
@@ -52,6 +52,7 @@
         <item name="dangerColor">#FFF43F5E</item>
         <item name="okColor">#FF34D399</item>
         <item name="textColorDim">#FF8A8F98</item>
+        <item name="colorSurface">#FF141418</item>
     </style>
 
     <!-- ③ 晨曦金 -->
@@ -68,6 +69,7 @@
         <item name="dangerColor">#FFF43F5E</item>
         <item name="okColor">#FF34D399</item>
         <item name="textColorDim">#FFC4A484</item>
+        <item name="colorSurface">#FF33200F</item>
     </style>
 
     <!-- ④ 冰川蓝 -->
@@ -84,6 +86,7 @@
         <item name="dangerColor">#FFF43F5E</item>
         <item name="okColor">#FF34D399</item>
         <item name="textColorDim">#FF7FA3C4</item>
+        <item name="colorSurface">#FF12263E</item>
     </style>
 
     <!-- ⑤ 樱雾粉 -->
@@ -100,6 +103,7 @@
         <item name="dangerColor">#FFF43F5E</item>
         <item name="okColor">#FF34D399</item>
         <item name="textColorDim">#FFC08CA8</item>
+        <item name="colorSurface">#FF33152A</item>
     </style>
 
     <!-- ⑥ 薄荷绿 -->
@@ -116,10 +120,12 @@
         <item name="dangerColor">#FFF43F5E</item>
         <item name="okColor">#FF34D399</item>
         <item name="textColorDim">#FF7FB8A4</item>
+        <item name="colorSurface">#FF0F2A20</item>
     </style>
 
     <!-- 底部导航选中指示 -->
     <style name="NavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">?attr/accentSoftColor</item>
+        <item name="colorSurface">#FF0F2A20</item>
     </style>
 </resources>
