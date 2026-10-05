@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.8.0"
+        const val APP_VERSION = "1.9.0"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_BLOCKED = "\u0000blocked"
@@ -107,7 +107,32 @@ class MainActivity : ComponentActivity() {
             true
         }
 
+        applyNavTint()
         applyBars()
+    }
+
+    /**
+     * 底栏图标与文字着色，在代码中动态构建 ColorStateList。
+     *
+     * 不能写成 XML 的 <selector> + ?attr/：ColorStateList 中的主题属性解析
+     * 由资源框架缓存且依赖时序，在部分设备上 inflate 会直接抛异常
+     * （正是此前 Binary XML 崩溃的来源）。动态构建则始终使用当前皮肤色，
+     * 换肤后也随之生效。
+     */
+    private fun applyNavTint() {
+        CrashGuard.guard {
+            val accent = resolveColor(this, R.attr.accentColor)
+            val dim = resolveColor(this, R.attr.textColorDim)
+            val soft = resolveColor(this, R.attr.accentSoftColor)
+            val tint = android.content.res.ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                intArrayOf(accent, dim)
+            )
+            val nav = findViewById<BottomNavigationView>(R.id.bottomNav)
+            nav.itemIconTintList = tint
+            nav.itemTextColor = tint
+            nav.itemActiveIndicatorColor = android.content.res.ColorStateList.valueOf(soft)
+        }
     }
 
     /** 状态栏与导航栏半透明，让背景渐变透上来，形成整体通透感。 */
