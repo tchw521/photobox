@@ -46,6 +46,25 @@ class MainActivity : Activity() {
     private var sort = 0                 // 0 日期新→旧 1 旧→新 2 名称 3 大小
     /** 图库视图：0 宫格 / 1 列表 / 2 流式（单列竖排大图）。 */
     private var viewMode = 0
+
+    /**
+     * 卡片页本轮已处理的照片 id。
+     *
+     * 放在 **Activity 实例**上而非页面对象里：每次操作后 loadPhotos 会重建
+     * 卡片页，页面级变量随之中清零，进度就永远显示 0。Activity 不重建，
+     * 所以这里是最可靠的存放位置。
+     */
+    private val cardDone = HashSet<Long>()
+    private var cardTotal = 0
+
+    fun markCardDone(id: Long) { cardDone.add(id) }
+    fun cardDoneCount() = cardDone.size
+    fun cardTotal(): Int {
+        if (cardTotal <= 0) cardTotal = cardDone.size + cardPhotos().size
+        return cardTotal
+    }
+    fun resetCardSession() { cardDone.clear(); cardTotal = 0 }
+    fun cardDoneIds(): Set<Long> = cardDone
     private var tab = 0                  // 0 图库 1 卡片 2 设置 3 回收站 4 查重
 
     private var root: View? = null
@@ -78,7 +97,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.6.1"
+        const val APP_VERSION = "1.6.2"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
@@ -133,10 +152,9 @@ class MainActivity : Activity() {
         nav?.background = Glass.floating(s, 26f)
         nav?.let { v ->
             val lp = v.layoutParams as? android.widget.LinearLayout.LayoutParams
-            // 进一步贴近底部：左右 12dp、底部 2dp
-            lp?.setMargins(12.dp, 0, 12.dp, 2.dp)
+            // 胶囊底栏：已由布局居中收窄，这里只补少量外边距与阴影
+            lp?.setMargins(0, 0, 0, 4.dp)
             v.layoutParams = lp
-            v.setPadding(0, 6, 0, 6)
             // 悬浮感靠阴影而非高度
             v.elevation = 6f * resources.displayMetrics.density
         }
@@ -263,6 +281,20 @@ class MainActivity : Activity() {
         }
     }
 
+    /**
+     * 从内存列表即时移除——删除后先让 UI 立刻少掉这几张，
+     * 再异步触发完整扫描，避免等待期间列表纹丝不动。
+     */
+    private fun dropFromMemory(ids: Set<Long>) {
+        if (ids.isEmpty()) return
+        CrashGuard.guard {
+            photos = photos.filter { it.id !in ids }
+            photoAdapter?.submit(visible())
+            refreshLibrary()
+            renderSidebar()
+        }
+    }
+
     private fun visible(): List<Photo> {
         val fav = Store.favorites(this)
         var l = when (albumKey) {
@@ -312,7 +344,7 @@ class MainActivity : Activity() {
     }
 
     private fun switchTabInner(t: Int) {
-        if (tab == 1 && t != 1) CardsPage.resetSession()   // 离开卡片页，结束本轮计数
+        if (tab == 1 && t != 1) { CardsPage.resetSession(); resetCardSession() }
         tab = t
         val holder = findViewById<FrameLayout>(R.id.content) ?: return
         holder.removeAllViews()
@@ -654,6 +686,7 @@ class MainActivity : Activity() {
             n
         }, ui = { n ->
             Ui.toast(this, "已清理 $n 张到回收站")
+            dropFromMemory(list.map { it.id }.toSet())
             exitSelect(); loadPhotos()
             done?.let { CrashGuard.guard { it(n) } }
         })
