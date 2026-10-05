@@ -86,7 +86,7 @@ class PhotoAdapter(
     private val c: Context,
     private val grid: Boolean,
     private val onClick: (Photo, Int) -> Unit,
-    private val onLongClick: (Photo, Int) -> Boolean,
+    private val onLongClick: (Photo, Int, View) -> Boolean,
 ) : RecyclerView.Adapter<PhotoAdapter.H>() {
 
     private val data = ArrayList<Photo>()
@@ -132,7 +132,7 @@ class PhotoAdapter(
         h.name?.text = p.name
         h.meta?.text = "${p.album} · ${p.dateText} · ${formatSize(p.size)}"
         h.itemView.setOnClickListener { onClick(p, i) }
-        h.itemView.setOnLongClickListener { onLongClick(p, i) }
+        h.itemView.setOnLongClickListener { onLongClick(p, i, h.itemView) }
     }
 }
 
