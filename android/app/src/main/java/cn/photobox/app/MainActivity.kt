@@ -327,7 +327,7 @@ class MainActivity : ComponentActivity() {
                     Toast.makeText(this, if (isFav) "已取消收藏" else "已收藏", Toast.LENGTH_SHORT).show()
                     exitSelect()
                 }
-                2 -> { showAlbumSheet { a -> moveOne(p, a) } }
+                2 -> { Ui.albumSheet(this, allAlbumNames()) { a -> moveOne(p, a) } }
                 3 -> renameOne(p)
                 4 -> confirmDelete(listOf(p))
                 5 -> Toast.makeText(this, "已进入多选，可继续点选更多", Toast.LENGTH_SHORT).show()
