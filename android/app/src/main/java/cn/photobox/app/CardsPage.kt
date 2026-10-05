@@ -127,7 +127,7 @@ class CardsPage(private val act: MainActivity, private val root: View) {
         val items = listOf("＋ 新建图集") + names
         rv.adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             override fun onCreateViewHolder(p: android.view.ViewGroup, t: Int) =
-                object : RecyclerView.ViewHolder(Ui.row(act, "", {}, SkinNow.skin.text)) {}
+                object : RecyclerView.ViewHolder(Ui.row(act, "", SkinNow.skin.text, {})) {}
 
             override fun onBindViewHolder(h: RecyclerView.ViewHolder, i: Int) {
                 CrashGuard.guard {
