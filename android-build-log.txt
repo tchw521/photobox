@@ -47,8 +47,8 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:generateReleaseAssets UP-TO-DATE
 > Task :app:mergeReleaseAssets
-> Task :app:compressReleaseAssets
 > Task :app:processReleaseManifestForPackage
+> Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
 > Task :app:bundleReleaseResources
@@ -88,5 +88,5 @@ w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 > Task :app:createReleaseApkListingFileRedirect
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 1m 20s
+BUILD SUCCESSFUL in 1m 23s
 39 actionable tasks: 39 executed
