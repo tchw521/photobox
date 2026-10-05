@@ -70,7 +70,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.4.0"
+        const val APP_VERSION = "1.4.1"
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
         const val KEY_TRASH = "\u0000trash"
@@ -164,6 +164,18 @@ class MainActivity : Activity() {
             val s = SkinNow.skin
             window.statusBarColor = s.bgTop
             window.navigationBarColor = s.bgBottom
+            // 皮肤为浅底，需要让系统状态栏/导航栏图标转为深色。
+            // LIGHT_STATUS_BAR 的含义正是「浅色背景 → 深色图标」，故为置位而非清除。
+            if (Build.VERSION.SDK_INT >= 23) {
+                window.decorView.systemUiVisibility =
+                    window.decorView.systemUiVisibility or
+                        android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
+            if (Build.VERSION.SDK_INT >= 26) {
+                window.decorView.systemUiVisibility =
+                    window.decorView.systemUiVisibility or
+                        android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            }
         }
     }
 
@@ -288,6 +300,7 @@ class MainActivity : Activity() {
     }
 
     private fun switchTabInner(t: Int) {
+        if (tab == 1 && t != 1) CardsPage.resetSession()   // 离开卡片页，结束本轮计数
         tab = t
         val holder = findViewById<FrameLayout>(R.id.content) ?: return
         holder.removeAllViews()
