@@ -858,10 +858,12 @@ class MainActivity : Activity() {
                     if (abs(dx) < 48f || abs(dx) < abs(dy) * 1.4f) return false
                     if (abs(vx) < 260f) return false
                     CrashGuard.guard {
-                        val child = rv.findChildViewUnder(e2.x, e2.y) ?: return
-                        val pos = rv.getChildAdapterPosition(child)
-                        val p = photoAdapter?.item(pos) ?: return
-                        showPhotoMenu(p)
+                        val child = rv.findChildViewUnder(e2.x, e2.y)
+                        if (child != null) {
+                            val pos = rv.getChildAdapterPosition(child)
+                            val p = photoAdapter?.item(pos)
+                            if (p != null) showPhotoMenu(p)
+                        }
                     }
                     return true
                 }
@@ -872,11 +874,14 @@ class MainActivity : Activity() {
 
     /** 单击照片 → 全屏查看（可缩放、左右切换）。 */
     private fun openViewer(list: List<Photo>, index: Int) {
-        CrashGuard.safe(this, "预览失败") {
-            if (list.isEmpty()) return
-            PhotoViewer(this, list, index.coerceIn(0, list.size - 1)) { p ->
-                trashPhotos(listOf(p))
-            }.show()
+        if (list.isEmpty()) return
+        CrashGuard.safe(this@MainActivity, "预览失败") {
+            val v = PhotoViewer(
+                this@MainActivity,
+                list,
+                index.coerceIn(0, list.size - 1)
+            ) { p -> trashPhotos(listOf(p)) }
+            v.show()
         }
     }
 
