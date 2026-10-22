@@ -52,16 +52,19 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:processReleaseManifestForPackage
 > Task :app:collectReleaseDependencies
 > Task :app:bundleReleaseResources
-> Task :app:processReleaseResources
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
+> Task :app:processReleaseResources
 > Task :app:writeReleaseSigningConfigVersions
 
 > Task :app:compileReleaseKotlin FAILED
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:861:74 This function must return a value of type Boolean
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:863:60 This function must return a value of type Boolean
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/PhotoViewer.kt:109:54 Unresolved reference: viewerHost
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/PhotoViewer.kt:111:55 Unresolved reference: viewerHost
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/PhotoViewer.kt:195:72 Unresolved reference: formatSize
+e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/PhotoViewer.kt:201:59 Unresolved reference: viewerHost
 
 FAILURE: Build failed with an exception.
 
@@ -269,5 +272,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 44s
+BUILD FAILED in 52s
 30 actionable tasks: 30 executed
