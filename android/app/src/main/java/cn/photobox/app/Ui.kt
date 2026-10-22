@@ -289,6 +289,53 @@ object Ui {
         rv.addOnItemTouchListener(touch)
     }
 
+    /** 表单的一行：标签 + 默认值。 */
+    data class Field(val label: String, val def: String = "", val hint: String = "")
+
+    /**
+     * 通用表单弹窗——所有需要多输入的批量操作都复用它，不重复写布局。
+     *
+     * @param fields 输入项定义
+     * @param onSubmit 回调收到与 fields 同序的输入值
+     */
+    fun formDialog(
+        a: Activity,
+        title: String,
+        fields: List<Field>,
+        okText: String = "确定",
+        onSubmit: (List<String>) -> Unit,
+    ) {
+        val s = SkinNow.skin
+        val box = android.widget.LinearLayout(a).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(32, 16, 32, 8)
+        }
+        val inputs = ArrayList<android.widget.EditText>()
+        fields.forEach { f ->
+            box.addView(TextView(a).apply {
+                text = f.label
+                setTextColor(s.textDim)
+                textSize = 12f
+                setPadding(0, 12, 0, 4)
+            })
+            box.addView(android.widget.EditText(a).apply {
+                setText(f.def)
+                hint = f.hint
+                setTextColor(s.text)
+                setHintTextColor(s.textDim)
+                setSingleLine(true)
+            }.also { inputs.add(it) })
+        }
+        Ui.dialog(a) {
+            setTitle(title)
+            setView(box)
+            setNegativeButton("取消", null)
+            setPositiveButton(okText) { _, _ ->
+                CrashGuard.guard { onSubmit(inputs.map { it.text.toString().trim() }) }
+            }
+        }
+    }
+
     /** 按坐标反查列表项下标。 */
     private fun hitTest(rv: RecyclerView, x: Float, y: Float): Int {
         val v = rv.findChildViewUnder(x, y) ?: return -1
