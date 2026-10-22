@@ -426,11 +426,8 @@ class MainActivity : Activity() {
             this, viewMode,
             onClick = { p, pos ->
                 CrashGuard.guard {
-                    if (photoAdapter?.selectMode == true) {
-                        // 多选态的选中统一由 swipeSelect 处理，这里兜底不再打开查看器
-                        return
-                    }
-                    openViewer(visible(), pos)
+                    // 多选态的选中统一由 swipeSelect 处理，这里兜底不再打开查看器
+                    if (photoAdapter?.selectMode != true) openViewer(visible(), pos)
                 }
             },
             onLongClick = { p, _, anchor ->
