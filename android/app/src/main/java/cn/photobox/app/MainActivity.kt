@@ -102,7 +102,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.7.0"
+        const val APP_VERSION = "1.7.1"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
@@ -426,11 +426,16 @@ class MainActivity : Activity() {
             this, viewMode,
             onClick = { p, pos ->
                 CrashGuard.guard {
-                    if (photoAdapter?.selectMode == true) { toggleSelect(p); refreshLibrary() }
-                    else openViewer(visible(), pos)
+                    if (photoAdapter?.selectMode == true) {
+                        // 多选态的选中统一由 swipeSelect 处理，这里兜底不再打开查看器
+                        return
+                    }
+                    openViewer(visible(), pos)
                 }
             },
             onLongClick = { p, _, anchor ->
+                // 多选态下禁用：选中与滑动选择由 swipeSelect 接管
+                if (photoAdapter?.selectMode == true) return@PhotoAdapter true
                 // 多选入口已移至底栏「图库」按钮长按。
                 // 图片长按保留为打开操作菜单，与左右滑动等价。
                 anchor.post {
@@ -453,6 +458,10 @@ class MainActivity : Activity() {
                 pick = { i ->
                     val p = photoAdapter?.item(i)
                     if (p != null) photoAdapter?.selected?.add(p.id)
+                },
+                toggle = { i ->
+                    val p = photoAdapter?.item(i)
+                    if (p != null) toggleSelect(p)
                 },
                 changed = { refreshSelectionOnly() }
             )
@@ -607,7 +616,8 @@ class MainActivity : Activity() {
     private fun toggleSelect(p: Photo) {
         val s = photoAdapter?.selected ?: return
         if (!s.add(p.id)) s.remove(p.id)
-        if (s.isEmpty()) photoAdapter?.selectMode = false
+        // 全部取消时也不退出多选——退出由底部「退出」按钮或长按底栏图库完成，
+        // 避免用户在批量取消过程中被意外踢出多选态。
     }
 
     private fun exitSelect() {
@@ -855,6 +865,7 @@ class MainActivity : Activity() {
                     val a = e1 ?: return false
                     val dx = e2.x - a.x
                     val dy = e2.y - a.y
+                    if (photoAdapter?.selectMode == true) return false
                     if (abs(dx) < 48f || abs(dx) < abs(dy) * 1.4f) return false
                     if (abs(vx) < 260f) return false
                     CrashGuard.guard {
