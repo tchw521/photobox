@@ -220,48 +220,70 @@ object Ui {
     ) {
         var lastPos = -1
         var moved = false
+        var active = false
+
+        fun begin(e: android.view.MotionEvent) {
+            rv.requestDisallowInterceptTouchEvent(true)
+            lastPos = hitTest(rv, e.x, e.y)
+            moved = false
+        }
+
+        fun onMove(e: android.view.MotionEvent) {
+            val pos = hitTest(rv, e.x, e.y)
+            if (pos >= 0 && pos != lastPos) {
+                moved = true
+                lastPos = pos
+                pick(pos)
+                changed()
+            }
+            // 划到上下边缘时自动滚动，便于连续选择
+            val h = rv.height
+            val edge = 72
+            when {
+                e.y < edge -> rv.scrollBy(0, -20)
+                e.y > h - edge -> rv.scrollBy(0, 20)
+            }
+        }
+
+        fun onUp() {
+            if (!moved && lastPos >= 0) { toggle(lastPos); changed() }
+            finish()
+        }
+
+        fun finish() {
+            lastPos = -1
+            moved = false
+            rv.requestDisallowInterceptTouchEvent(false)
+        }
+
         val touch = object : RecyclerView.OnItemTouchListener {
+            /**
+             * 只在按下时决定是否接管。
+             *
+             * **关键**：RecyclerView 一旦在这里返回 true，就会把本 listener
+             * 记为 activeListener，之后的 MOVE / UP **只走 onTouchEvent，
+             * 不再经过本方法**。所以真正的处理逻辑必须写在 onTouchEvent 里，
+             * 否则抬起与滑动事件会全部丢失——表现就是"进多选后选不中"。
+             */
             override fun onInterceptTouchEvent(rv: RecyclerView, e: android.view.MotionEvent): Boolean {
-                if (!isSelectMode()) return false
-                when (e.actionMasked) {
-                    android.view.MotionEvent.ACTION_DOWN -> {
-                        // 阻止父容器与 RecyclerView 自身滚动
-                        rv.requestDisallowInterceptTouchEvent(true)
-                        lastPos = hitTest(rv, e.x, e.y)
-                        moved = false
-                    }
-                    android.view.MotionEvent.ACTION_MOVE -> {
-                        val pos = hitTest(rv, e.x, e.y)
-                        if (pos >= 0 && pos != lastPos) {
-                            moved = true
-                            lastPos = pos
-                            pick(pos)
-                            changed()
-                        }
-                        // 划到上下边缘时自动滚动，便于连续选择
-                        val h = rv.height
-                        val edge = 72
-                        when {
-                            e.y < edge -> rv.scrollBy(0, -20)
-                            e.y > h - edge -> rv.scrollBy(0, 20)
-                        }
-                    }
-                    android.view.MotionEvent.ACTION_UP -> {
-                        if (!moved && lastPos >= 0) { toggle(lastPos); changed() }
-                        finish()
-                    }
-                    android.view.MotionEvent.ACTION_CANCEL -> finish()
+                if (e.actionMasked == android.view.MotionEvent.ACTION_DOWN) {
+                    active = isSelectMode()
+                    if (active) begin(e)
                 }
-                return true     // 拦截：屏蔽单击 / 长按 / 滚动
+                return active
             }
 
-            private fun finish() {
-                lastPos = -1
-                moved = false
-                rv.requestDisallowInterceptTouchEvent(false)
+            /** 接管后的全部手势都在这里处理。 */
+            override fun onTouchEvent(rv: RecyclerView, e: android.view.MotionEvent) {
+                if (!active) return
+                when (e.actionMasked) {
+                    android.view.MotionEvent.ACTION_DOWN -> begin(e)
+                    android.view.MotionEvent.ACTION_MOVE -> onMove(e)
+                    android.view.MotionEvent.ACTION_UP -> onUp()
+                    android.view.MotionEvent.ACTION_CANCEL -> { finish(); active = false }
+                }
             }
 
-            override fun onTouchEvent(rv: RecyclerView, e: android.view.MotionEvent) {}
             override fun onRequestDisallowInterceptTouchEvent(b: Boolean) {}
         }
         rv.addOnItemTouchListener(touch)
