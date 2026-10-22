@@ -18,6 +18,9 @@ data class Photo(
 ) {
     val month: String get() = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(Date(dateSec * 1000))
     val dateText: String get() = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(dateSec * 1000))
+
+    /** 文件名去掉扩展名的部分，重命名时统一基于它加工。 */
+    val baseName: String get() = name.substringBeforeLast('.')
 }
 
 /** 回收站条目：原始文件已复制到应用私有目录，元数据存 JSON。 */
