@@ -192,7 +192,7 @@ class PhotoViewer(
         val p = list.getOrNull(index) ?: return
         // 复用高清解码：目标边长按屏幕长边 ×3 封顶 4096
         Thumbs.into(act, p, CardsPage.ORIGINAL, image ?: return)
-        caption?.text = "${p.name}\n${p.album} · ${p.dateText} · ${act.formatSize(p.size)}" +
+        caption?.text = "${p.name}\n${p.album} · ${p.dateText} · ${formatSize(p.size)}" +
             "\n双击缩放 · 左右滑动切换 · 下滑关闭"
     }
 
