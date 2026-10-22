@@ -185,6 +185,24 @@ object Repo {
      * 图集重命名：把该图集内所有照片的 RELATIVE_PATH 改写为新名。
      * 若目标图集名已存在，效果等同于合并。
      */
+    /**
+     * 重命名单张照片，返回是否成功。
+     *
+     * 扩展名始终沿用原文件的：只改 DISPLAY_NAME 的主名部分，
+     * 避免用户手动输入时写错后缀导致图片打不开。
+     *
+     * 对他方应用创建的文件会抛 [RecoverableSecurityException]，
+     * 这里**不吞掉**，交给上层 Ui.write 转交系统授权弹窗。
+     */
+    fun rename(c: Context, p: Photo, newBase: String): Boolean {
+        val ext = p.name.substringAfterLast('.', "")
+        val full = if (ext.isBlank()) newBase else "$newBase.$ext"
+        val cv = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, full)
+        }
+        return c.contentResolver.update(uriOf(p), cv, null, null) > 0
+    }
+
     fun renameAlbum(c: Context, from: String, to: String): Int {
         var n = 0
         scan(c).filter { it.album == from }.forEach { p ->
