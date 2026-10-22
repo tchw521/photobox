@@ -6,6 +6,8 @@ import android.app.RecoverableSecurityException
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.view.MotionEvent
+import kotlin.math.abs
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
@@ -100,7 +102,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.6.3"
+        const val APP_VERSION = "1.7.0"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
@@ -173,6 +175,20 @@ class MainActivity : Activity() {
             val tv = findViewById<TextView>(ids.third)
             iv?.setImageResource(icon)
             box?.setOnClickListener { CrashGuard.guard { switchTab(targets[i]) } }
+            // 「图库」按钮长按 → 进入多选模式
+            if (targets[i] == 0) {
+                box?.setOnLongClickListener {
+                    CrashGuard.guard {
+                        switchTab(0)
+                        val on = photoAdapter?.selectMode != true
+                        photoAdapter?.selectMode = on
+                        if (on) photoAdapter?.selected?.clear()
+                        refreshLibrary()
+                        Ui.toast(this@MainActivity, if (on) "已进入多选" else "已退出多选")
+                    }
+                    true
+                }
+            }
             Unit
         }
     }
@@ -408,19 +424,16 @@ class MainActivity : Activity() {
 
         photoAdapter = PhotoAdapter(
             this, viewMode,
-            onClick = { p, _ ->
+            onClick = { p, pos ->
                 CrashGuard.guard {
                     if (photoAdapter?.selectMode == true) { toggleSelect(p); refreshLibrary() }
-                    else preview(p)
+                    else openViewer(visible(), pos)
                 }
             },
             onLongClick = { p, _, anchor ->
-                // 不能在长按回调里同步刷新：notifyDataSetChanged 会重建 ViewHolder，
-                // 使 anchor 失效并掐断长按序列，菜单就弹不出来。延后一帧再处理。
-                photoAdapter?.selectMode = true
-                photoAdapter?.selected?.add(p.id)
+                // 多选入口已移至底栏「图库」按钮长按。
+                // 图片长按保留为打开操作菜单，与左右滑动等价。
                 anchor.post {
-                    refreshLibrary()
                     anchor.post {
                         if (anchor.isAttachedToWindow && !isFinishing) {
                             CrashGuard.guard { showPhotoMenu(p) }
@@ -447,6 +460,7 @@ class MainActivity : Activity() {
         list?.setHasFixedSize(true)
         list?.setItemViewCacheSize(12)
         list?.recycledViewPool?.setMaxRecycledViews(0, 24)
+        attachSwipeMenu(list)
 
         search?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
@@ -822,6 +836,50 @@ class MainActivity : Activity() {
     }
 
     // ---------- 预览
+    /**
+     * 左右滑动照片 → 弹出操作菜单（原先由长按触发）。
+     *
+     * 用 GestureDetector 的 onFling 判定：仅当水平速度明显大于垂直速度
+     * 且超过阈值时才触发，避免与纵向滚动冲突。
+     */
+    @Suppress("ClickableViewAccessibility")
+    private fun attachSwipeMenu(list: RecyclerView?) {
+        val rv = list ?: return
+        val det = android.view.GestureDetector(
+            this,
+            object : android.view.GestureDetector.SimpleOnGestureListener() {
+                override fun onFling(
+                    e1: MotionEvent?, e2: MotionEvent,
+                    vx: Float, vy: Float
+                ): Boolean {
+                    val a = e1 ?: return false
+                    val dx = e2.x - a.x
+                    val dy = e2.y - a.y
+                    if (abs(dx) < 48f || abs(dx) < abs(dy) * 1.4f) return false
+                    if (abs(vx) < 260f) return false
+                    CrashGuard.guard {
+                        val child = rv.findChildViewUnder(e2.x, e2.y) ?: return
+                        val pos = rv.getChildAdapterPosition(child)
+                        val p = photoAdapter?.item(pos) ?: return
+                        showPhotoMenu(p)
+                    }
+                    return true
+                }
+            }
+        )
+        rv.setOnTouchListener { _, e -> det.onTouchEvent(e); false }
+    }
+
+    /** 单击照片 → 全屏查看（可缩放、左右切换）。 */
+    private fun openViewer(list: List<Photo>, index: Int) {
+        CrashGuard.safe(this, "预览失败") {
+            if (list.isEmpty()) return
+            PhotoViewer(this, list, index.coerceIn(0, list.size - 1)) { p ->
+                trashPhotos(listOf(p))
+            }.show()
+        }
+    }
+
     private fun preview(p: Photo) {
         CrashGuard.safe(this, "预览失败") { previewInner(p) }
     }
