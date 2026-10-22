@@ -198,56 +198,73 @@ object Ui {
      * @param pick    把某一下标加入选中
      * @param changed 选中集合变化后刷新界面
      */
+    /**
+     * 滑动多选。
+     *
+     * **多选模式下拦截全部触摸**（返回 true）：
+     * 这样可以同时屏蔽掉单击打开全屏、长按弹菜单、列表滚动，
+     * 让"点击选中 / 滑动批量选中"成为多选态下唯一的手势。
+     *
+     * - 按下即记录起点，抬手时若未发生跨项移动 → 视为单击，切换该项选中
+     * - 移动过程中每划过一项 → 追加选中（只增不减，符合扫过一片的直觉）
+     *
+     * @param toggle 单击切换（用于取消已选项）
+     * @param pick   滑动划过时追加选中
+     */
     fun swipeSelect(
         rv: RecyclerView,
         isSelectMode: () -> Boolean,
         pick: (Int) -> Unit,
+        toggle: (Int) -> Unit,
         changed: () -> Unit,
     ) {
-        var swiping = false
         var lastPos = -1
-        val autoScroll = Runnable {
-            CrashGuard.guard { /* 由外层 post 驱动 */ }
-        }
+        var moved = false
         val touch = object : RecyclerView.OnItemTouchListener {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: android.view.MotionEvent): Boolean {
                 if (!isSelectMode()) return false
                 when (e.actionMasked) {
                     android.view.MotionEvent.ACTION_DOWN -> {
-                        rv.parent?.requestDisallowInterceptTouchEvent(true)
-                        swiping = true
+                        // 阻止父容器与 RecyclerView 自身滚动
+                        rv.requestDisallowInterceptTouchEvent(true)
                         lastPos = hitTest(rv, e.x, e.y)
-                        if (lastPos >= 0) { pick(lastPos); changed() }
+                        moved = false
                     }
                     android.view.MotionEvent.ACTION_MOVE -> {
                         val pos = hitTest(rv, e.x, e.y)
                         if (pos >= 0 && pos != lastPos) {
+                            moved = true
                             lastPos = pos
                             pick(pos)
                             changed()
                         }
-                        // 边缘自动滚动
+                        // 划到上下边缘时自动滚动，便于连续选择
                         val h = rv.height
-                        val edge = 60
+                        val edge = 72
                         when {
-                            e.y < edge -> rv.scrollBy(0, -24)
-                            e.y > h - edge -> rv.scrollBy(0, 24)
+                            e.y < edge -> rv.scrollBy(0, -20)
+                            e.y > h - edge -> rv.scrollBy(0, 20)
                         }
                     }
-                    android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
-                        swiping = false
-                        lastPos = -1
-                        rv.parent?.requestDisallowInterceptTouchEvent(false)
+                    android.view.MotionEvent.ACTION_UP -> {
+                        if (!moved && lastPos >= 0) { toggle(lastPos); changed() }
+                        finish()
                     }
+                    android.view.MotionEvent.ACTION_CANCEL -> finish()
                 }
-                return false   // 不拦截，保证单击 / 长按仍能正常触发
+                return true     // 拦截：屏蔽单击 / 长按 / 滚动
+            }
+
+            private fun finish() {
+                lastPos = -1
+                moved = false
+                rv.requestDisallowInterceptTouchEvent(false)
             }
 
             override fun onTouchEvent(rv: RecyclerView, e: android.view.MotionEvent) {}
             override fun onRequestDisallowInterceptTouchEvent(b: Boolean) {}
         }
         rv.addOnItemTouchListener(touch)
-        autoScroll.run()
     }
 
     /** 按坐标反查列表项下标。 */
