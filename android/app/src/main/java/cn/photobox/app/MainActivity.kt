@@ -102,7 +102,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.7.1"
+        const val APP_VERSION = "1.7.2"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
@@ -603,9 +603,12 @@ class MainActivity : Activity() {
                 if (on) View.VISIBLE else View.GONE
         }
         val n = sel.size
+        // 进入多选就显示操作条：0 项时也要能看到「退出」，否则界面毫无反馈
+        val on = photoAdapter?.selectMode == true
         v.findViewById<LinearLayout>(R.id.selBar)?.visibility =
-            if (photoAdapter?.selectMode == true && n > 0) View.VISIBLE else View.GONE
-        v.findViewById<TextView>(R.id.selText)?.text = "已选 $n 项"
+            if (on) View.VISIBLE else View.GONE
+        v.findViewById<TextView>(R.id.selText)?.text =
+            if (n > 0) "已选 $n 项" else "点击或滑动选择"
         v.findViewById<Button>(R.id.btnRename)?.visibility =
             if (n == 1) View.VISIBLE else View.GONE
     }
