@@ -50,18 +50,16 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
-> Task :app:processReleaseManifestForPackage
 > Task :app:bundleReleaseResources
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
+> Task :app:processReleaseManifestForPackage
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
 > Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin FAILED
 e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:431:25 'return' is not allowed here
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:462:17 Cannot find a parameter with this name: toggle
-e: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:462:28 Cannot infer a type for this parameter. Please specify it explicitly.
 
 FAILURE: Build failed with an exception.
 
@@ -269,5 +267,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 56s
+BUILD FAILED in 54s
 30 actionable tasks: 30 executed
