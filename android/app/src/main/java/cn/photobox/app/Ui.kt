@@ -245,15 +245,15 @@ object Ui {
             }
         }
 
-        fun onUp() {
-            if (!moved && lastPos >= 0) { toggle(lastPos); changed() }
-            finish()
-        }
-
         fun finish() {
             lastPos = -1
             moved = false
             rv.requestDisallowInterceptTouchEvent(false)
+        }
+
+        fun onUp() {
+            if (!moved && lastPos >= 0) { toggle(lastPos); changed() }
+            finish()
         }
 
         val touch = object : RecyclerView.OnItemTouchListener {
