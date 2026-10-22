@@ -102,7 +102,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.7.2"
+        const val APP_VERSION = "1.8.0"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
@@ -509,7 +509,11 @@ class MainActivity : Activity() {
         v.findViewById<Button>(R.id.btnSelExit)?.setOnClickListener { CrashGuard.guard { exitSelect() } }
         v.findViewById<Button>(R.id.btnFav)?.setOnClickListener { CrashGuard.guard { selFav() } }
         v.findViewById<Button>(R.id.btnMove)?.setOnClickListener { CrashGuard.guard { selMove() } }
-        v.findViewById<Button>(R.id.btnRename)?.setOnClickListener { CrashGuard.guard { selRename() } }
+        v.findViewById<Button>(R.id.btnRename)?.setOnClickListener {
+            CrashGuard.guard {
+                if ((photoAdapter?.selected?.size ?: 0) > 1) selRenameBatch() else selRename()
+            }
+        }
         v.findViewById<Button>(R.id.btnDelete)?.setOnClickListener { CrashGuard.guard { selDelete() } }
 
         styleButtons(v)
@@ -572,10 +576,14 @@ class MainActivity : Activity() {
         chipAdapter?.submit(data.map { it.month }.distinct().sortedDescending(), month)
 
         val sel = photoAdapter?.selected?.size ?: 0
-        val mode = photoAdapter?.selectMode == true && sel > 0
-        selBar?.visibility = if (mode) View.VISIBLE else View.GONE
-        selText?.text = "已选 $sel 项"
-        btnRename?.visibility = if (sel == 1) View.VISIBLE else View.GONE
+        val on = photoAdapter?.selectMode == true
+        // 进入多选即显示操作条，0 项时也能看到「退出」，否则界面毫无反馈
+        selBar?.visibility = if (on) View.VISIBLE else View.GONE
+        selText?.text = if (sel > 0) "已选 $sel 项" else "点击或滑动选择"
+        btnRename?.apply {
+            visibility = if (sel >= 1) View.VISIBLE else View.GONE
+            text = if (sel > 1) "重命名($sel)" else "重命名"
+        }
 
         tip?.text = when {
             photos.isEmpty() -> "暂无照片，可在设置里重新扫描，或先授予照片权限"
@@ -609,8 +617,11 @@ class MainActivity : Activity() {
             if (on) View.VISIBLE else View.GONE
         v.findViewById<TextView>(R.id.selText)?.text =
             if (n > 0) "已选 $n 项" else "点击或滑动选择"
-        v.findViewById<Button>(R.id.btnRename)?.visibility =
-            if (n == 1) View.VISIBLE else View.GONE
+        // 单选走单张重命名，多选走批量重命名（五种模式）
+        v.findViewById<Button>(R.id.btnRename)?.apply {
+            visibility = if (n >= 1) View.VISIBLE else View.GONE
+            text = if (n > 1) "重命名(${n})" else "重命名"
+        }
     }
 
     private fun toggleSelect(p: Photo) {
@@ -673,15 +684,145 @@ class MainActivity : Activity() {
             setPositiveButton("确定") { _, _ ->
                 val new = input.text.toString().trim()
                 if (new.isBlank()) return@setPositiveButton
-                val ext = p.name.substringAfterLast('.', "")
-                val cv = ContentValues().apply { put(MediaStore.Images.Media.DISPLAY_NAME, "$new.$ext") }
-                val ok = Ui.write(this@MainActivity, {
-                    contentResolver.update(Repo.uriOf(p), cv, null, null) > 0
-                }) { e -> requestDeleteConsent(e) }
+                val ok = Ui.write(this@MainActivity, { Repo.rename(this@MainActivity, p, new) }) { e ->
+                    requestDeleteConsent(e)
+                }
                 Ui.toast(this@MainActivity, if (ok) "已重命名" else "重命名失败，可能无权修改该文件")
                 if (ok) { exitSelect(); loadPhotos() }
             }
         }
+    }
+
+    /**
+     * 批量重命名：五种模式，按需选一种。
+     *
+     * 全部复用 [Ui.formDialog] 收集参数、复用 [Repo.rename] 写回，
+     * 五种模式共用同一套执行与刷新逻辑。
+     */
+    private fun selRenameBatch() {
+        val list = selectedPhotos()
+        if (list.isEmpty()) return
+        val modes = listOf("序号命名", "查找替换", "添加前后缀", "按拍摄日期", "删除指定文字")
+        Ui.listSheet(this, "批量重命名（${list.size} 张）", modes) { which ->
+            CrashGuard.guard {
+                when (which) {
+                    0 -> renameByIndex(list)
+                    1 -> renameByReplace(list)
+                    2 -> renameByAffix(list)
+                    3 -> renameByDate(list)
+                    4 -> renameByRemove(list)
+                }
+            }
+        }
+    }
+
+    /** 模式一：前缀 + 递增序号，可设起始号与位数。 */
+    private fun renameByIndex(list: List<Photo>) {
+        Ui.formDialog(
+            this, "序号命名",
+            listOf(
+                Ui.Field("前缀", "照片"),
+                Ui.Field("起始序号", "1"),
+                Ui.Field("序号位数（1~6）", "3"),
+            )
+        ) { v ->
+            CrashGuard.guard {
+                val pre = v[0].ifBlank { "照片" }
+                val start = v[1].toIntOrNull() ?: 1
+                val width = (v[2].toIntOrNull() ?: 3).coerceIn(1, 6)
+                val names = list.mapIndexed { i, _ ->
+                    "$pre${(start + i).toString().padStart(width, '0')}"
+                }
+                applyRename(list, names)
+            }
+        }
+    }
+
+    /** 模式二：把文件名里某段文字替换为另一段。 */
+    private fun renameByReplace(list: List<Photo>) {
+        Ui.formDialog(
+            this, "查找替换",
+            listOf(Ui.Field("查找", "IMG"), Ui.Field("替换为", "照片"))
+        ) { v ->
+            CrashGuard.guard {
+                if (v[0].isBlank()) { Ui.toast(this, "查找内容不能为空"); return@guard }
+                applyRename(list, list.map { it.baseName.replace(v[0], v[1]) })
+            }
+        }
+    }
+
+    /** 模式三：统一加前缀和/或后缀。 */
+    private fun renameByAffix(list: List<Photo>) {
+        Ui.formDialog(
+            this, "添加前后缀",
+            listOf(Ui.Field("前缀", ""), Ui.Field("后缀", ""))
+        ) { v ->
+            CrashGuard.guard {
+                if (v[0].isBlank() && v[1].isBlank()) {
+                    Ui.toast(this, "前缀与后缀不能同时为空"); return@guard
+                }
+                applyRename(list, list.map { "${v[0]}${it.baseName}${v[1]}" })
+            }
+        }
+    }
+
+    /** 模式四：用拍摄时间命名，天然按时间排序且不重复。 */
+    private fun renameByDate(list: List<Photo>) {
+        Ui.formDialog(
+            this, "按拍摄日期",
+            listOf(Ui.Field("前缀（可留空）", ""), Ui.Field("是否带时间", "1", "1=带时分秒 0=只要日期"))
+        ) { v ->
+            CrashGuard.guard {
+                val pre = v[0]
+                val withTime = v[1] != "0"
+                val fmt = java.text.SimpleDateFormat(
+                    if (withTime) "yyyyMMdd_HHmmss" else "yyyyMMdd",
+                    java.util.Locale.getDefault()
+                )
+                val names = ArrayList<String>()
+                list.forEachIndexed { i, p ->
+                    val base = fmt.format(java.util.Date(p.dateSec * 1000))
+                    // 同一秒拍的多张会重名，追加下标区分
+                    names.add(if (withTime) "$pre$base" else "${pre}${base}_${i + 1}")
+                }
+                applyRename(list, names)
+            }
+        }
+    }
+
+    /** 模式五：删除文件名中的指定文字。 */
+    private fun renameByRemove(list: List<Photo>) {
+        Ui.formDialog(
+            this, "删除指定文字",
+            listOf(Ui.Field("要删除的文字", "IMG_"))
+        ) { v ->
+            CrashGuard.guard {
+                if (v[0].isBlank()) { Ui.toast(this, "请输入要删除的文字"); return@guard }
+                applyRename(list, list.map { it.baseName.replace(v[0], "") })
+            }
+        }
+    }
+
+    /**
+     * 统一的重命名执行与刷新——五种模式共用。
+     * 逐张写入，失败的不中断，最后汇报成功数。
+     */
+    private fun applyRename(list: List<Photo>, names: List<String>) {
+        Ui.async(this, io = {
+            var n = 0
+            list.forEachIndexed { i, p ->
+                val new = names.getOrNull(i) ?: return@forEachIndexed
+                if (new.isBlank() || new == p.baseName) return@forEachIndexed
+                val ok = Ui.write(this@MainActivity, { Repo.rename(this@MainActivity, p, new) }) { e ->
+                    Ui.main { requestDeleteConsent(e) }
+                }
+                if (ok) n++
+            }
+            n
+        }, ui = { n ->
+            Ui.toast(this, "已重命名 $n / ${list.size} 张")
+            exitSelect(); loadPhotos()
+        })
     }
 
     private fun selDelete() { confirmDelete(selectedPhotos()) }
