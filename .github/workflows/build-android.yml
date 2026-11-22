@@ -1,9 +1,14 @@
 name: 构建安卓 APK（原生 Kotlin）
 
+# 只保留手动触发：push 触发会让「推送多个文件」产生多个并发构建，
+# 互相覆盖 apk/ 目录，导致下载到的包是旧版本。
 on:
   workflow_dispatch:
-  push:
-    paths: [ "android/**" ]
+
+# 双保险：同一时间只允许一个构建运行
+concurrency:
+  group: android-apk-build
+  cancel-in-progress: false
 
 permissions:
   contents: write
