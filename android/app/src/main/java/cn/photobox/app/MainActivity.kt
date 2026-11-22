@@ -72,6 +72,13 @@ class MainActivity : Activity() {
     fun cardDoneIds(): Set<Long> = cardDone
     private var tab = 0                  // 0 图库 1 卡片 2 设置 3 回收站 4 查重
 
+    /**
+     * 侧滑退出两段式状态。
+     * false = 尚未执行"第一下"；true = 已归位到主页，等待第二下退出。
+     * 用户主动点底部导航切换页面时重置，保证"第一下"总是指最近一次侧滑归位。
+     */
+    private var backArmed = false
+
     private var root: View? = null
     private var sidebar: View? = null
     private var libraryView: View? = null
@@ -102,7 +109,7 @@ class MainActivity : Activity() {
             R.drawable.ic_sort_name,
             R.drawable.ic_sort_size,
         )
-        const val APP_VERSION = "1.8.0"
+        const val APP_VERSION = "1.8.1"
         const val REQ_PICK_BG = 9011
         const val KEY_ALL = "\u0000all"
         const val KEY_FAV = "\u0000fav"
@@ -147,6 +154,49 @@ class MainActivity : Activity() {
 
         bindNav()
         applyBars()
+    }
+
+    /**
+     * 边缘侧滑 / 返回键：两段式退出。
+     *
+     * 第一下 → 回到应用主页（图库）；第二下 → 真正退出到系统桌面。
+     * 优先级从高到低：关闭全屏查看器 → 退出多选 → 回主页 → 退出应用。
+     *
+     * Android 13+ 默认启用预测式返回（OnBackInvoked）会让 onBackPressed
+     * 不再被调用，因此 manifest 中显式 opt-out，全部版本统一走这一套逻辑，
+     * 边缘手势与实体返回键行为一致。
+     */
+    override fun onBackPressed() {
+        CrashGuard.guard {
+            // 1. 全屏查看器打开时，先关查看器
+            val host = findViewById<FrameLayout>(R.id.viewerHost)
+            if (host != null) {
+                (host.parent as? android.view.ViewGroup)?.removeView(host)
+                return@guard
+            }
+            // 2. 多选态先退出多选，不直接回主页
+            //    加 tab==0 限定：切到别的页面后 photoAdapter 仍持有旧实例，
+            //    残留的 selectMode 不该拦住"回主页"这一段。
+            if (tab == 0 && photoAdapter?.selectMode == true) {
+                exitSelect()
+                return@guard
+            }
+            // 3. 第一下：从任意页面归位到图库主页
+            if (tab != 0) {
+                switchTab(0)
+                backArmed = true          // switchTabInner 会清掉，这里补回
+                Ui.toast(this@MainActivity, "已回到图库，再侧滑一次退出")
+                return@guard
+            }
+            // 4. 已在主页：第一下只提示，第二下才退出
+            if (!backArmed) {
+                backArmed = true
+                Ui.toast(this@MainActivity, "再侧滑一次退出")
+                return@guard
+            }
+            backArmed = false
+            finish()                      // 退出到系统桌面
+        }
     }
 
     /** 底栏三个按钮：自绘图标 + 文字，选中态用强调色。 */
@@ -363,6 +413,7 @@ class MainActivity : Activity() {
     }
 
     private fun switchTabInner(t: Int) {
+        if (tab != t) backArmed = false   // 主动切页：侧滑计数重新开始
         if (tab == 1 && t != 1) { CardsPage.resetSession(); resetCardSession() }
         tab = t
         val holder = findViewById<FrameLayout>(R.id.content) ?: return
