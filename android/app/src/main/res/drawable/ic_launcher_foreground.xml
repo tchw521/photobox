@@ -1,9 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  启动图标前景（自适应图标 foreground 层）。
+
+  构图：两张错落叠放的拍立得照片 + 一枚闪光。
+  用「半透明玻璃后层 / 白色主卡 / 投影 / 顶部高光」四层叠加做质感，
+  不依赖 aapt:attr 渐变或主题属性，兼容性最稳。
+
+  自适应图标安全区：以 (54,54) 为圆心、半径 33dp 的圆内必须放得下主体。
+  主卡片四角到中心约 28.8dp，留有余量，圆形/方形/水滴遮罩都不会切到内容。
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <!-- 启动图标：圆角底 + 照片意象（山与太阳） -->
-    <path android:fillColor="#C084FC" android:pathData="M26,30h56c2.2,0 4,1.8 4,4v44c0,2.2 -1.8,4 -4,4H26c-2.2,0 -4,-1.8 -4,-4V34c0,-2.2 1.8,-4 4,-4zM26,36v40h56V36z"/>
-    <path android:fillColor="#F7F3FF"
-        android:pathData="M32,70l14,-17 10.5,12.5 8.5,-9.5 12.5,14z"/>
-    <path android:fillColor="#F7F3FF"
-        android:pathData="M64,46m-5,0a5,5 0 1,0 10,0a5,5 0 1,0 -10,0"/>
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+
+    <!-- 后层照片：右上错位露出，半透明玻璃感 -->
+    <group android:rotation="8" android:pivotX="56" android:pivotY="50">
+        <path android:fillColor="#4DFFFFFF"
+            android:pathData="M45,30 L67,30 Q76,30 76,39 L76,61 Q76,70 67,70 L45,70 Q36,70 36,61 L36,39 Q36,30 45,30 Z"/>
+        <path android:strokeColor="#80FFFFFF" android:strokeWidth="1"
+            android:fillColor="#00000000"
+            android:pathData="M45,30 L67,30 Q76,30 76,39 L76,61 Q76,70 67,70 L45,70 Q36,70 36,61 L36,39 Q36,30 45,30 Z"/>
+    </group>
+
+    <!-- 主卡片投影：下移 3dp，制造悬浮层次 -->
+    <path android:fillColor="#2E1A0A3A"
+        android:pathData="M40,41 L64,41 Q74,41 74,51 L74,75 Q74,85 64,85 L40,85 Q30,85 30,75 L30,51 Q30,41 40,41 Z"/>
+
+    <!-- 主卡片：纯白拍立得 -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M40,38 L64,38 Q74,38 74,48 L74,72 Q74,82 64,82 L40,82 Q30,82 30,72 L30,48 Q30,38 40,38 Z"/>
+
+    <!-- 画面里的暖阳：光晕与日轮同心且完全落在白卡内，不外溢 -->
+    <path android:fillColor="#2EFFB65C"
+        android:pathData="M57,53 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0"/>
+    <path android:fillColor="#FFC46B"
+        android:pathData="M57,53 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0"/>
+
+    <!-- 远山：浅紫，靠后 -->
+    <path android:fillColor="#B9A6FF"
+        android:pathData="M32,72 L44,58 L52,66 L62,55 L72,72 Z"/>
+    <!-- 近山：深紫，压出纵深 -->
+    <path android:fillColor="#7C5CFF"
+        android:pathData="M32,72 L42,64 L52,72 L62,61 L72,72 Z"/>
+
+    <!-- 左上角斜切高光：玻璃反光，避开日轮主体 -->
+    <path android:fillColor="#24FFFFFF"
+        android:pathData="M30,48 Q30,38 40,38 L56,38 L30,64 Z"/>
+
+    <!-- 闪光点缀：年轻感 -->
+    <path android:fillColor="#E6FFFFFF"
+        android:pathData="M73,25 L74.1,28.9 L78,30 L74.1,31.1 L73,35 L71.9,31.1 L68,30 L71.9,28.9 Z"/>
 </vector>
