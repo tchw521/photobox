@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 13+ 主题图标（themed icon）用的单色层。
+  全部用纯白，由系统按壁纸取色上色；只保留轮廓与最简意象，
+  避免大面积填充导致在浅色主题下糊成一团。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+
+    <!-- 后层卡片轮廓 -->
+    <group android:rotation="8" android:pivotX="56" android:pivotY="50">
+        <path android:strokeColor="#99FFFFFF" android:strokeWidth="2"
+            android:fillColor="#00000000"
+            android:pathData="M45,30 L67,30 Q76,30 76,39 L76,61 Q76,70 67,70 L45,70 Q36,70 36,61 L36,39 Q36,30 45,30 Z"/>
+    </group>
+
+    <!-- 主卡片轮廓 -->
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="2.6"
+        android:fillColor="#00000000"
+        android:pathData="M40,38 L64,38 Q74,38 74,48 L74,72 Q74,82 64,82 L40,82 Q30,82 30,72 L30,48 Q30,38 40,38 Z"/>
+
+    <!-- 日轮 -->
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M57,52 m-5.5,0 a5.5,5.5 0 1,0 11,0 a5.5,5.5 0 1,0 -11,0"/>
+
+    <!-- 山 -->
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M33,71 L44,59 L52,67 L62,57 L71,71 Z"/>
+</vector>
