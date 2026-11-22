@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
 
+    <!-- Android 13+ 预测式返回会绕过 onBackPressed，显式关闭以保证两段式侧滑生效 -->
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -15,6 +16,7 @@
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
         android:largeHeap="false"
+        android:enableOnBackInvokedCallback="false"
         android:theme="@android:style/Theme.Material.NoActionBar">
 
         <activity
