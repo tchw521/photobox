@@ -12,6 +12,7 @@ For more details see https://docs.gradle.org/8.5/release-notes.html
 
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
 Checking the license for package Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/licenses
 License for package Android SDK Build-Tools 33.0.1 accepted.
 Preparing "Install Android SDK Build-Tools 33.0.1 v.33.0.1".
@@ -44,34 +45,34 @@ Installing Android SDK Build-Tools 33.0.1 in /usr/local/lib/android/sdk/build-to
 > Task :app:extractProguardFiles
 > Task :app:mergeReleaseArtProfile
 > Task :app:mergeReleaseShaders
+> Task :app:processReleaseManifestForPackage
 > Task :app:compileReleaseShaders NO-SOURCE
 > Task :app:generateReleaseAssets UP-TO-DATE
 > Task :app:mergeReleaseAssets
 > Task :app:compressReleaseAssets
 > Task :app:processApplicationManifestReleaseForBundle
 > Task :app:collectReleaseDependencies
+> Task :app:processReleaseResources
+> Task :app:bundleReleaseResources
 > Task :app:sdkReleaseDependencyData
 > Task :app:validateSigningRelease
 > Task :app:writeReleaseAppMetadata
 > Task :app:writeReleaseSigningConfigVersions
-> Task :app:bundleReleaseResources
-> Task :app:processReleaseManifestForPackage
-> Task :app:processReleaseResources
 
 > Task :app:compileReleaseKotlin
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Adapters.kt:250:24 No cast needed
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/CardsPage.kt:421:22 Variable 'ok' initializer is redundant
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:175:17 Variable 'tv' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:219:34 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:220:38 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:221:43 'SYSTEM_UI_FLAG_LIGHT_STATUS_BAR: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:224:34 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:225:38 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:226:43 'SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR: Int' is deprecated. Deprecated in Java
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:339:13 Variable 's' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:414:13 Variable 'selBar' is never used
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:427:25 Parameter 'p' is never used, could be renamed to _
-w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:974:26 Variable 'ok' initializer is redundant
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:225:17 Variable 'tv' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:269:34 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:270:38 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:271:43 'SYSTEM_UI_FLAG_LIGHT_STATUS_BAR: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:274:34 'setter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:275:38 'getter for systemUiVisibility: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:276:43 'SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR: Int' is deprecated. Deprecated in Java
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:389:13 Variable 's' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:465:13 Variable 'selBar' is never used
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:478:25 Parameter 'p' is never used, could be renamed to _
+w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/MainActivity.kt:1025:26 Variable 'ok' initializer is redundant
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Repo.kt:287:20 Parameter 'c' is never used
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/SkinPage.kt:221:21 Name shadowed: it
 w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photobox/app/Ui.kt:170:9 Parameter 'a' is never used
@@ -88,5 +89,5 @@ w: file:///home/runner/work/photobox/photobox/android/app/src/main/java/cn/photo
 > Task :app:createReleaseApkListingFileRedirect
 > Task :app:assembleRelease
 
-BUILD SUCCESSFUL in 1m 25s
+BUILD SUCCESSFUL in 1m 7s
 39 actionable tasks: 39 executed
