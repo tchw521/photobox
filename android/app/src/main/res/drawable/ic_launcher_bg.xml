@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  启动图标背景（自适应图标 background 层）。
+  线性渐变打底 + 径向光晕叠加，用 layer-list 组合出光源感，
+  比原来的纯深紫色更年轻、更有通透质感。
+  只使用 shape/gradient 这类编译期确定的资源，不依赖主题属性。
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="315"
+                android:startColor="#6D5BFF"
+                android:centerColor="#A855F7"
+                android:endColor="#FF6FB5" />
+        </shape>
+    </item>
+    <!-- 左上角环境光：让渐变有方向感，而不是平铺色块 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:centerX="0.22"
+                android:centerY="0.16"
+                android:gradientRadius="82dp"
+                android:startColor="#66FFFFFF"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+    <!-- 右下角冷色补光，压住粉色的甜腻感 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:centerX="0.86"
+                android:centerY="0.9"
+                android:gradientRadius="70dp"
+                android:startColor="#33436BFF"
+                android:endColor="#00436BFF" />
+        </shape>
+    </item>
+</layer-list>
